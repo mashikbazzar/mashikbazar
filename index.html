@@ -221,7 +221,7 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 
 <div id="admin-supplier" class="adminbox" style="display:none">
 <h3>🏪 পাইকারি দোকানদারের পাঠানো দাম</h3>
-<p class="small">দোকানদার দাম পাঠালে এখানে আসবে। দেখে <b>বসান</b> চাপলে সেটা পাইকারি দাম হয়ে যাবে, <b>বাতিল</b> চাপলে সরে যাবে।</p>
+<p class="small">দোকানদার দাম পাঠালে এখানে আসবে। দেখে <b>বসান</b> চাপলে সেটা পাইকারি দাম হয়ে যাবে — নাম/ব্র্যান্ড/একক বদলে পাঠালে সেটাও বসে যাবে (নামের বদল কাস্টমার দেখবে <b>প্রকাশ</b> করার পর), <b>বাতিল</b> চাপলে সরে যাবে।</p>
 <button class="primary" onclick="loadSupplierPrices()">🔄 রিফ্রেশ করুন</button>
 <div id="supplierPrices"></div>
 <h3 style="margin-top:18px">👥 নিবন্ধিত পাইকারি দোকানদার</h3>
@@ -771,18 +771,31 @@ async function loadSupplierPrices(){
   if(!rows.length){ el.innerHTML="<p>কোনো নতুন দাম আসেনি।</p>"; return; }
   el.innerHTML=rows.map(function(r){
     var d=new Date(r.created_at);
-    return '<div class="ordercard"><b>'+r.product_name+'</b> '+(r.brand||"")+'<br>দোকানদার: '+(r.supplier_name||"")+' • '+d.toLocaleDateString("bn-BD")+'<br><b>পাঠানো দাম: ৳'+bn(r.price)+' / '+(r.unit||"")+'</b><br><button class="gold" onclick="applySupplierPrice(\''+r.id+'\','+(r.product_id||'null')+',\''+r.product_name.replace(/'/g,"")+'\',\''+(r.brand||"").replace(/'/g,"")+'\',\''+(r.unit||"").replace(/'/g,"")+'\','+r.price+')">✅ এই দাম পাইকারি দামে বসান</button> <button class="danger" onclick="rejectSupplierPrice(\''+r.id+'\')">বাতিল</button></div>';
+    var cur=null; DATA.products.forEach(function(x){ if(x.id===r.product_id) cur=x; });
+    var diffs=[];
+    if(cur){
+      if(r.product_name && r.product_name!==cur.name) diffs.push('নাম: <b>'+r.product_name+'</b> (এখন: '+cur.name+')');
+      if((r.brand||"")!==(cur.brand||"")) diffs.push('ব্র্যান্ড: <b>'+(r.brand||"—")+'</b> (এখন: '+(cur.brand||"—")+')');
+      if(r.unit && r.unit!==cur.unit) diffs.push('একক: <b>'+r.unit+'</b> (এখন: '+cur.unit+')');
+    }
+    return '<div class="ordercard"><b>'+r.product_name+'</b> '+(r.brand||"")+'<br>দোকানদার: '+(r.supplier_name||"")+' • '+d.toLocaleDateString("bn-BD")+'<br><b>পাঠানো দাম: ৳'+bn(r.price)+' / '+(r.unit||"")+'</b>'+(diffs.length?('<br>'+diffs.join('<br>')):"")+'<br><button class="gold" onclick="applySupplierPrice(\''+r.id+'\','+(r.product_id||'null')+',\''+r.product_name.replace(/'/g,"")+'\',\''+(r.brand||"").replace(/'/g,"")+'\',\''+(r.unit||"").replace(/'/g,"")+'\','+r.price+')">✅ বসান (দাম + নাম/ব্র্যান্ড/একক)</button> <button class="danger" onclick="rejectSupplierPrice(\''+r.id+'\')">বাতিল</button></div>';
   }).join("");
 }
 async function applySupplierPrice(id, productId, productName, brand, unit, price){
   if(!sb) return;
   if(productId){
-    await sb.from("products").update({wholesale_price:price}).eq("id", productId);
-    DATA.products.forEach(function(p){ if(p.id===productId) p.wholesale_price=price; });
-    if(DRAFT) DRAFT.products.forEach(function(p){ if(p.id===productId) p.wholesale_price=price; });
+    var upd={};
+    if(price>0) upd.wholesale_price=price;
+    if(productName) upd.name=productName;
+    if(brand!==undefined) upd.brand=brand||"";
+    if(unit) upd.unit=unit;
+    await sb.from("products").update(upd).eq("id", productId);
+    var applyLocal=function(p){ if(price>0) p.wholesale_price=price; if(productName) p.name=productName; if(brand!==undefined) p.brand=brand||""; if(unit) p.unit=unit; };
+    DATA.products.forEach(function(p){ if(p.id===productId) applyLocal(p); });
+    if(DRAFT) DRAFT.products.forEach(function(p){ if(p.id===productId) applyLocal(p); });
   }
   await sb.from("supplier_prices").update({status:"applied"}).eq("id", id);
-  alert("বসানো হয়েছে: "+productName+" — পাইকারি দাম ৳"+price);
+  alert("বসানো হয়েছে: "+productName+" — পাইকারি দাম ৳"+price+"। নাম/ব্র্যান্ড/একক বদলে থাকলে তা কাস্টমার দেখবে প্রকাশ করার পর।");
   loadSupplierPrices(); renderShop();
 }
 async function loadSuppliers(){

@@ -69,7 +69,7 @@ Chrome-এর ⋮ মেনুতে 'Add to Home screen' না দেখাল
 <div id="appBox" style="display:none">
 <div class="card">
 <h2>👋 <span id="helloName"></span></h2>
-<p class="small">নিচের পণ্যগুলোর আজকের পাইকারি দাম বসিয়ে <b>পাঠান</b> চাপুন। দাম বাড়লে বা কমলে যেকোনো সময় আবার আপডেট করতে পারবেন — মাসিক বাজারের অ্যাডমিন সঙ্গে সঙ্গে দেখতে পাবে।</p>
+<p class="small">নিচের পণ্যগুলোর আজকের পাইকারি দাম বসিয়ে <b>পাঠান</b> চাপুন। দাম বাড়লে বা কমলে যেকোনো সময় আবার আপডেট করতে পারবেন। নাম, ব্র্যান্ড বা একক ভুল থাকলে ঠিক করে দিতে পারবেন — সেটা অ্যাডমিনের কাছে যাবে, অ্যাডমিন বসালে ঠিক হয়ে যাবে।</p>
 <button class="ghost" onclick="logout()">লগআউট</button>
 </div>
 
@@ -139,33 +139,50 @@ async function showApp(){
   var res = await sb.from("products").select("*").eq("active", true).order("sort_order");
   if(res.error){ document.getElementById("plist").innerHTML="<p>পণ্যের তালিকা আসেনি: "+res.error.message+"</p>"; return; }
   products=res.data||[];
+  var CAT_ORDER=["চাল ও আটা","তেল ও ঘি","মসলা","ডাল ও চিনি","সাবান ও পরিষ্কারক","ব্যক্তিগত যত্ন","চা ও পানীয়","নাস্তা","ঘরোয়া সামগ্রী","অন্যান্য"];
+  products.sort(function(a,b){ var ia=CAT_ORDER.indexOf(a.category); if(ia<0) ia=99; var ib=CAT_ORDER.indexOf(b.category); if(ib<0) ib=99; if(ia!==ib) return ia-ib; return (a.sort_order||0)-(b.sort_order||0); });
   renderProducts(); loadMySubs();
 }
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+var changedMeta={};
+function markMeta(id, field, val){ if(!changedMeta[id]) changedMeta[id]={}; changedMeta[id][field]=val; }
 function renderProducts(){
   var q=(document.getElementById("q").value||"").trim();
   var list=products.filter(function(p){ return !q||p.name.indexOf(q)>=0||(p.brand||"").indexOf(q)>=0||p.category.indexOf(q)>=0; });
   document.getElementById("plist").innerHTML=list.map(function(p){
     var cur = (changed[p.id]!==undefined)? changed[p.id] : (p.wholesale_price||"");
-    return '<div class="row"><div class="n"><b>'+p.name+'</b> <span style="color:#666">'+(p.brand||"")+' • '+p.category+'</span><br><span class="small">বিক্রি দাম: ৳'+bn(p.selling_price)+' / '+p.unit+' • এখনকার পাইকারি দাম: '+(p.wholesale_price?("৳"+bn(p.wholesale_price)):"—")+'</span></div><div style="width:130px"><label class="small">নতুন পাইকারি দাম (৳)</label><input type="number" min="0" value="'+cur+'" onchange="markChanged('+p.id+',this.value)"></div></div>';
+    var m = changedMeta[p.id]||{};
+    var nm = (m.name!==undefined)? m.name : p.name;
+    var br = (m.brand!==undefined)? m.brand : (p.brand||"");
+    var un = (m.unit!==undefined)? m.unit : p.unit;
+    return '<div class="row"><div class="n"><label class="small">পণ্যের নাম</label><input value="'+esc(nm)+'" onchange="markMeta('+p.id+',\'name\',this.value)"><label class="small">ব্র্যান্ড</label><input value="'+esc(br)+'" onchange="markMeta('+p.id+',\'brand\',this.value)"><div style="display:flex;gap:8px"><div style="flex:1"><label class="small">পরিমাণ / একক</label><input value="'+esc(un)+'" onchange="markMeta('+p.id+',\'unit\',this.value)"></div><div style="flex:1"><label class="small">এখনকার পাইকারি দাম</label><div class="price">'+(p.wholesale_price?("৳"+bn(p.wholesale_price)):"—")+'</div></div></div></div><div style="width:120px"><label class="small">নতুন পাইকারি দাম (৳)</label><input type="number" min="0" value="'+cur+'" onchange="markChanged('+p.id+',this.value)"></div></div>';
   }).join("")||"<p>কোনো পণ্য পাওয়া যায়নি।</p>";
 }
 function markChanged(id, val){ changed[id]=parseFloat(val)||0; }
 async function submitPrice(productId, productName, brand, unit, price){
-  if(!price || price<=0) return false;
+  if(price===undefined || price===null) return false;
   var res = await sb.from("supplier_prices").insert([{supplier_id:supplier.id, supplier_name:supplier.name, product_id:productId, product_name:productName, brand:brand||"", unit:unit||"", price:price, status:"pending"}]);
   return !res.error;
 }
 async function submitAllChanged(){
   var msg=document.getElementById("sendMsg");
-  var ids=Object.keys(changed); if(!ids.length){ msg.textContent="কোনো দাম বদলাননি — প্রথমে দাম লিখুন।"; return; }
+  var idMap={};
+  Object.keys(changed).forEach(function(k){ idMap[k]=1; });
+  Object.keys(changedMeta).forEach(function(k){ idMap[k]=1; });
+  var ids=Object.keys(idMap); if(!ids.length){ msg.textContent="কিছু বদলাননি — প্রথমে দাম লিখুন বা নাম/ব্র্যান্ড/একক ঠিক করুন।"; return; }
   msg.textContent="পাঠানো হচ্ছে…";
   var ok=0, fail=0;
   for(var i=0;i<ids.length;i++){
     var p=null; products.forEach(function(x){ if(String(x.id)===String(ids[i])) p=x; }); if(!p) continue;
-    var done = await submitPrice(p.id, p.name, p.brand, p.unit, changed[p.id]);
+    var m=changedMeta[p.id]||{};
+    var nm=(m.name!==undefined)?m.name:p.name;
+    var br=(m.brand!==undefined)?m.brand:(p.brand||"");
+    var un=(m.unit!==undefined)?m.unit:p.unit;
+    var price=(changed[p.id]!==undefined)?changed[p.id]:(p.wholesale_price||0);
+    var done = await submitPrice(p.id, nm, br, un, price);
     if(done) ok++; else fail++;
   }
-  changed={};
+  changed={}; changedMeta={};
   msg.textContent = ok? ("✅ "+bn(ok)+"টি দাম পাঠানো হয়েছে। অ্যাডমিন দেখে পাইকারি দামে বসাবে।") : "পাঠানো যায়নি — আবার চেষ্টা করুন।";
   if(fail) msg.textContent += " ("+bn(fail)+"টি পাঠানো যায়নি।)";
   renderProducts(); loadMySubs();
