@@ -44,6 +44,18 @@ header p{margin:4px 0;color:#e8f5ee}
 .vrow:last-child{border-bottom:0}
 .vrow input,.vrow select{padding:7px;font-size:14px;margin:0}
 .vrow button{padding:6px 8px;flex:none}
+.pcard{background:#fff;border:1px solid #e8e8e8;border-radius:16px;padding:14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.06);cursor:pointer}
+.pcard b{font-size:18px}
+.pcat{display:inline-block;background:#e8f5ee;color:#065f46;border-radius:999px;padding:2px 10px;font-size:13px;margin-left:8px}
+.pbrands{display:block;color:#555;font-size:15px;margin-top:6px}
+.pacts{display:flex;gap:6px;margin-top:10px}
+.pacts button{padding:8px 12px;font-size:15px}
+.vcard{background:#fff;border:1px solid #e8e8e8;border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.vcard label{font-size:14px;color:#065f46;font-weight:700}
+.vrow2{display:flex;gap:8px}
+.vrow2>div{flex:1;min-width:0}
+.vacts{display:flex;gap:6px;margin-top:8px}
+.vacts button{padding:8px 12px;font-size:15px}
 .arow .n{flex:1;min-width:0}
 .arow input,.arow select{padding:7px;font-size:14px;margin:2px 0}
 .arow .mini{display:flex;gap:4px;align-items:center}
@@ -168,7 +180,7 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 
 <div id="admin-products" class="adminbox">
 <h3>🛍️ পণ্যের লিস্ট ও সিরিয়াল</h3>
-<p class="small">সিরিয়াল লিস্ট — নাম, ব্র্যান্ড, খুচরা দাম, পাইকারি দাম, একক — সব ঘরেই সরাসরি লেখা যায়। সিরিয়াল বদলাতে <b>↑ ↓</b> চাপুন বা নাম ধরে টেনে নিন।</p>
+<p class="small">পণ্যের কার্ডে চাপ দিলেই সেটা খুলবে — নাম, ব্র্যান্ড, দাম, একক বদলান। সিরিয়াল বদলাতে কার্ডের <b>↑ ওপরে / ↓ নিচে</b> চাপুন।</p>
 <div class="adminbox" style="margin-bottom:10px">
 <b>💰 লাভের হার দিয়ে সব দাম একসাথে বসান</b><br>
 <label class="small">লাভের হার (%)</label>
@@ -440,26 +452,73 @@ function applyMargin(){
 function saveToken(){ localStorage.setItem("mb-gh-token", document.getElementById("ghToken").value.trim()); }
 var draggedId=null;
 function groupNameA(gid){ var p=null; DRAFT.products.forEach(function(x){ if(x.id===gid) p=x; }); return p?p.name:""; }
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+var editGroupId=null;
+var adminProdCat="সব";
+function adminGroups(){
+  var map={}, out=[];
+  DRAFT.products.forEach(function(p){
+    if(!map[p.name]){ map[p.name]={gid:p.id, name:p.name, category:p.category, vars:[]}; out.push(map[p.name]); }
+    map[p.name].vars.push(p);
+  });
+  return out;
+}
 function renderAdminProducts(){
+  var el=document.getElementById("adminProducts"); if(!el) return;
+  var groups=adminGroups();
+  if(editGroupId!==null){
+    var g=null; groups.forEach(function(x){ if(x.gid===editGroupId) g=x; });
+    if(g){ el.innerHTML=renderGroupEdit(g); return; }
+    editGroupId=null;
+  }
   var q=(document.getElementById("adminQ").value||"").trim();
-  var seen={}, gids=[];
-  DRAFT.products.forEach(function(p){ if(!seen[p.name]){ seen[p.name]=true; gids.push(p.id); } });
-  var ghtml=gids.filter(function(gid){
-    if(!q) return true;
-    var name=groupNameA(gid);
-    if(name.indexOf(q)>=0) return true;
-    return DRAFT.products.some(function(p){ return p.name===name && ((p.brand||"").indexOf(q)>=0); });
-  }).map(function(gid, gi){
-    var name=groupNameA(gid);
-    var vars=DRAFT.products.filter(function(p){ return p.name===name; });
-    var cat0=vars[0].category;
-    var head='<div class="agroup"><div class="ghead"><b>'+bn(gi+1)+'.</b><div class="n"><div style="display:flex;gap:6px;align-items:center"><input style="flex:2;min-width:0" value="'+name.replace(/"/g,"&quot;")+'" onchange="renameGroup('+gid+',this.value)" placeholder="পণ্যের নাম"><select style="flex:1;min-width:0" onchange="setGroupCategory('+gid+',this.value)">'+CATS.map(function(c){ return '<option '+(c===cat0?'selected':'')+'>'+c+'</option>'; }).join("")+'</select><button class="ghost" style="padding:6px 10px" onclick="addVariant('+gid+')">＋ ব্র্যান্ড</button><button class="danger" style="padding:6px 9px" onclick="delGroup('+gid+')">'+(pendingDelGroup===gid?'নিশ্চিত?':'🗑️')+'</button></div><div class="small" style="margin-top:2px">'+bn(vars.length)+'টি ব্র্যান্ড</div></div><span style="display:flex;flex-direction:column;gap:4px"><button onclick="moveGroup('+gid+',-1)">↑</button><button onclick="moveGroup('+gid+',1)">↓</button></span></div>';
-    var rows=vars.map(function(p){
-      return '<div class="vrow"><input style="flex:1;min-width:0" value="'+(p.brand||"").replace(/"/g,"&quot;")+'" onchange="editProduct('+p.id+',\'brand\',this.value)" placeholder="ব্র্যান্ড"><input type="number" min="0" style="width:84px" value="'+p.price_taka+'" onchange="editProduct('+p.id+',\'price_taka\',this.value)" placeholder="খুচরা ৳"><input type="number" min="0" style="width:84px" value="'+(p.wholesale_price||0)+'" onchange="editProduct('+p.id+',\'wholesale_price\',this.value)" placeholder="পাইকারি ৳"><input style="width:70px" value="'+p.unit+'" onchange="editProduct('+p.id+',\'unit\',this.value)" placeholder="একক"><button onclick="moveVariant('+p.id+',-1)">↑</button><button onclick="moveVariant('+p.id+',1)">↓</button><button class="danger" style="padding:6px 9px" onclick="delProduct('+p.id+')">'+(pendingDelId===p.id?'নিশ্চিত?':'✕')+'</button></div>';
-    }).join("");
-    return head+rows+'</div>';
-  }).join("");
-  document.getElementById("adminProducts").innerHTML=ghtml||"<p>কোনো পণ্য পাওয়া যায়নি।</p>";
+  var list=groups.filter(function(g){
+    if(adminProdCat!=="সব"&&g.category!==adminProdCat) return false;
+    if(q){
+      if(g.name.indexOf(q)>=0) return true;
+      return g.vars.some(function(v){ return (v.brand||"").indexOf(q)>=0; });
+    }
+    return true;
+  });
+  var h='<div class="chips">'+CATS.map(function(c){ return '<button class="chip'+(adminProdCat===c?' on':'')+'" onclick="setAdminProdCat(\''+c+'\')">'+c+'</button>'; }).join("")+'</div>';
+  h+='<p class="small">মোট '+bn(groups.length)+'টি পণ্য • '+bn(DRAFT.products.length)+'টি ব্র্যান্ড — বদলাতে পণ্যের কার্ডে চাপ দিন।</p>';
+  h+=list.map(function(g){
+    var brands=g.vars.map(function(v){ return esc(v.brand||"সাধারণ")+" ৳"+bn(v.price_taka||0); }).join(" • ");
+    return '<div class="pcard" onclick="openGroupEdit('+g.gid+')"><div><b>'+esc(g.name)+'</b><span class="pcat">'+esc(g.category)+'</span></div><span class="pbrands">'+brands+'</span><div class="pacts"><button class="primary" onclick="event.stopPropagation();openGroupEdit('+g.gid+')">✏️ বদলান</button><button class="ghost" onclick="event.stopPropagation();moveGroup('+g.gid+',-1)">↑ ওপরে</button><button class="ghost" onclick="event.stopPropagation();moveGroup('+g.gid+',1)">↓ নিচে</button></div></div>';
+  }).join("")||"<p>কোনো পণ্য পাওয়া যায়নি।</p>";
+  el.innerHTML=h;
+}
+function setAdminProdCat(c){ adminProdCat=c; renderAdminProducts(); }
+function openGroupEdit(gid){ editGroupId=gid; renderAdminProducts(); }
+function closeGroupEdit(){
+  if(editGroupId!==null){
+    var name=groupNameA(editGroupId);
+    if(!name){ var id=editGroupId; editGroupId=null; doDelProduct(id); return; }
+  }
+  editGroupId=null; renderAdminProducts();
+}
+function renderGroupEdit(g){
+  var h='<button class="ghost" onclick="closeGroupEdit()">← পণ্যের তালিকা</button>';
+  h+='<h3>✏️ '+esc(g.name||"নতুন পণ্য")+'</h3>';
+  h+='<p class="small">যা বদলাবেন, তা সাথে সাথে সংরক্ষণ হবে। শেষে প্রকাশ ট্যাবে গিয়ে প্রকাশ করলেই কাস্টমার নতুন তথ্য দেখবে।</p>';
+  h+='<label>পণ্যের নাম</label><input value="'+esc(g.name)+'" onchange="renameGroup('+g.gid+',this.value)" placeholder="যেমন: সয়াবিন তেল">';
+  h+='<label>ক্যাটাগরি</label><select onchange="setGroupCategory('+g.gid+',this.value)">'+CATS.map(function(c){ return '<option '+(c===g.category?'selected':'')+'>'+c+'</option>'; }).join("")+'</select>';
+  h+='<h4>ব্র্যান্ড ও দাম</h4>';
+  g.vars.forEach(function(p){
+    h+='<div class="vcard">';
+    h+='<label>ব্র্যান্ডের নাম</label><input value="'+esc(p.brand||"")+'" onchange="editProduct('+p.id+',\'brand\',this.value)" placeholder="যেমন: তীর">';
+    h+='<div class="vrow2">';
+    h+='<div><label>খুচরা দাম (৳)</label><input type="number" min="0" value="'+(p.price_taka||0)+'" onchange="editProduct('+p.id+',\'price_taka\',this.value)"></div>';
+    h+='<div><label>পাইকারি দাম (৳)</label><input type="number" min="0" value="'+(p.wholesale_price||0)+'" onchange="editProduct('+p.id+',\'wholesale_price\',this.value)"></div>';
+    h+='<div><label>একক</label><input value="'+esc(p.unit||"")+'" onchange="editProduct('+p.id+',\'unit\',this.value)" placeholder="কেজি / লিটার"></div>';
+    h+='</div>';
+    h+='<div class="vacts"><button class="ghost" onclick="moveVariant('+p.id+',-1)">↑</button><button class="ghost" onclick="moveVariant('+p.id+',1)">↓</button><button class="danger" onclick="delProduct('+p.id+')">'+(pendingDelId===p.id?'নিশ্চিত?':'এই ব্র্যান্ডটি মুছুন')+'</button></div>';
+    h+='</div>';
+  });
+  h+='<button class="gold" onclick="addVariant('+g.gid+')">＋ ব্র্যান্ড যোগ করুন</button> ';
+  h+='<button class="danger" onclick="delGroup('+g.gid+')">'+(pendingDelGroup===g.gid?'নিশ্চিত? পণ্যটি মুছুন':'🗑️ পণ্যটি মুছুন')+'</button><br><br>';
+  h+='<button class="ghost" onclick="closeGroupEdit()">← পণ্যের তালিকায় ফিরুন</button>';
+  return h;
 }
 function renameGroup(gid, newName){
   var old=groupNameA(gid); if(!old||!newName||newName===old) return;
@@ -472,11 +531,12 @@ function setGroupCategory(gid, cat){
   recalcPackages(DRAFT); saveDraft(); renderAdminProducts();
 }
 function addVariant(gid){
-  var name=groupNameA(gid); if(!name) return;
+  var p0=null; DRAFT.products.forEach(function(x){ if(x.id===gid) p0=x; }); if(!p0) return;
+  var name=p0.name;
   var vars=DRAFT.products.filter(function(p){ return p.name===name; });
   var maxId=0; DRAFT.products.forEach(function(p){ if(p.id>maxId) maxId=p.id; });
   var lastIdx=DRAFT.products.indexOf(vars[vars.length-1]);
-  DRAFT.products.splice(lastIdx+1,0,{id:maxId+1, name:name, brand:"", category:vars[0].category, unit:vars[0].unit, price_taka:0, wholesale_price:0, daily:false});
+  DRAFT.products.splice(lastIdx+1,0,{id:maxId+1, name:name, brand:"", category:p0.category, unit:p0.unit, price_taka:0, wholesale_price:0, daily:false});
   saveDraft(); renderAdminProducts();
 }
 var pendingDelGroup=null, pendingDelGroupTimer=null;
@@ -552,16 +612,13 @@ function doDelProduct(id){
 }
 function addProduct(){
   var maxId=0; DRAFT.products.forEach(function(p){ if(p.id>maxId) maxId=p.id; });
-  var name=prompt("নতুন পণ্যের নাম লিখুন:"); if(!name) return;
-  var price=parseInt(prompt("দাম (টাকা) লিখুন:", "0")||"0",10)||0;
-  var unit=prompt("একক লিখুন (যেমন: কেজি / পিস / লিটার):", "পিস")||"পিস";
-  var brand=prompt("ব্র্যান্ড (না থাকলে খালি রাখুন):", "")||"";
-  var cat=prompt("ক্যাটাগরি লিখুন:", "অন্যান্য")||"অন্যান্য";
-  var newP={id:maxId+1, name:name, brand:brand, category:cat, unit:unit, price_taka:price, daily:false};
-  var lastIdx=-1; DRAFT.products.forEach(function(p,i){ if(p.name===name) lastIdx=i; });
-  if(lastIdx>=0) DRAFT.products.splice(lastIdx+1,0,newP); else DRAFT.products.unshift(newP);
-  if(CATS.indexOf(cat)<0) CATS.push(cat);
-  saveDraft(); renderAdminProducts();
+  var newP={id:maxId+1, name:"", brand:"", category:"অন্যান্য", unit:"কেজি", price_taka:0, wholesale_price:0, daily:false};
+  DRAFT.products.unshift(newP);
+  saveDraft();
+  editGroupId=newP.id;
+  renderAdminProducts();
+  var inp=document.querySelector('#adminProducts input');
+  if(inp) inp.focus();
 }
 function renderAdminPackages(){
   document.getElementById("adminPackages").innerHTML=DRAFT.packages.map(function(pkg){
