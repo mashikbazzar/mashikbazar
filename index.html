@@ -66,6 +66,12 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 <p><span id="companyTitle">নীড়</span> &nbsp;•&nbsp; মাসিক বাজারের সবকিছু, এক জায়গায়</p>
 </header>
 <div class="hero"><b>Fresh Groceries Delivered Fast</b><br><span id="heroCount">১৩৩টি পণ্য • ৩টি পরিবার প্যাকেজ • WhatsApp-এ অর্ডার</span></div>
+<div id="installBanner" style="display:none;background:#ffd970;color:#111;padding:14px 16px;text-align:center;border-bottom:3px solid #065f46">
+<b>📲 অ্যাপ হিসেবে হোম স্ক্রিনে যোগ করুন</b><br><span id="installText">এক ট্যাপে ফোনে অ্যাপের মতো রাখুন — পরে আর লিংক খুঁজতে হবে না।</span><br>
+<button class="primary" id="installBtn" style="margin-top:8px" onclick="doInstall()">হোম স্ক্রিনে যোগ করুন</button>
+<button style="background:none;border:0;font-size:18px;cursor:pointer" onclick="document.getElementById('installBanner').style.display='none'">✕</button>
+<div id="installSteps" style="display:none;text-align:left;background:#fff;border-radius:10px;padding:12px;margin-top:10px"></div>
+</div>
 <div class="wrap">
 
 <div id="tab-shop">
@@ -346,6 +352,28 @@ async function publish(){
 }
 document.getElementById("cname").addEventListener("input",renderCart);
 document.getElementById("cphone").addEventListener("input",renderCart);
+/* ---- Install as app ---- */
+var deferredPrompt=null;
+function isStandalone(){ return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone; }
+function inAppBrowser(){ var ua=navigator.userAgent||""; return /WhatsApp|FBAN|FBAV|Instagram|imo|Line|Viber|Telegram/i.test(ua); }
+window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); deferredPrompt=e; showInstallBanner(); });
+function showInstallBanner(){
+  if(isStandalone()) return;
+  var b=document.getElementById("installBanner"); if(!b) return;
+  b.style.display="block";
+  if(inAppBrowser()) document.getElementById("installText").textContent="আপনি WhatsApp / Messenger / IMO-এর ভেতরে আছেন — নিচের বোতাম চাপলে Chrome-এ খোলার ধাপ দেখাবে, সেখান থেকে এক ট্যাপে অ্যাপ হবে।";
+  else if(deferredPrompt) document.getElementById("installText").textContent="এক ট্যাপে ফোনে অ্যাপের মতো রাখুন — পরে আর লিংক খুঁজতে হবে না।";
+}
+function doInstall(){
+  var steps=document.getElementById("installSteps");
+  if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.then(function(){ deferredPrompt=null; }); return; }
+  var ua=navigator.userAgent||"";
+  var app = /WhatsApp/i.test(ua) ? "WhatsApp" : (/FBAN|FBAV/i.test(ua) ? "Messenger / Facebook" : (/imo/i.test(ua) ? "IMO" : "এই অ্যাপ"));
+  steps.style.display="block";
+  steps.innerHTML="<b>"+app+"-এর ভেতরে সরাসরি ইনস্টল হয় না — ২টা ধাপ:</b><br>১. ওপরে <b>⋮</b> (বা <b>•••</b>) চাপুন → <b>Open in Chrome</b> / <b>ব্রাউজারে খুলুন</b> চাপুন।<br>২. Chrome খুললে আবার <b>⋮</b> চাপুন → <b>Add to Home screen</b> → <b>Add</b> চাপুন।<br>ব্যস — মাসিক বাজার অ্যাপ ফোনের হোম স্ক্রিনে চলে আসবে, তারপর থেকে ওখান থেকেই পণ্য দেখে অর্ডার করা যাবে।";
+}
+if("serviceWorker" in navigator){ window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
+showInstallBanner();
 fetch("products.json").then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(j && j.products){ DATA=j; } renderShop(); renderCart(); }).catch(function(){ renderShop(); renderCart(); });
 renderShop(); renderCart();
 </script>
