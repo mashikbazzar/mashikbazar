@@ -485,7 +485,7 @@ function renderCart(){
   document.getElementById("grand").textContent=canSeePrices()?("৳"+bn(total+fee)):"—";
   document.getElementById("cartPriceNote").textContent=canSeePrices()?"":"🔑 দাম দেখতে লগইন করুন — আমার অর্ডার ট্যাবে লগইন করলে দাম দেখা যাবে। অর্ডার পাঠালে দোকান WhatsApp-এ দাম জানিয়ে দেবে।";
   document.getElementById("cartCount").textContent=cartTotals().n?("("+bn(cartTotals().n)+")"):"";
-  document.getElementById("ocode").textContent=code();
+  document.getElementById("ocode").textContent=cartTotals().n?code():"—";
   var name=document.getElementById("cname").value||"", phone=document.getElementById("cphone").value||"";
   var ca=document.getElementById("caddr"); if(ca && !ca.value){ try{ ca.value=localStorage.getItem("mb-addr")||""; }catch(e){} }
   var addr=ca?ca.value:"";
