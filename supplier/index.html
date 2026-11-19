@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>পাইকারি দাম পাঠান — মাসিক বাজার</title>
 <meta name="theme-color" content="#065f46">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="../icon.svg">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}
@@ -38,11 +40,17 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 <h1>🛒 মাসিক বাজার — পাইকারি দাম</h1>
 <p>পাইকারি দোকানদারদের জন্য — পণ্যের দাম পাঠান, মাসিক বাজার দেখবে</p>
 </header>
+<div id="installBanner" style="display:none;background:#d4a017;color:#111;text-align:center;padding:12px 14px;font-weight:700">
+📱 অ্যাপ হিসেবে হোম স্ক্রিনে যোগ করুন <button id="installBtn" style="background:#065f46;color:#fff;border:0;border-radius:8px;padding:8px 14px;font-size:15px;margin-left:8px" onclick="installApp()">হোম স্ক্রিনে যোগ করুন</button>
+</div>
+<div id="installHelp" style="display:none;background:#fff3cd;color:#7a5b00;text-align:center;padding:10px 14px;font-size:15px">
+WhatsApp/Messenger/IMO-র ভেতর থেকে ইন্সটল হবে না — ওপরে ⋮ চেপে 'Open in Chrome' করুন, তারপর ⋮ → 'Add to Home screen' চাপুন।
+</div>
 <div class="wrap">
 
 <div id="loginBox" class="card">
 <h2>🔐 লগইন করুন</h2>
-<p class="small">আপনার নাম, মোবাইল নম্বর আর ৪ সংখ্যার কোড দিন। কোডটা মাসিক বাজারের অ্যাডমিনের কাছ থেকে নেবেন। প্রথমবার এলে নাম-মোবাইল-কোড দিয়ে নিবন্ধন করুন।</p>
+<p class="small">আপনার নাম, মোবাইল নম্বর আর ৪ সংখ্যার কোড দিন। <b>কোডটা আপনিই প্রথমবার নিজে বসাবেন</b> — এটাই আপনার গোপন কোড (পাসওয়ার্ডের মতো), মনে রাখবেন। পরেরবার সেই কোড দিয়েই ঢুকবেন। অ্যাডমিনের কাছ থেকে কোড নিতে হয় না — তবে অ্যাডমিন আপনার নাম-মোবাইল দেখতে পাবে, আর চাইলে আপনার ঢোকা বন্ধ করতে পারবে।</p>
 <label>আপনার নাম (দোকানের নাম)</label><input id="supName" placeholder="যেমন: রহিম ট্রেডার্স">
 <label>মোবাইল নম্বর</label><input id="supPhone" placeholder="01XXXXXXXXX">
 <label>কোড (৪ সংখ্যা)</label><input id="supCode" type="password" inputmode="numeric" maxlength="6" placeholder="কোড লিখুন">
@@ -166,6 +174,17 @@ async function submitNewProduct(){
     loadMySubs();
   } else alert("পাঠানো যায়নি — আবার চেষ্টা করুন।");
 }
+var deferredPrompt=null;
+window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); deferredPrompt=e; document.getElementById("installBanner").style.display="block"; });
+function installApp(){ if(deferredPrompt){ deferredPrompt.prompt(); } else { document.getElementById("installHelp").style.display="block"; } }
+if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(function(){}); }
+(function(){
+  var ua=navigator.userAgent||"";
+  var inApp=/WhatsApp|FBAN|FBAV|Instagram|Messenger|Line\//i.test(ua);
+  if(inApp){ document.getElementById("installHelp").style.display="block"; }
+  else if(window.matchMedia("(display-mode: standalone)").matches){ /* already installed */ }
+  else { setTimeout(function(){ if(!deferredPrompt) document.getElementById("installBanner").style.display="block"; }, 1500); }
+})();
 async function loadMySubs(){
   var res = await sb.from("supplier_prices").select("*").eq("supplier_id", supplier.id).order("created_at", {ascending:false}).limit(30);
   var el=document.getElementById("mySubs");

@@ -145,6 +145,36 @@
       "daily": true
     },
     {
+      "id": 134,
+      "name": "আতপ চাল (পাইজাম)",
+      "brand": "",
+      "category": "চাল ও আটা",
+      "unit": "কেজি",
+      "price_taka": 70,
+      "wholesale_price": 0,
+      "daily": true
+    },
+    {
+      "id": 135,
+      "name": "চালের গুঁড়া",
+      "brand": "",
+      "category": "চাল ও আটা",
+      "unit": "কেজি",
+      "price_taka": 90,
+      "wholesale_price": 0,
+      "daily": true
+    },
+    {
+      "id": 136,
+      "name": "সাগু দানা",
+      "brand": "",
+      "category": "চাল ও আটা",
+      "unit": "৫০০ গ্রাম",
+      "price_taka": 60,
+      "wholesale_price": 0,
+      "daily": true
+    },
+    {
       "id": 3,
       "name": "সয়াবিন তেল",
       "brand": "তীর",
@@ -375,6 +405,36 @@
       "daily": true
     },
     {
+      "id": 137,
+      "name": "খেসারি ডাল",
+      "brand": "",
+      "category": "ডাল ও চিনি",
+      "unit": "কেজি",
+      "price_taka": 95,
+      "wholesale_price": 0,
+      "daily": true
+    },
+    {
+      "id": 138,
+      "name": "বেসন",
+      "brand": "",
+      "category": "ডাল ও চিনি",
+      "unit": "৫০০ গ্রাম",
+      "price_taka": 70,
+      "wholesale_price": 0,
+      "daily": true
+    },
+    {
+      "id": 139,
+      "name": "খেজুরের গুড়",
+      "brand": "",
+      "category": "ডাল ও চিনি",
+      "unit": "কেজি",
+      "price_taka": 260,
+      "wholesale_price": 0,
+      "daily": true
+    },
+    {
       "id": 7,
       "name": "হলুদ গুঁড়া",
       "brand": "",
@@ -561,6 +621,46 @@
       "category": "মসলা",
       "unit": "প্যাকেট",
       "price_taka": 50,
+      "wholesale_price": 0,
+      "daily": true
+    },
+    {
+      "id": 140,
+      "name": "গোলমরিচ গুঁড়া",
+      "brand": "",
+      "category": "মসলা",
+      "unit": "৫০ গ্রাম",
+      "price_taka": 110,
+      "wholesale_price": 0,
+      "daily": true
+    },
+    {
+      "id": 141,
+      "name": "সরিষা দানা",
+      "brand": "",
+      "category": "মসলা",
+      "unit": "২৫০ গ্রাম",
+      "price_taka": 90,
+      "wholesale_price": 0,
+      "daily": true
+    },
+    {
+      "id": 142,
+      "name": "মেথি",
+      "brand": "",
+      "category": "মসলা",
+      "unit": "১০০ গ্রাম",
+      "price_taka": 60,
+      "wholesale_price": 0,
+      "daily": true
+    },
+    {
+      "id": 143,
+      "name": "জায়ফল",
+      "brand": "",
+      "category": "মসলা",
+      "unit": "পিস",
+      "price_taka": 40,
       "wholesale_price": 0,
       "daily": true
     },
@@ -765,6 +865,56 @@
       "daily": true
     },
     {
+      "id": 155,
+      "name": "ফিনাইল",
+      "brand": "",
+      "category": "সাবান ও পরিষ্কারক",
+      "unit": "১ লিটার",
+      "price_taka": 120,
+      "wholesale_price": 0,
+      "daily": true
+    },
+    {
+      "id": 156,
+      "name": "ব্লিচিং পাউডার",
+      "brand": "",
+      "category": "সাবান ও পরিষ্কারক",
+      "unit": "৫০০ গ্রাম",
+      "price_taka": 60,
+      "wholesale_price": 0,
+      "daily": true
+    },
+    {
+      "id": 157,
+      "name": "ন্যাপথলিন",
+      "brand": "",
+      "category": "সাবান ও পরিষ্কারক",
+      "unit": "প্যাকেট",
+      "price_taka": 50,
+      "wholesale_price": 0,
+      "daily": true
+    },
+    {
+      "id": 158,
+      "name": "কাপড় কাচা সোডা",
+      "brand": "",
+      "category": "সাবান ও পরিষ্কারক",
+      "unit": "কেজি",
+      "price_taka": 55,
+      "wholesale_price": 0,
+      "daily": true
+    },
+    {
+      "id": 159,
+      "name": "বাসন মাজার স্পঞ্জ",
+      "brand": "",
+      "category": "সাবান ও পরিষ্কারক",
+      "unit": "পিস",
+      "price_taka": 25,
+      "wholesale_price": 0,
+      "daily": true
+    },
+    {
       "id": 27,
       "name": "টুথপেস্ট",
       "brand": "ক্লোজআপ",
@@ -915,6 +1065,36 @@
       "daily": false
     },
     {
+      "id": 165,
+      "name": "শেভিং ক্রিম",
+      "brand": "",
+      "category": "ব্যক্তিগত যত্ন",
+      "unit": "পিস",
+      "price_taka": 140,
+      "wholesale_price": 0,
+      "daily": false
+    },
+    {
+      "id": 166,
+      "name": "রেজার ব্লেড",
+      "brand": "",
+      "category": "ব্যক্তিগত যত্ন",
+      "unit": "প্যাকেট",
+      "price_taka": 60,
+      "wholesale_price": 0,
+      "daily": false
+    },
+    {
+      "id": 167,
+      "name": "চুলের তেল",
+      "brand": "আমলা",
+      "category": "ব্যক্তিগত যত্ন",
+      "unit": "২০০ মিলি",
+      "price_taka": 180,
+      "wholesale_price": 0,
+      "daily": false
+    },
+    {
       "id": 24,
       "name": "চা পাতা",
       "brand": "ইস্পাহানি মির্জাপুর",
@@ -1011,6 +1191,56 @@
       "category": "চা ও পানীয়",
       "unit": "৭৫০ গ্রাম",
       "price_taka": 520,
+      "wholesale_price": 0,
+      "daily": false
+    },
+    {
+      "id": 144,
+      "name": "কনডেন্সড মিল্ক",
+      "brand": "ডানো",
+      "category": "চা ও পানীয়",
+      "unit": "৩৯৭ গ্রাম",
+      "price_taka": 140,
+      "wholesale_price": 0,
+      "daily": false
+    },
+    {
+      "id": 145,
+      "name": "গ্রিন টি",
+      "brand": "",
+      "category": "চা ও পানীয়",
+      "unit": "প্যাকেট",
+      "price_taka": 180,
+      "wholesale_price": 0,
+      "daily": false
+    },
+    {
+      "id": 146,
+      "name": "কোমল পানীয়",
+      "brand": "",
+      "category": "চা ও পানীয়",
+      "unit": "২ লিটার",
+      "price_taka": 150,
+      "wholesale_price": 0,
+      "daily": false
+    },
+    {
+      "id": 147,
+      "name": "সেরেলাক (শিশু খাদ্য)",
+      "brand": "",
+      "category": "চা ও পানীয়",
+      "unit": "৪০০ গ্রাম",
+      "price_taka": 420,
+      "wholesale_price": 0,
+      "daily": false
+    },
+    {
+      "id": 148,
+      "name": "ওরস্যালাইন",
+      "brand": "",
+      "category": "চা ও পানীয়",
+      "unit": "প্যাকেট",
+      "price_taka": 25,
       "wholesale_price": 0,
       "daily": false
     },
@@ -1195,6 +1425,66 @@
       "daily": false
     },
     {
+      "id": 149,
+      "name": "চিনাবাদাম",
+      "brand": "",
+      "category": "নাস্তা",
+      "unit": "৫০০ গ্রাম",
+      "price_taka": 110,
+      "wholesale_price": 0,
+      "daily": false
+    },
+    {
+      "id": 150,
+      "name": "জলপাইয়ের আচার",
+      "brand": "প্রাণ",
+      "category": "নাস্তা",
+      "unit": "৪০০ গ্রাম",
+      "price_taka": 160,
+      "wholesale_price": 0,
+      "daily": false
+    },
+    {
+      "id": 151,
+      "name": "ভিনেগার",
+      "brand": "",
+      "category": "নাস্তা",
+      "unit": "৫০০ মিলি",
+      "price_taka": 80,
+      "wholesale_price": 0,
+      "daily": false
+    },
+    {
+      "id": 152,
+      "name": "সয়া সস",
+      "brand": "",
+      "category": "নাস্তা",
+      "unit": "৫০০ মিলি",
+      "price_taka": 130,
+      "wholesale_price": 0,
+      "daily": false
+    },
+    {
+      "id": 153,
+      "name": "বেকিং পাউডার",
+      "brand": "",
+      "category": "নাস্তা",
+      "unit": "১০০ গ্রাম",
+      "price_taka": 70,
+      "wholesale_price": 0,
+      "daily": false
+    },
+    {
+      "id": 154,
+      "name": "কর্নফ্লাওয়ার",
+      "brand": "",
+      "category": "নাস্তা",
+      "unit": "২০০ গ্রাম",
+      "price_taka": 60,
+      "wholesale_price": 0,
+      "daily": false
+    },
+    {
       "id": 122,
       "name": "টিস্যু পেপার",
       "brand": "বসুন্ধরা",
@@ -1265,6 +1555,56 @@
       "daily": false
     },
     {
+      "id": 160,
+      "name": "পলিথিন ব্যাগ",
+      "brand": "",
+      "category": "ঘরোয়া সামগ্রী",
+      "unit": "প্যাকেট",
+      "price_taka": 40,
+      "wholesale_price": 0,
+      "daily": false
+    },
+    {
+      "id": 161,
+      "name": "অ্যালুমিনিয়াম ফয়েল",
+      "brand": "",
+      "category": "ঘরোয়া সামগ্রী",
+      "unit": "পিস",
+      "price_taka": 120,
+      "wholesale_price": 0,
+      "daily": false
+    },
+    {
+      "id": 162,
+      "name": "মশা মারার ব্যাট",
+      "brand": "",
+      "category": "ঘরোয়া সামগ্রী",
+      "unit": "পিস",
+      "price_taka": 350,
+      "wholesale_price": 0,
+      "daily": false
+    },
+    {
+      "id": 163,
+      "name": "আগরবাতি",
+      "brand": "",
+      "category": "ঘরোয়া সামগ্রী",
+      "unit": "প্যাকেট",
+      "price_taka": 45,
+      "wholesale_price": 0,
+      "daily": false
+    },
+    {
+      "id": 164,
+      "name": "গ্যাস লাইটার",
+      "brand": "",
+      "category": "ঘরোয়া সামগ্রী",
+      "unit": "পিস",
+      "price_taka": 60,
+      "wholesale_price": 0,
+      "daily": false
+    },
+    {
       "id": 14,
       "name": "পেঁয়াজ",
       "brand": "",
@@ -1331,6 +1671,16 @@
       "category": "অন্যান্য",
       "unit": "৫০০ গ্রাম",
       "price_taka": 280,
+      "wholesale_price": 0,
+      "daily": false
+    },
+    {
+      "id": 168,
+      "name": "আলু",
+      "brand": "",
+      "category": "অন্যান্য",
+      "unit": "কেজি",
+      "price_taka": 45,
       "wholesale_price": 0,
       "daily": false
     }
