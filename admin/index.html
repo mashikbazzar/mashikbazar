@@ -177,6 +177,7 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 <button id="atab-supplier" onclick="showAdminTab('supplier')">🏪 পাইকারি দাম</button>
 <button id="atab-customers" onclick="showAdminTab('customers')">👥 কাস্টমার</button>
 <button id="atab-visitors" onclick="showAdminTab('visitors')">📊 ভিজিটর</button>
+<button id="atab-feedback" onclick="showAdminTab('feedback')">💬 অভিযোগ ও পরামর্শ</button>
 </div>
 
 <div id="admin-products" class="adminbox">
@@ -268,6 +269,13 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 <p class="small">অ্যাপ খোলা ও কোন ট্যাব দেখা হয়েছে — সব এখানে জমা হয়।</p>
 <button class="primary" onclick="loadVisitors()">🔄 হিসাব দেখুন</button>
 <div id="visitorBox"></div>
+</div>
+
+<div id="admin-feedback" class="adminbox" style="display:none">
+<h3>💬 কাস্টমারের অভিযোগ ও পরামর্শ</h3>
+<p class="small">কাস্টমার অভিযোগ, পরামর্শ বা নতুন আইডিয়া জানালে এখানে আসবে। ফোনে কনফার্ম চাইলে সেটাও এখানে আসবে — ফোন করে অর্ডার কনফার্ম করুন। সেরা আইডিয়ার জন্য পুরস্কার দেওয়ার কথা মনে রাখবেন।</p>
+<button class="primary" onclick="loadFeedback()">🔄 তালিকা দেখুন</button>
+<div id="feedbackList"></div>
 </div>
 </div>
 </div>
@@ -426,7 +434,7 @@ async function renderAdmin(){
   }
 }
 function showAdminTab(t){
-  ["products","packages","settings","publish","orders","profit","supplier","customers","visitors"].forEach(function(x){
+  ["products","packages","settings","publish","orders","profit","supplier","customers","visitors","feedback"].forEach(function(x){
     document.getElementById("admin-"+x).style.display=(x===t)?"block":"none";
     document.getElementById("atab-"+x).classList.toggle("on", x===t);
   });
@@ -435,6 +443,34 @@ function showAdminTab(t){
   if(t==="supplier"){ loadSupplierPrices(); loadSuppliers(); }
   if(t==="customers") loadCustomers();
   if(t==="visitors") loadVisitors();
+  if(t==="feedback") loadFeedback();
+}
+async function loadFeedback(){
+  var el=document.getElementById("feedbackList"); if(!el) return;
+  if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
+  el.innerHTML="<p>আসছে…</p>";
+  var res=await sb.from("feedback").select("*").order("created_at",{ascending:false}).limit(100);
+  if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
+  var rows=res.data||[];
+  if(!rows.length){ el.innerHTML="<p>এখনো কোনো অভিযোগ বা পরামর্শ আসেনি।</p>"; return; }
+  var nNew=rows.filter(function(r){ return r.status!=="done"; }).length;
+  var typeEmoji={ "অভিযোগ":"😠", "পরামর্শ":"💡", "নতুন আইডিয়া":"🏆", "ফোনে কনফার্ম":"📞" };
+  el.innerHTML='<div class="statgrid"><div class="stat"><b>'+bn(rows.length)+'</b>টি বার্তা</div><div class="stat"><b>'+bn(nNew)+'</b>টি নতুন</div></div>'+rows.map(function(r){
+    var d=new Date(r.created_at);
+    var done=r.status==="done";
+    return '<div class="ordercard" style="'+(done?"opacity:.65":"")+'">'+(typeEmoji[r.type]||"💬")+' <b>'+esc(r.type||"মতামত")+'</b> '+(done?"✅ সমাধান হয়েছে":"🆕 নতুন")+'<br><b>'+esc(r.name||"কাস্টমার")+'</b> • 📱 <a href="tel:'+(r.phone||"")+'">'+(r.phone||"—")+'</a><br>'+esc(r.message||"")+'<br><span class="small">'+d.toLocaleString("bn-BD")+'</span><br>'+(done?"":'<button class="primary" onclick="markFeedbackDone(\''+r.id+'\')">✅ সমাধান হয়েছে</button> ')+'<button class="danger" onclick="delFeedback(this,\''+r.id+'\')">🗑️ মুছুন</button></div>';
+  }).join("");
+}
+async function markFeedbackDone(id){
+  if(!sb) return;
+  await sb.from("feedback").update({status:"done"}).eq("id",id);
+  loadFeedback();
+}
+var pendingDelFb=null;
+function delFeedback(btn,id){
+  if(pendingDelFb!==id){ pendingDelFb=id; btn.textContent="নিশ্চিত?"; setTimeout(function(){ if(pendingDelFb===id){ pendingDelFb=null; loadFeedback(); } },4000); return; }
+  pendingDelFb=null;
+  (async function(){ if(sb) await sb.from("feedback").delete().eq("id",id); loadFeedback(); })();
 }
 function saveSettings(){
   DRAFT.shop=document.getElementById("sShop").value;
