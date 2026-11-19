@@ -181,6 +181,8 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 <div id="admin-products" class="adminbox">
 <h3>🛍️ পণ্যের লিস্ট ও সিরিয়াল</h3>
 <p class="small">পণ্যের কার্ডে চাপ দিলেই সেটা খুলবে — নাম, ব্র্যান্ড, দাম, একক বদলান। সিরিয়াল বদলাতে কার্ডের <b>↑ ওপরে / ↓ নিচে</b> চাপুন।</p>
+<button class="ghost" id="priceToolsBtn" onclick="togglePriceTools()">⚙️ দামের সেটিংস দেখান</button>
+<div id="priceTools" style="display:none">
 <div class="adminbox" style="margin-bottom:10px">
 <b>💰 লাভের হার দিয়ে সব দাম একসাথে বসান</b><br>
 <label class="small">লাভের হার (%)</label>
@@ -192,6 +194,7 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 <b>👁️ কাস্টমারের দাম</b> — <span id="priceVisLabel"></span>
 <button class="primary" onclick="togglePrices()">এক ক্লিকে বদলান</button>
 <p class="small">চালু থাকলে লগইন করা কাস্টমার দাম দেখবে; বন্ধ থাকলে কেউ দাম দেখবে না। লগইন ছাড়া কেউ দাম দেখতে পায় না।</p>
+</div>
 </div>
 <input id="adminQ" placeholder="পণ্য খুঁজুন…" oninput="renderAdminProducts()">
 <button class="gold" onclick="addProduct()">+ নতুন পণ্য যোগ করুন</button>
@@ -347,7 +350,8 @@ function updateDraftInfo(){
 }
 function updateAdminStats(){
   if(!DRAFT) return;
-  document.getElementById("stProducts").textContent=bn(DRAFT.products.length);
+  var names={}; DRAFT.products.forEach(function(p){ names[p.name]=true; });
+  document.getElementById("stProducts").textContent=bn(Object.keys(names).length);
   document.getElementById("stPackages").textContent=bn(DRAFT.packages.length);
   document.getElementById("stOrders").textContent=bn(getOrders().length);
 }
@@ -440,6 +444,12 @@ function saveSettings(){
 }
 function updatePriceVisLabel(){ var el=document.getElementById("priceVisLabel"); if(!el) return; el.textContent=(DRAFT.show_prices!==false)?"দেখানো হচ্ছে (লগইন করা কাস্টমার দাম দেখবে)":"লুকানো আছে (কেউ দাম দেখবে না)"; }
 function togglePrices(){ if(!DRAFT) return; DRAFT.show_prices=(DRAFT.show_prices===false)?true:false; saveDraft(); updatePriceVisLabel(); }
+function togglePriceTools(){
+  var t=document.getElementById("priceTools"); if(!t) return;
+  var open=t.style.display!=="none";
+  t.style.display=open?"none":"block";
+  var b=document.getElementById("priceToolsBtn"); if(b) b.textContent=open?"⚙️ দামের সেটিংস দেখান":"⚙️ দামের সেটিংস লুকান";
+}
 function applyMargin(){
   var pct=parseFloat(document.getElementById("marginPct").value)||0;
   if(pct<=0){ alert("লাভের হার লিখুন — যেমন: ১০"); return; }
@@ -480,7 +490,7 @@ function renderAdminProducts(){
     }
     return true;
   });
-  var h='<div class="chips">'+CATS.map(function(c){ return '<button class="chip'+(adminProdCat===c?' on':'')+'" onclick="setAdminProdCat(\''+c+'\')">'+c+'</button>'; }).join("")+'</div>';
+  var h='<div class="chips">'+["সব"].concat(CATS).map(function(c){ return '<button class="chip'+(adminProdCat===c?' on':'')+'" onclick="setAdminProdCat(\''+c+'\')">'+c+'</button>'; }).join("")+'</div>';
   h+='<p class="small">মোট '+bn(groups.length)+'টি পণ্য • '+bn(DRAFT.products.length)+'টি ব্র্যান্ড — বদলাতে পণ্যের কার্ডে চাপ দিন।</p>';
   h+=list.map(function(g){
     var brands=g.vars.map(function(v){ return esc(v.brand||"সাধারণ")+" ৳"+bn(v.price_taka||0); }).join(" • ");
@@ -517,7 +527,7 @@ function renderGroupEdit(g){
   });
   h+='<button class="gold" onclick="addVariant('+g.gid+')">＋ ব্র্যান্ড যোগ করুন</button> ';
   h+='<button class="danger" onclick="delGroup('+g.gid+')">'+(pendingDelGroup===g.gid?'নিশ্চিত? পণ্যটি মুছুন':'🗑️ পণ্যটি মুছুন')+'</button><br><br>';
-  h+='<button class="ghost" onclick="closeGroupEdit()">← পণ্যের তালিকায় ফিরুন</button>';
+  h+='<button class="ghost" onclick="closeGroupEdit()">← পণ্যের তালিকা</button>';
   return h;
 }
 function renameGroup(gid, newName){
