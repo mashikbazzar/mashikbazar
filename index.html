@@ -584,7 +584,7 @@ async function publish(){
 }
 document.getElementById("cname").addEventListener("input",renderCart);
 document.getElementById("cphone").addEventListener("input",renderCart);
-fetch("products.json").then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(j && j.products){ DATA=j; } renderShop(); renderCart(); }).catch(function(){ renderShop(); renderCart(); });
+fetch("products.json?v=3", {cache:"no-store"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(j && j.products && j.packages && j.packages.length>=FALLBACK.packages.length){ DATA=j; } renderShop(); renderCart(); }).catch(function(){ renderShop(); renderCart(); });
 renderShop(); renderCart();
 </script>
 </body>
