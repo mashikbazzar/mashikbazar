@@ -112,6 +112,7 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 <div id="homeView" style="display:none">
 <div class="adminbox"><h2>🏠 নীড় — সব ব্যবসা</h2><p class="small">একটাই অ্যাডমিন অ্যাপ থেকে নীড়ের সব ব্যবসা চালান। নতুন ব্যবসা শুরু করলে এখানে যোগ করা যাবে।</p></div>
 <div id="bizList"></div>
+<div class="adminbox" style="background:#ffd970;border-color:#065f46;text-align:center"><h3>📲 অ্যাপ হিসেবে হোম স্ক্রিনে যোগ করুন</h3><p class="small">এক ট্যাপে ফোনে অ্যাপের মতো রাখুন — পরে আর লিংক খুঁজতে হবে না।</p><button class="primary" style="width:100%" onclick="doInstall()">হোম স্ক্রিনে যোগ করুন</button></div>
 <div class="adminbox"><h3>🔗 অ্যাপগুলো খুলুন</h3>
 <a class="applink" href="../">🛒 কাস্টমার অ্যাপ — মাসিক বাজার</a>
 <a class="applink" href="../supplier/">📦 দোকানদারের অ্যাপ — পাইকারি দাম</a>
@@ -271,6 +272,7 @@ function showInstallBanner(){
   else if(deferredPrompt) document.getElementById("installText").textContent="এক ট্যাপে ফোনে অ্যাপের মতো রাখুন — পরে আর লিংক খুঁজতে হবে না।";
 }
 function doInstall(){
+  var __b=document.getElementById("installBanner"); if(__b) __b.style.display="block";
   var steps=document.getElementById("installSteps");
   if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.then(function(){ deferredPrompt=null; }); return; }
   var ua=navigator.userAgent||"";
