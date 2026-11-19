@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>পাইকারি দাম পাঠান — মাসিক বাজার</title>
+<meta name="theme-color" content="#065f46">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:"Noto Sans Bengali","Hind Siliguri",system-ui,sans-serif;background:#f6f7f2;color:#111}
+header{background:linear-gradient(135deg,#065f46,#0b7a4b);color:#fff;padding:20px 16px;text-align:center}
+h1{margin:0;font-size:26px;color:#ffd970}
+header p{margin:6px 0;color:#e8f5ee}
+.wrap{max-width:800px;margin:0 auto;padding:14px 14px 60px}
+.card{background:#fff;border:1px solid #d8d8d8;border-radius:14px;padding:14px;margin-bottom:12px}
+input,select{width:100%;padding:12px;font-size:16px;border:1px solid #999;border-radius:10px;margin:6px 0}
+button.primary{background:#065f46;color:#fff;border:0;border-radius:10px;padding:12px 16px;font-size:16px;cursor:pointer}
+button.gold{background:#d4a017;color:#111;border:0;border-radius:10px;padding:12px 16px;font-size:16px;font-weight:700;cursor:pointer}
+button.ghost{background:#fff;border:1px solid #065f46;color:#065f46;border-radius:10px;padding:8px 12px;font-size:15px;cursor:pointer}
+button.danger{background:#b91c1c;color:#fff;border:0;border-radius:10px;padding:8px 12px;font-size:15px;cursor:pointer}
+.search{width:100%;padding:12px 14px;font-size:17px;border:2px solid #065f46;border-radius:12px}
+.row{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #d8d8d8;border-radius:12px;padding:10px;margin-bottom:8px}
+.row .n{flex:1}
+.price{color:#065f46;font-weight:800;font-size:18px}
+.small{font-size:14px;color:#555}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:13px;font-weight:700}
+.pending{background:#fff3cd;color:#7a5b00}
+.applied{background:#d1fae5;color:#065f46}
+.rejected{background:#fee2e2;color:#b91c1c}
+.note{background:#fff;border-left:5px solid #d4a017;padding:12px;border-radius:8px;margin:12px 0}
+.warn{background:#fff3cd;border-left:5px solid #b7791f;padding:12px;border-radius:8px;margin:12px 0}
+footer{text-align:center;color:#555;padding:16px;font-size:14px}
+</style>
+</head>
+<body>
+<header>
+<h1>🛒 মাসিক বাজার — পাইকারি দাম</h1>
+<p>পাইকারি দোকানদারদের জন্য — পণ্যের দাম পাঠান, মাসিক বাজার দেখবে</p>
+</header>
+<div class="wrap">
+
+<div id="loginBox" class="card">
+<h2>🔐 লগইন করুন</h2>
+<p class="small">আপনার নাম, মোবাইল নম্বর আর ৪ সংখ্যার কোড দিন। কোডটা মাসিক বাজারের অ্যাডমিনের কাছ থেকে নেবেন। প্রথমবার এলে নাম-মোবাইল-কোড দিয়ে নিবন্ধন করুন।</p>
+<label>আপনার নাম (দোকানের নাম)</label><input id="supName" placeholder="যেমন: রহিম ট্রেডার্স">
+<label>মোবাইল নম্বর</label><input id="supPhone" placeholder="01XXXXXXXXX">
+<label>কোড (৪ সংখ্যা)</label><input id="supCode" type="password" inputmode="numeric" maxlength="6" placeholder="কোড লিখুন">
+<button class="primary" onclick="login()">লগইন / নিবন্ধন করুন</button>
+<p id="loginMsg" class="small"></p>
+</div>
+
+<div id="appBox" style="display:none">
+<div class="card">
+<h2>👋 <span id="helloName"></span></h2>
+<p class="small">নিচের পণ্যগুলোর আজকের পাইকারি দাম বসিয়ে <b>পাঠান</b> চাপুন। দাম বাড়লে বা কমলে যেকোনো সময় আবার আপডেট করতে পারবেন — মাসিক বাজারের অ্যাডমিন সঙ্গে সঙ্গে দেখতে পাবে।</p>
+<button class="ghost" onclick="logout()">লগআউট</button>
+</div>
+
+<div class="card">
+<h3>➕ তালিকায় নেই এমন পণ্যের দাম পাঠান</h3>
+<input id="newName" placeholder="পণ্যের নাম">
+<input id="newBrand" placeholder="ব্র্যান্ড (যদি থাকে)">
+<input id="newUnit" placeholder="একক — যেমন: কেজি / পিস / লিটার">
+<input id="newPrice" type="number" min="0" placeholder="পাইকারি দাম (টাকা)">
+<button class="gold" onclick="submitNewProduct()">এই পণ্যের দাম পাঠান</button>
+</div>
+
+<input class="search" id="q" placeholder="পণ্য খুঁজুন… যেমন: চাল, তেল, সাবান" oninput="renderProducts()">
+<div id="plist"></div>
+<button class="gold" style="width:100%" onclick="submitAllChanged()">✅ বদলানো সব দাম একসাথে পাঠান</button>
+<p id="sendMsg" class="small"></p>
+
+<div class="card">
+<h3>📋 আমার পাঠানো দাম</h3>
+<div id="mySubs"></div>
+</div>
+</div>
+
+<div class="note">এই অ্যাপ শুধু দাম পাঠানোর জন্য। কাস্টমারের অর্ডার বা দোকানের অন্য কিছু এখানে দেখা যায় না — সেগুলো শুধু মাসিক বাজারের অ্যাডমিন দেখতে পারে।</div>
+</div>
+<footer>মাসিক বাজার • নীড়</footer>
+
+<script>
+var SUPABASE_URL = "https://iucgavgdpbvjnxmnuqce.supabase.co";
+var SUPABASE_KEY = "sb_publishable_seDgIW1BHnvbNjuJnyxqvw_dK2AKNug";
+var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+var supplier = null;
+var products = [];
+var changed = {};
+function bn(n){ return String(n).replace(/\d/g, function(d){ return "০১২৩৪৫৬৭৮৯"[+d]; }); }
+try{ supplier = JSON.parse(localStorage.getItem("mb-supplier")||"null"); }catch(e){ supplier=null; }
+if(supplier){ showApp(); }
+async function login(){
+  var name=document.getElementById("supName").value.trim();
+  var phone=document.getElementById("supPhone").value.trim();
+  var code=document.getElementById("supCode").value.trim();
+  var msg=document.getElementById("loginMsg");
+  if(!name||!phone||code.length<4){ msg.textContent="নাম, মোবাইল আর ৪ সংখ্যার কোড — তিনটাই লিখুন।"; return; }
+  msg.textContent="যাচাই করা হচ্ছে…";
+  var res = await sb.from("suppliers").select("*").eq("phone", phone);
+  if(res.error){ msg.textContent="সমস্যা হয়েছে: "+res.error.message; return; }
+  if(res.data && res.data.length){
+    var s=res.data[0];
+    if(s.code!==code){ msg.textContent="কোড ভুল। অ্যাডমিনের কাছ থেকে ঠিক কোডটা নিন।"; return; }
+    if(!s.active){ msg.textContent="এই অ্যাকাউন্ট বন্ধ আছে। অ্যাডমিনের সঙ্গে যোগাযোগ করুন।"; return; }
+    supplier=s;
+  } else {
+    var ins = await sb.from("suppliers").insert([{name:name, phone:phone, code:code}]).select();
+    if(ins.error){ msg.textContent="নিবন্ধন হয়নি: "+ins.error.message; return; }
+    supplier=ins.data[0];
+    msg.textContent="নিবন্ধন হয়েছে। অ্যাডমিন আপনাকে দেখতে পাবে।";
+  }
+  localStorage.setItem("mb-supplier", JSON.stringify(supplier));
+  showApp();
+}
+function logout(){ localStorage.removeItem("mb-supplier"); supplier=null; document.getElementById("appBox").style.display="none"; document.getElementById("loginBox").style.display="block"; }
+async function showApp(){
+  document.getElementById("loginBox").style.display="none";
+  document.getElementById("appBox").style.display="block";
+  document.getElementById("helloName").textContent=supplier.name;
+  var res = await sb.from("products").select("*").eq("active", true).order("sort_order");
+  if(res.error){ document.getElementById("plist").innerHTML="<p>পণ্যের তালিকা আসেনি: "+res.error.message+"</p>"; return; }
+  products=res.data||[];
+  renderProducts(); loadMySubs();
+}
+function renderProducts(){
+  var q=(document.getElementById("q").value||"").trim();
+  var list=products.filter(function(p){ return !q||p.name.indexOf(q)>=0||(p.brand||"").indexOf(q)>=0||p.category.indexOf(q)>=0; });
+  document.getElementById("plist").innerHTML=list.map(function(p){
+    var cur = (changed[p.id]!==undefined)? changed[p.id] : (p.wholesale_price||"");
+    return '<div class="row"><div class="n"><b>'+p.name+'</b> <span style="color:#666">'+(p.brand||"")+' • '+p.category+'</span><br><span class="small">বিক্রি দাম: ৳'+bn(p.selling_price)+' / '+p.unit+' • এখনকার পাইকারি দাম: '+(p.wholesale_price?("৳"+bn(p.wholesale_price)):"—")+'</span></div><div style="width:130px"><label class="small">নতুন পাইকারি দাম (৳)</label><input type="number" min="0" value="'+cur+'" onchange="markChanged('+p.id+',this.value)"></div></div>';
+  }).join("")||"<p>কোনো পণ্য পাওয়া যায়নি।</p>";
+}
+function markChanged(id, val){ changed[id]=parseFloat(val)||0; }
+async function submitPrice(productId, productName, brand, unit, price){
+  if(!price || price<=0) return false;
+  var res = await sb.from("supplier_prices").insert([{supplier_id:supplier.id, supplier_name:supplier.name, product_id:productId, product_name:productName, brand:brand||"", unit:unit||"", price:price, status:"pending"}]);
+  return !res.error;
+}
+async function submitAllChanged(){
+  var msg=document.getElementById("sendMsg");
+  var ids=Object.keys(changed); if(!ids.length){ msg.textContent="কোনো দাম বদলাননি — প্রথমে দাম লিখুন।"; return; }
+  msg.textContent="পাঠানো হচ্ছে…";
+  var ok=0, fail=0;
+  for(var i=0;i<ids.length;i++){
+    var p=null; products.forEach(function(x){ if(String(x.id)===String(ids[i])) p=x; }); if(!p) continue;
+    var done = await submitPrice(p.id, p.name, p.brand, p.unit, changed[p.id]);
+    if(done) ok++; else fail++;
+  }
+  changed={};
+  msg.textContent = ok? ("✅ "+bn(ok)+"টি দাম পাঠানো হয়েছে। অ্যাডমিন দেখে পাইকারি দামে বসাবে।") : "পাঠানো যায়নি — আবার চেষ্টা করুন।";
+  if(fail) msg.textContent += " ("+bn(fail)+"টি পাঠানো যায়নি।)";
+  renderProducts(); loadMySubs();
+}
+async function submitNewProduct(){
+  var name=document.getElementById("newName").value.trim();
+  var brand=document.getElementById("newBrand").value.trim();
+  var unit=document.getElementById("newUnit").value.trim()||"পিস";
+  var price=parseFloat(document.getElementById("newPrice").value)||0;
+  if(!name||!price){ alert("পণ্যের নাম আর দাম — দুটোই লিখুন।"); return; }
+  var done = await submitPrice(null, name, brand, unit, price);
+  if(done){
+    alert("পাঠানো হয়েছে। অ্যাডমিন দেখে পণ্যটা তালিকায় যোগ করবে।");
+    document.getElementById("newName").value=""; document.getElementById("newBrand").value=""; document.getElementById("newUnit").value=""; document.getElementById("newPrice").value="";
+    loadMySubs();
+  } else alert("পাঠানো যায়নি — আবার চেষ্টা করুন।");
+}
+async function loadMySubs(){
+  var res = await sb.from("supplier_prices").select("*").eq("supplier_id", supplier.id).order("created_at", {ascending:false}).limit(30);
+  var el=document.getElementById("mySubs");
+  if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
+  var rows=res.data||[];
+  if(!rows.length){ el.innerHTML="<p>এখনো কোনো দাম পাঠাননি।</p>"; return; }
+  var badge={pending:'<span class="badge pending">অপেক্ষায়</span>', applied:'<span class="badge applied">বসানো হয়েছে</span>', rejected:'<span class="badge rejected">বাতিল</span>'};
+  el.innerHTML=rows.map(function(r){
+    var d=new Date(r.created_at);
+    return '<div class="row"><div class="n"><b>'+r.product_name+'</b> '+(r.brand||"")+'<br>৳'+bn(r.price)+' / '+(r.unit||"")+' • '+d.toLocaleDateString("bn-BD")+'</div>'+(badge[r.status]||r.status)+'</div>';
+  }).join("");
+}
+</script>
+</body>
+</html>
