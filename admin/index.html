@@ -98,6 +98,13 @@ button.ghost{background:#fff;border:1px solid #065f46;color:#065f46;border-radiu
 .ordercard{background:#fff;border:1px solid #d8d8d8;border-radius:14px;padding:12px;margin-bottom:10px}
 footer{text-align:center;color:#555;padding:16px;font-size:14px}
 @media print{.bottomnav,.viewrow,.chips,.search,.add,.qty,.wa,.pdfbtn,#installBanner{display:none!important}}
+#memoOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;overflow:auto;padding:12px;display:none}
+#memoPaper{background:#fff;max-width:640px;margin:0 auto;padding:20px;border-radius:8px;color:#111}
+#memoPaper table{width:100%;border-collapse:collapse;margin:10px 0}
+#memoPaper th,#memoPaper td{border:1px solid #ccc;padding:6px 8px;font-size:15px;text-align:left;vertical-align:top}
+#memoPaper th{background:#e8f5ee;color:#065f46}
+#memoPaper input{padding:6px;font-size:15px;border:1px solid #999;border-radius:6px;margin:0}
+@media print{body *{visibility:hidden} #memoOverlay,#memoOverlay *{visibility:visible} #memoOverlay{position:absolute;left:0;top:0;width:100%;background:#fff;padding:0} .noprint{display:none!important}}
 
 .bizcard{background:#fff;border:2px solid #d4a017;border-radius:16px;padding:16px;margin-bottom:12px}
 .bizcard h3{margin:0;color:#065f46}
@@ -759,6 +766,63 @@ async function loadWholesale(){
   DATA.products.forEach(function(p){ if(map[p.id]!==undefined) p.wholesale_price=map[p.id]; });
   if(DRAFT) DRAFT.products.forEach(function(p){ if(map[p.id]!==undefined && !p.wholesale_price) p.wholesale_price=map[p.id]; });
 }
+var adminOrdersById={};
+var memoData=null;
+function openMemo(orderId){
+  var o=adminOrdersById[orderId]; if(!o) return;
+  memoData={no:o.order_no, date:o.created_at, name:o.customer_name||"", phone:o.phone||"", address:"—",
+    items:(o.items||[]).map(function(it){ return {name:it.name||"", brand:it.brand||"", qty:+it.qty||0, unit:it.unit||"", price:+it.price||0}; }),
+    fee:+o.delivery_fee||0};
+  renderMemo(true);
+  document.getElementById("memoOverlay").style.display="block";
+  window.scrollTo(0,0);
+}
+function memoTotals(){
+  var sub=0; memoData.items.forEach(function(it){ sub+=(+it.qty||0)*(+it.price||0); });
+  var fee=+memoData.fee||0; return {sub:sub, fee:fee, grand:sub+fee};
+}
+function renderMemo(editable){
+  var m=memoData; if(!m) return;
+  var d=new Date(m.date);
+  var t=memoTotals();
+  var head='<div style="text-align:center;border-bottom:2px solid #065f46;padding-bottom:10px;margin-bottom:12px"><h2 style="margin:0;color:#065f46">মাসিক বাজার</h2><p style="margin:2px 0">নীড় • WhatsApp: 01631421995</p><h3 style="margin:8px 0 0">🧾 ক্যাশ মেমো</h3></div>';
+  var info='<p>অর্ডার নম্বর: <b>'+esc(m.no)+'</b><br>তারিখ: '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br>কাস্টমার: <b>'+esc(m.name||"—")+'</b><br>মোবাইল: '+esc(m.phone||"—")+'<br>ঠিকানা: '+esc(m.address||"—")+'</p>';
+  var rows=m.items.map(function(it,i){
+    var line=(+it.qty||0)*(+it.price||0);
+    if(editable){
+      return '<tr><td>'+esc(it.name)+'</td><td><input type="text" value="'+esc(it.brand)+'" onchange="memoChg('+i+',\'brand\',this.value)" style="width:90px"></td><td><input type="number" min="0" step="any" value="'+it.qty+'" oninput="memoChg('+i+',\'qty\',this.value)" style="width:64px"></td><td>'+esc(it.unit)+'</td><td><input type="number" min="0" step="any" value="'+it.price+'" oninput="memoChg('+i+',\'price\',this.value)" style="width:80px"></td><td style="text-align:right"><b id="memoLine'+i+'">৳'+bn(line)+'</b></td><td class="noprint"><button class="danger" onclick="memoDelRow('+i+')">✕</button></td></tr>';
+    }
+    return '<tr><td>'+esc(it.name)+'</td><td>'+esc(it.brand||"—")+'</td><td>'+bn(it.qty)+' '+esc(it.unit)+'</td><td style="text-align:right">৳'+bn(it.price)+'</td><td style="text-align:right"><b>৳'+bn(line)+'</b></td></tr>';
+  }).join("");
+  var thead=editable?'<tr><th>পণ্য</th><th>ব্র্যান্ড</th><th>পরিমাণ</th><th>একক</th><th>দর (৳)</th><th>মোট</th><th class="noprint"></th></tr>':'<tr><th>পণ্য</th><th>ব্র্যান্ড</th><th>পরিমাণ</th><th>দর (৳)</th><th>মোট</th></tr>';
+  var feeRow=editable?'<p>ডেলিভারি চার্জ: ৳ <input id="memoFee" type="number" min="0" step="any" value="'+m.fee+'" oninput="memoFeeChg(this.value)" style="width:90px"></p>':'<p>ডেলিভারি চার্জ: ৳'+bn(t.fee)+'</p>';
+  var foot='<p style="font-size:20px">সর্বমোট: <b id="memoGrand">৳'+bn(t.grand)+'</b></p><p style="text-align:center">ধন্যবাদ — আবার আসবেন!</p>';
+  var btns='<div class="noprint" style="display:flex;gap:8px;margin-top:12px"><button class="primary" style="flex:1" onclick="window.print()">🖨️ প্রিন্ট / PDF করুন</button><button class="ghost" onclick="closeMemo()">✕ বন্ধ করুন</button></div><p class="small noprint">এই মেমোতে বদল শুধু ছাপার জন্য — আসল অর্ডার বদলাবে না।</p>';
+  document.getElementById("memoPaper").innerHTML=head+info+'<table>'+thead+rows+'</table>'+feeRow+foot+btns;
+}
+function memoChg(i,field,val){
+  if(!memoData) return;
+  var it=memoData.items[i]; if(!it) return;
+  if(field==="brand"){ it.brand=val; return; }
+  if(field==="qty"){ it.qty=parseFloat(val)||0; }
+  if(field==="price"){ it.price=parseFloat(val)||0; }
+  var line=(+it.qty||0)*(+it.price||0);
+  var el=document.getElementById("memoLine"+i); if(el) el.textContent="৳"+bn(line);
+  var t=memoTotals(); var g=document.getElementById("memoGrand"); if(g) g.textContent="৳"+bn(t.grand);
+}
+function memoFeeChg(val){
+  if(!memoData) return;
+  memoData.fee=parseFloat(val)||0;
+  var t=memoTotals(); var g=document.getElementById("memoGrand"); if(g) g.textContent="৳"+bn(t.grand);
+}
+function memoDelRow(i){
+  if(!memoData) return;
+  memoData.items.splice(i,1);
+  renderMemo(true);
+}
+function closeMemo(){
+  document.getElementById("memoOverlay").style.display="none";
+}
 async function loadAdminOrders(){
   var el=document.getElementById("adminOrders"); if(!el) return;
   if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
@@ -766,12 +830,13 @@ async function loadAdminOrders(){
   var res = await sb.from("orders").select("*").order("created_at", {ascending:false}).limit(50);
   if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
   var rows=res.data||[];
+  adminOrdersById={}; rows.forEach(function(o){ adminOrdersById[o.id]=o; });
   if(!rows.length){ el.innerHTML="<p>এখনো কোনো অর্ডার আসেনি।</p>"; return; }
   var statuses=["New Order","Contacted","Confirmed","Preparing","Out for Delivery","Delivered","Cancelled"];
   var bnStatus={"New Order":"নতুন অর্ডার","Contacted":"যোগাযোগ হয়েছে","Confirmed":"নিশ্চিত","Preparing":"তৈরি হচ্ছে","Out for Delivery":"ডেলিভারিতে","Delivered":"ডেলিভারি সম্পন্ন","Cancelled":"বাতিল"};
   el.innerHTML=rows.map(function(o){
     var d=new Date(o.created_at);
-    return '<div class="ordercard"><b>'+o.order_no+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br>'+(o.customer_name||"")+' • '+(o.phone||"")+'<br>'+(o.items||[]).map(function(it){ return it.name+' — '+bn(it.qty)+' '+(it.unit||""); }).join("<br>")+'<br><b>মোট: ৳'+bn(o.total)+' • লাভ: ৳'+bn(o.profit||0)+'</b><br><label>স্ট্যাটাস</label><select onchange="setAdminOrderStatus(\''+o.id+'\',this.value)">'+statuses.map(function(s){ return '<option value="'+s+'" '+(s===o.status?'selected':'')+'>'+bnStatus[s]+'</option>'; }).join("")+'</select></div>';
+    return '<div class="ordercard"><b>'+o.order_no+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br>'+(o.customer_name||"")+' • '+(o.phone||"")+'<br>'+(o.items||[]).map(function(it){ return it.name+' — '+bn(it.qty)+' '+(it.unit||""); }).join("<br>")+'<br><b>মোট: ৳'+bn(o.total)+' • লাভ: ৳'+bn(o.profit||0)+'</b><br><label>স্ট্যাটাস</label><select onchange="setAdminOrderStatus(\''+o.id+'\',this.value)">'+statuses.map(function(s){ return '<option value="'+s+'" '+(s===o.status?'selected':'')+'>'+bnStatus[s]+'</option>'; }).join("")+'</select><br><button class="gold" onclick="openMemo(\''+o.id+'\')">🧾 ক্যাশ মেমো</button></div>';
   }).join("");
 }
 async function setAdminOrderStatus(id, status){
@@ -965,5 +1030,6 @@ fetch("../products.json", {cache:"no-store"}).then(function(r){ return r.ok?r.js
 renderAdmin();
 showInstallBanner();
 </script>
+<div id="memoOverlay"><div id="memoPaper"></div></div>
 </body>
 </html>
