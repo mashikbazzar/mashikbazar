@@ -101,12 +101,23 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 <div class="wrap">
 
 <div class="adminbox" id="pinBox">
-<h2>🔒 অ্যাডমিন প্যানেল</h2>
-<p class="small">শুধু দোকানের মালিকের জন্য। প্রথমবার নিজের ৪ সংখ্যার PIN বসান — পরে ওই PIN দিয়েই খুলবে। PIN শুধু এই ফোনে থাকে।</p>
-<input id="pinInput" type="password" inputmode="numeric" maxlength="6" placeholder="PIN লিখুন">
+<h2>🔒 নীড় অ্যাডমিন</h2>
+<p class="small">শুধু দোকানের মালিকের জন্য।</p>
+<p class="small" id="lockedMsg" style="display:none">⚠️ এই ফোনে অ্যাডমিন সেটআপ নেই। শুধু মালিকের ফোন থেকেই অ্যাডমিন খোলা যাবে। নতুন ফোনে সেটআপ করতে নিচের লিংক চাপুন — GitHub টোকেন লাগবে।</p>
+<div id="pinEntry">
+<input id="pinInput" type="password" inputmode="numeric" maxlength="4" placeholder="৪ সংখ্যার PIN লিখুন">
 <button class="primary" onclick="unlockAdmin()">খুলুন</button>
 <p id="pinMsg" class="small"></p>
-<p class="small">PIN ভুলে গেলে: এই ফোনের ব্রাউজার ডেটা মুছে আবার নতুন PIN বসাতে হবে। কাস্টমাররা অ্যাডমিন দেখতে পায় না।</p>
+</div>
+<div id="setupBox" style="display:none">
+<p class="small"><b>নতুন ফোনে সেটআপ:</b> আপনার GitHub টোকেন লিখুন (যেটা দিয়ে প্রকাশ করা হয়), তারপর নতুন ৪ সংখ্যার PIN বসান। টোকেনটি শুধু যাচাইয়ের জন্য ব্যবহার হবে, সংরক্ষণ করা হবে না।</p>
+<input id="setupToken" type="password" placeholder="GitHub টোকেন (ghp_…)" style="width:100%">
+<input id="newPin1" type="password" inputmode="numeric" maxlength="4" placeholder="নতুন PIN (৪ সংখ্যা)">
+<input id="newPin2" type="password" inputmode="numeric" maxlength="4" placeholder="PIN আবার লিখুন">
+<button class="primary" onclick="verifySetup()">যাচাই করে PIN বসান</button>
+<p id="setupMsg" class="small"></p>
+</div>
+<p class="small"><a href="#" onclick="showSetup();return false;">নতুন ফোনে সেটআপ / PIN নতুন করে বসান</a> &nbsp;•&nbsp; <a href="#" onclick="document.getElementById('setupBox').style.display='none';document.getElementById('pinEntry').style.display='block';return false;">PIN দিয়ে খুলুন</a></p>
 </div>
 
 <div id="homeView" style="display:none">
@@ -294,7 +305,7 @@ function renderHome(){
 </script>
 <script>
 /* ---- Admin ---- */
-function hashPin(s){ var h=0; for(var i=0;i<s.length;i++){ h=((h<<5)-h+s.charCodeAt(i))|0; } return "h"+h; }
+function hashPin(s){ var h=2166136261; var salt="neer-admin-v2"; for(var r=0;r<500;r++){ for(var i=0;i<s.length;i++){ h^=s.charCodeAt(i)+salt.charCodeAt(i%salt.length)+r; h=Math.imul(h,16777619); } } return "h2-"+(h>>>0).toString(36); }
 function loadDraft(){
   try{ var d=JSON.parse(localStorage.getItem("mb-draft")||"null"); if(d && d.products) { DRAFT=d; return; } }catch(e){}
   DRAFT=JSON.parse(JSON.stringify(DATA));
@@ -312,22 +323,26 @@ function updateAdminStats(){
   document.getElementById("stOrders").textContent=bn(getOrders().length);
 }
 function unlockAdmin(){
+  var now=Date.now();
+  var lockUntil=parseInt(localStorage.getItem("mb-admin-lockuntil2")||"0",10);
+  if(now<lockUntil){ var m=Math.ceil((lockUntil-now)/60000); document.getElementById("pinMsg").textContent="অনেকবার ভুল PIN দেওয়া হয়েছে। "+m+" মিনিট পরে আবার চেষ্টা করুন।"; return; }
   var pin=document.getElementById("pinInput").value.trim();
-  var stored=localStorage.getItem("mb-admin-pin");
-  if(!stored){
-    if(pin.length<4){ document.getElementById("pinMsg").textContent="প্রথমবার ৪ সংখ্যার (বা বেশি) PIN বসান।"; return; }
-    localStorage.setItem("mb-admin-pin", hashPin(pin));
-    localStorage.setItem("mb-admin-unlocked","1");
-    document.getElementById("pinMsg").textContent="PIN বসানো হয়েছে। মনে রাখবেন।";
-    openAdmin();
-  } else if(hashPin(pin)===stored){
-    localStorage.setItem("mb-admin-unlocked","1");
+  var stored=localStorage.getItem("mb-admin-pin2");
+  if(!stored){ document.getElementById("pinMsg").textContent="এই ফোনে অ্যাডমিন PIN বসানো নেই। নিচে 'নতুন ফোনে সেটআপ' থেকে বসান।"; return; }
+  if(pin.length<4){ document.getElementById("pinMsg").textContent="৪ সংখ্যার PIN লিখুন।"; return; }
+  if(hashPin(pin)===stored){
+    localStorage.removeItem("mb-admin-attempts2"); localStorage.removeItem("mb-admin-lockuntil2");
+    localStorage.setItem("mb-admin-unlocked2","1");
+    document.getElementById("pinMsg").textContent="";
     openAdmin();
   } else {
-    document.getElementById("pinMsg").textContent="ভুল PIN। আবার চেষ্টা করুন।";
+    var n=parseInt(localStorage.getItem("mb-admin-attempts2")||"0",10)+1;
+    localStorage.setItem("mb-admin-attempts2", String(n));
+    if(n>=5){ localStorage.setItem("mb-admin-lockuntil2", String(now+5*60000)); localStorage.removeItem("mb-admin-attempts2"); document.getElementById("pinMsg").textContent="৫ বার ভুল PIN। ৫ মিনিটের জন্য লক করা হয়েছে।"; }
+    else { document.getElementById("pinMsg").textContent="ভুল PIN। আবার চেষ্টা করুন। ("+(5-n)+" বার বাকি)"; }
   }
 }
-function lockAdmin(){ localStorage.removeItem("mb-admin-unlocked"); document.getElementById("masikView").style.display="none"; document.getElementById("homeView").style.display="none"; document.getElementById("adminBody").style.display="none"; document.getElementById("pinBox").style.display="block"; document.getElementById("pinInput").value=""; }
+function lockAdmin(){ localStorage.removeItem("mb-admin-unlocked2"); document.getElementById("masikView").style.display="none"; document.getElementById("homeView").style.display="none"; document.getElementById("adminBody").style.display="none"; document.getElementById("pinBox").style.display="block"; document.getElementById("pinInput").value=""; }
 function openAdmin(){
   loadDraft();
   document.getElementById("pinBox").style.display="none";
@@ -354,7 +369,10 @@ function openMasikAdmin(){
 }
 function goHome(){ showHome(); }
 function renderAdmin(){
-  if(localStorage.getItem("mb-admin-unlocked")==="1"){ openAdmin(); }
+  var stored=localStorage.getItem("mb-admin-pin2");
+  var pe=document.getElementById("pinEntry"); if(pe) pe.style.display=stored?"block":"none";
+  var lm=document.getElementById("lockedMsg"); if(lm) lm.style.display=stored?"none":"block";
+  if(stored && localStorage.getItem("mb-admin-unlocked2")==="1"){ openAdmin(); }
 }
 function showAdminTab(t){
   ["products","packages","settings","publish","orders","profit","supplier","customers","visitors"].forEach(function(x){
@@ -657,6 +675,32 @@ async function pushWholesaleToSupabase(){
   for(var i=0;i<rows.length;i+=50){
     await sb.from("products").upsert(rows.slice(i,i+50), {onConflict:"id"});
   }
+}
+
+function showSetup(){
+  document.getElementById("pinEntry").style.display="none";
+  var lm=document.getElementById("lockedMsg"); if(lm) lm.style.display="none";
+  document.getElementById("setupBox").style.display="block";
+  var t=document.getElementById("setupToken"); if(t && !t.value) t.value=localStorage.getItem("mb-gh-token")||"";
+}
+async function verifySetup(){
+  var tok=document.getElementById("setupToken").value.trim();
+  var p1=document.getElementById("newPin1").value.trim();
+  var p2=document.getElementById("newPin2").value.trim();
+  var msg=document.getElementById("setupMsg");
+  if(!tok){ msg.textContent="GitHub টোকেন লিখুন।"; return; }
+  if(p1.length<4 || !/^[0-9]+$/.test(p1)){ msg.textContent="৪ সংখ্যার নতুন PIN লিখুন (শুধু সংখ্যা)।"; return; }
+  if(p1!==p2){ msg.textContent="দুইবার একই PIN লিখুন।"; return; }
+  msg.textContent="টোকেন যাচাই করা হচ্ছে…";
+  try{
+    var r=await fetch("https://api.github.com/repos/mashikbazzar/mashikbazar", {headers:{Authorization:"token "+tok, Accept:"application/vnd.github+json"}});
+    if(!r.ok){ msg.textContent="টোকেনটি ঠিক নয়। আবার দেখে লিখুন।"; return; }
+    localStorage.setItem("mb-admin-pin2", hashPin(p1));
+    localStorage.setItem("mb-admin-unlocked2","1");
+    localStorage.removeItem("mb-admin-attempts2"); localStorage.removeItem("mb-admin-lockuntil2");
+    msg.textContent="PIN বসানো হয়েছে।";
+    openAdmin();
+  }catch(e){ msg.textContent="ইন্টারনেট চেক করুন, আবার চেষ্টা করুন।"; }
 }
 
 fetch("../products.json", {cache:"no-store"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(j && j.products && j.packages && j.packages.length>=FALLBACK.packages.length){ DATA=j; } }).catch(function(){});
