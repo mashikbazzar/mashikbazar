@@ -23,6 +23,8 @@ button.ghost{background:#fff;border:1px solid #065f46;color:#065f46;border-radiu
 button.danger{background:#b91c1c;color:#fff;border:0;border-radius:10px;padding:8px 12px;font-size:15px;cursor:pointer}
 .search{width:100%;padding:12px 14px;font-size:17px;border:2px solid #065f46;border-radius:12px}
 .row{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #d8d8d8;border-radius:12px;padding:10px;margin-bottom:8px}
+.srow{align-items:flex-start;padding:8px}
+.srow input{padding:7px;font-size:15px;margin:2px 0}
 .row .n{flex:1}
 .price{color:#065f46;font-weight:800;font-size:18px}
 .small{font-size:14px;color:#555}
@@ -83,6 +85,11 @@ Chrome-এর ⋮ মেনুতে 'Add to Home screen' না দেখাল
 </div>
 
 <input class="search" id="q" placeholder="পণ্য খুঁজুন… যেমন: চাল, তেল, সাবান" oninput="renderProducts()">
+<div style="display:flex;gap:8px;margin:10px 0">
+<button id="supTabAll" class="primary" style="flex:1" onclick="setSupTab('all')">📋 সব পণ্য</button>
+<button id="supTabCat" class="ghost" style="flex:1" onclick="setSupTab('cat')">🗂️ ক্যাটাগরি</button>
+</div>
+<div id="catChips" style="display:none;margin-bottom:6px"></div>
 <div id="plist"></div>
 <button class="gold" style="width:100%" onclick="submitAllChanged()">✅ বদলানো সব দাম একসাথে পাঠান</button>
 <p id="sendMsg" class="small"></p>
@@ -146,19 +153,36 @@ async function showApp(){
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 var changedMeta={};
 function markMeta(id, field, val){ if(!changedMeta[id]) changedMeta[id]={}; changedMeta[id][field]=val; }
+var supTab="all", supCat="";
+var SUP_CATS=["চাল ও আটা","তেল ও ঘি","মসলা","ডাল ও চিনি","সাবান ও পরিষ্কারক","ব্যক্তিগত যত্ন","চা ও পানীয়","নাস্তা","ঘরোয়া সামগ্রী","অন্যান্য"];
+function setSupTab(t){ supTab=t; supCat=""; renderProducts(); }
+function setSupCat(c){ supCat=(supCat===c)?"":c; renderProducts(); }
 function renderProducts(){
   var q=(document.getElementById("q").value||"").trim();
-  var list=products.filter(function(p){ return !q||p.name.indexOf(q)>=0||(p.brand||"").indexOf(q)>=0||p.category.indexOf(q)>=0; });
+  var list=products.filter(function(p){
+    if(supTab==="cat" && supCat && p.category!==supCat) return false;
+    return !q||p.name.indexOf(q)>=0||(p.brand||"").indexOf(q)>=0||p.category.indexOf(q)>=0;
+  });
+  document.getElementById("supTabAll").className=(supTab==="all")?"primary":"ghost";
+  document.getElementById("supTabCat").className=(supTab==="cat")?"primary":"ghost";
+  var chips=document.getElementById("catChips");
+  if(supTab==="cat"){
+    chips.style.display="block";
+    chips.innerHTML=SUP_CATS.map(function(c){
+      var n=0; products.forEach(function(p){ if(p.category===c) n++; });
+      return '<button class="'+(supCat===c?'primary':'ghost')+'" style="padding:8px 10px;margin:4px 4px 0 0" onclick="setSupCat(\''+c+'\')">'+c+' ('+bn(n)+')</button>';
+    }).join("");
+  } else { chips.style.display="none"; chips.innerHTML=""; }
   document.getElementById("plist").innerHTML=list.map(function(p){
     var cur = (changed[p.id]!==undefined)? changed[p.id] : (p.wholesale_price||"");
     var m = changedMeta[p.id]||{};
     var nm = (m.name!==undefined)? m.name : p.name;
     var br = (m.brand!==undefined)? m.brand : (p.brand||"");
     var un = (m.unit!==undefined)? m.unit : p.unit;
-    return '<div class="row"><div class="n"><label class="small">পণ্যের নাম</label><input value="'+esc(nm)+'" onchange="markMeta('+p.id+',\'name\',this.value)"><label class="small">ব্র্যান্ড</label><input value="'+esc(br)+'" onchange="markMeta('+p.id+',\'brand\',this.value)"><div style="display:flex;gap:8px"><div style="flex:1"><label class="small">পরিমাণ / একক</label><input value="'+esc(un)+'" onchange="markMeta('+p.id+',\'unit\',this.value)"></div><div style="flex:1"><label class="small">এখনকার পাইকারি দাম</label><div class="price">'+(p.wholesale_price?("৳"+bn(p.wholesale_price)):"—")+'</div></div></div></div><div style="width:120px"><label class="small">নতুন পাইকারি দাম (৳)</label><input type="number" min="0" value="'+cur+'" onchange="markChanged('+p.id+',this.value)"></div></div>';
+    var serial = products.indexOf(p)+1;
+    return '<div class="row srow"><b>'+bn(serial)+'.</b><div class="n"><div style="display:flex;gap:6px"><input style="flex:2" value="'+esc(nm)+'" onchange="markMeta('+p.id+',\'name\',this.value)" placeholder="পণ্যের নাম"><input style="flex:1" value="'+esc(br)+'" onchange="markMeta('+p.id+',\'brand\',this.value)" placeholder="ব্র্যান্ড"></div><div style="display:flex;gap:6px;align-items:center"><input style="flex:1" value="'+esc(un)+'" onchange="markMeta('+p.id+',\'unit\',this.value)" placeholder="পরিমাণ / একক"><span class="small">এখন: '+(p.wholesale_price?("৳"+bn(p.wholesale_price)):"—")+'</span><input type="number" min="0" style="flex:1" value="'+cur+'" placeholder="নতুন দাম ৳" onchange="markChanged('+p.id+',this.value)"></div></div></div>';
   }).join("")||"<p>কোনো পণ্য পাওয়া যায়নি।</p>";
-}
-function markChanged(id, val){ changed[id]=parseFloat(val)||0; }
+}function markChanged(id, val){ changed[id]=parseFloat(val)||0; }
 async function submitPrice(productId, productName, brand, unit, price){
   if(price===undefined || price===null) return false;
   var res = await sb.from("supplier_prices").insert([{supplier_id:supplier.id, supplier_name:supplier.name, product_id:productId, product_name:productName, brand:brand||"", unit:unit||"", price:price, status:"pending"}]);
