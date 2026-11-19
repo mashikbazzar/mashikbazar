@@ -172,7 +172,7 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 <div class="statgrid">
 <div class="stat"><b id="stProducts">০</b>টি পণ্য</div>
 <div class="stat"><b id="stPackages">০</b>টি প্যাকেজ</div>
-<div class="stat"><b id="stOrders">০</b>টি অর্ডার (এই ফোনে)</div>
+<div class="stat"><b id="stOrders">—</b>টি অর্ডার</div>
 </div>
 <div class="admintabs">
 <button id="atab-products" class="on" onclick="showAdminTab('products')">🛍️ পণ্য</button>
@@ -369,7 +369,14 @@ function updateAdminStats(){
   var names={}; DRAFT.products.forEach(function(p){ names[p.name]=true; });
   document.getElementById("stProducts").textContent=bn(Object.keys(names).length);
   document.getElementById("stPackages").textContent=bn(DRAFT.packages.length);
-  document.getElementById("stOrders").textContent=bn(getOrders().length);
+  document.getElementById("stOrders").textContent=(adminOrderCount===null)?"—":bn(adminOrderCount);
+}
+async function refreshAdminOrderCount(){
+  if(!sb) return;
+  try{
+    var res=await sb.from("orders").select("id",{count:"exact",head:true});
+    if(!res.error && res.count!==null && res.count!==undefined){ adminOrderCount=res.count; updateAdminStats(); }
+  }catch(e){}
 }
 async function unlockAdmin(){
   var msg=document.getElementById("pinMsg");
@@ -418,7 +425,7 @@ function openMasikAdmin(){
   document.getElementById("homeView").style.display="none";
   document.getElementById("masikView").style.display="block";
   document.getElementById("adminBody").style.display="block";
-  renderAdminProducts(); renderAdminPackages(); updateDraftInfo(); updateAdminStats();
+  renderAdminProducts(); renderAdminPackages(); updateDraftInfo(); updateAdminStats(); refreshAdminOrderCount();
 }
 function goHome(){ showHome(); }
 async function renderAdmin(){
@@ -767,6 +774,7 @@ async function loadWholesale(){
   if(DRAFT) DRAFT.products.forEach(function(p){ if(map[p.id]!==undefined && !p.wholesale_price) p.wholesale_price=map[p.id]; });
 }
 var adminOrdersById={};
+var adminOrderCount=null;
 var memoData=null;
 function openMemo(orderId){
   var o=adminOrdersById[orderId]; if(!o) return;
@@ -830,6 +838,8 @@ async function loadAdminOrders(){
   var res = await sb.from("orders").select("*").order("created_at", {ascending:false}).limit(50);
   if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
   var rows=res.data||[];
+  if(adminOrderCount===null){ adminOrderCount=rows.length; updateAdminStats(); }
+  refreshAdminOrderCount();
   adminOrdersById={}; rows.forEach(function(o){ adminOrdersById[o.id]=o; });
   if(!rows.length){ el.innerHTML="<p>এখনো কোনো অর্ডার আসেনি।</p>"; return; }
   var statuses=["New Order","Contacted","Confirmed","Preparing","Out for Delivery","Delivered","Cancelled"];
