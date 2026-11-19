@@ -258,6 +258,7 @@ function logVisit(ev, detail){
   var c=getCustomer();
   sb.from("visits").insert([{phone:c?c.phone:"", event:ev, detail:detail||""}]).then(function(){});
 }
+function getCustomer(){ try{ return JSON.parse(localStorage.getItem("mb-customer")||"null"); }catch(e){ return null; } }
 var deferredPrompt=null;
 function isStandalone(){ return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone; }
 function inAppBrowser(){ var ua=navigator.userAgent||""; return /WhatsApp|FBAN|FBAV|Instagram|imo|Line|Viber|Telegram/i.test(ua); }
