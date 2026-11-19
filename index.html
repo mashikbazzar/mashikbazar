@@ -138,7 +138,7 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 </div>
 
 <div id="tab-orders" style="display:none">
-<section><h2>📋 আমার অর্ডার</h2><p class="small">এই ফোন থেকে দেওয়া অর্ডারগুলো এখানে সেভ থাকে। দোকান থেকে নিশ্চিত হলে WhatsApp-এ জানানো হবে।</p><div id="myOrders"></div></section>
+<section><h2>📋 আমার অর্ডার</h2><p class="small">লগইন করলে আপনার অর্ডারগুলো সেভ থাকবে — ফোন বদলালেও দেখা যাবে। লগইন ছাড়াও পণ্য দেখা ও অর্ডার করা যাবে।</p><div id="customerBox" class="adminbox"></div><div id="myOrders"></div></section>
 </div>
 
 <div id="tab-admin" style="display:none">
@@ -164,6 +164,8 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 <button id="atab-orders" onclick="showAdminTab('orders')">📋 অর্ডার</button>
 <button id="atab-profit" onclick="showAdminTab('profit')">💰 লাভ-লস</button>
 <button id="atab-supplier" onclick="showAdminTab('supplier')">🏪 পাইকারি দাম</button>
+<button id="atab-customers" onclick="showAdminTab('customers')">👥 কাস্টমার</button>
+<button id="atab-visitors" onclick="showAdminTab('visitors')">📊 ভিজিটর</button>
 </div>
 
 <div id="admin-products" class="adminbox">
@@ -227,6 +229,20 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 <button class="primary" onclick="loadSuppliers()">🔄 তালিকা দেখুন</button>
 <div id="supplierList"></div>
 </div>
+
+<div id="admin-customers" class="adminbox" style="display:none">
+<h3>👥 লগইন করা কাস্টমার</h3>
+<p class="small">যারা মোবাইল/ই-মেইল দিয়ে লগইন করেছে, তাদের নাম ও মোবাইল নম্বর। অর্ডার নিয়ে পরে কল করতে পারবেন।</p>
+<button class="primary" onclick="loadCustomers()">🔄 তালিকা দেখুন</button>
+<div id="customerList"></div>
+</div>
+
+<div id="admin-visitors" class="adminbox" style="display:none">
+<h3>📊 কে কতবার এসেছে, কী দেখেছে</h3>
+<p class="small">অ্যাপ খোলা ও কোন ট্যাব দেখা হয়েছে — সব এখানে জমা হয়।</p>
+<button class="primary" onclick="loadVisitors()">🔄 হিসাব দেখুন</button>
+<div id="visitorBox"></div>
+</div>
 </div>
 </div>
 
@@ -254,6 +270,65 @@ try{ customCart = JSON.parse(localStorage.getItem("mb-custom-cart")||"[]"); }cat
 function bn(n){ return String(n).replace(/\d/g, function(d){ return "০১২৩৪৫৬৭৮৯"[+d]; }); }
 function saveCart(){ localStorage.setItem("mb-cart", JSON.stringify(cart)); localStorage.setItem("mb-custom-cart", JSON.stringify(customCart)); }
 function code(){ if(!localStorage.getItem("mb-code")) localStorage.setItem("mb-code","MB-"+Math.random().toString(36).slice(2,8).toUpperCase()); return localStorage.getItem("mb-code"); }
+/* ---- customer login (optional; order history needs it) ---- */
+function getCustomer(){ try{ return JSON.parse(localStorage.getItem("mb-customer")||"null"); }catch(e){ return null; } }
+function setCustomer(c){ if(c) localStorage.setItem("mb-customer", JSON.stringify(c)); else localStorage.removeItem("mb-customer"); }
+async function sha256hex(str){ try{ var b=await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str)); return Array.from(new Uint8Array(b)).map(function(x){ return ("0"+x.toString(16)).slice(-2); }).join(""); }catch(e){ var h=0; for(var i=0;i<str.length;i++){ h=((h<<5)-h+str.charCodeAt(i))|0; } return "h"+h; } }
+function renderCustomerBox(){
+  var box=document.getElementById("customerBox"); if(!box) return;
+  var c=getCustomer();
+  if(c){
+    box.innerHTML='<p>👋 <b>'+c.name+'</b> ('+c.phone+(c.email?(' • '+c.email):'')+') — লগইন করা আছে। আপনার অর্ডারগুলো এখানে সেভ থাকবে। <button class="ghost" onclick="customerLogout()">লগআউট</button></p>';
+    var cn=document.getElementById("cname"); if(cn && !cn.value) cn.value=c.name||"";
+    var cp=document.getElementById("cphone"); if(cp && !cp.value) cp.value=c.phone||"";
+  } else {
+    box.innerHTML='<p><b>🔑 লগইন করুন (ঐচ্ছিক)</b> — মোবাইল নম্বর বা ই-মেইল + পাসওয়ার্ড দিয়ে একবার লগইন করলেই হবে, বারবার করতে হবে না। লগইন ছাড়াও পণ্য দেখা ও অর্ডার করা যাবে, তবে আপনার অর্ডারের রেকর্ড সেভ থাকবে শুধু লগইন করলে।</p><input id="cuName" placeholder="আপনার নাম"><input id="cuId" placeholder="মোবাইল নম্বর বা ই-মেইল"><input id="cuPass" type="password" placeholder="পাসওয়ার্ড (নতুন হলে নিজে বসান)"><button class="primary" onclick="customerLogin()">লগইন / নিবন্ধন</button> <span id="cuMsg" class="small"></span>';
+  }
+}
+async function customerLogin(){
+  var name=(document.getElementById("cuName").value||"").trim();
+  var idv=(document.getElementById("cuId").value||"").trim();
+  var pass=document.getElementById("cuPass").value||"";
+  var msg=document.getElementById("cuMsg");
+  if(!idv || pass.length<4){ msg.textContent="মোবাইল/ই-মেইল আর কমপক্ষে ৪ সংখ্যার পাসওয়ার্ড দিন।"; return; }
+  if(!sb){ msg.textContent="ইন্টারনেট সংযোগ পাওয়া যাচ্ছে না — পরে আবার চেষ্টা করুন।"; return; }
+  msg.textContent="হচ্ছে…";
+  var isEmail=idv.indexOf("@")>=0;
+  var q=sb.from("customers").select("*").limit(1);
+  var res = isEmail ? await q.eq("email", idv) : await q.eq("phone", idv);
+  if(res.error){ msg.textContent="হয়নি: "+res.error.message; return; }
+  var hash=await sha256hex(idv+"|"+pass);
+  var row=(res.data||[])[0];
+  if(row){
+    if(row.password_hash!==hash){ msg.textContent="পাসওয়ার্ড মিলছে না। আবার চেষ্টা করুন।"; return; }
+    await sb.from("customers").update({last_seen:new Date().toISOString()}).eq("id", row.id);
+    setCustomer({id:row.id, name:row.name, phone:row.phone, email:row.email});
+    msg.textContent="লগইন হয়েছে।";
+  } else {
+    var ins=await sb.from("customers").insert([{name:name||"কাস্টমার", phone:isEmail?"":idv, email:isEmail?idv:"", password_hash:hash, last_seen:new Date().toISOString()}]).select().single();
+    if(ins.error){ msg.textContent="নিবন্ধন হয়নি: "+ins.error.message; return; }
+    var r=ins.data;
+    setCustomer({id:r.id, name:r.name, phone:r.phone, email:r.email});
+    msg.textContent="নিবন্ধন ও লগইন হয়েছে।";
+  }
+  renderCustomerBox(); renderMyOrders();
+}
+function customerLogout(){ setCustomer(null); renderCustomerBox(); renderMyOrders(); }
+function reorderByNo(no){
+  if(!sb) return;
+  sb.from("orders").select("items").eq("order_no", no).limit(1).then(function(res){
+    var o=(res.data||[])[0]; if(!o) return;
+    (o.items||[]).forEach(function(it){ var p=null; DATA.products.forEach(function(x){ if(x.name===it.name) p=x; }); if(p) cart[p.id]=(cart[p.id]||0)+it.qty; });
+    saveCart(); renderCart(); showTab("cart");
+  });
+}
+/* ---- visits ---- */
+function logVisit(ev, detail){
+  if(!sb) return;
+  try{ if(ev==="open" && sessionStorage.getItem("mb-visit-open")) return; if(ev==="open") sessionStorage.setItem("mb-visit-open","1"); }catch(e){}
+  var c=getCustomer();
+  sb.from("visits").insert([{phone:c?c.phone:"", event:ev, detail:detail||""}]).then(function(){});
+}
 function waNumber(){ return (DATA.whatsapp||"01631421995").replace(/[^0-9]/g,"").replace(/^0/,"880"); }
 function findProduct(id){ var f=null; DATA.products.forEach(function(x){ if(String(x.id)===String(id)) f=x; }); return f; }
 function showTab(t){
@@ -264,6 +339,7 @@ function showTab(t){
   if(t==="cart") renderCart();
   if(t==="orders") renderMyOrders();
   if(t==="admin") renderAdmin();
+  logVisit("tab", t);
 }
 function setView(v){ view=v; document.getElementById("vGrid").classList.toggle("on",v==="grid"); document.getElementById("vList").classList.toggle("on",v==="list"); renderShop(); }
 function setCat(c){ cat=c; renderShop(); }
@@ -399,6 +475,8 @@ function renderCart(){
 function getOrders(){ try{ return JSON.parse(localStorage.getItem("mb-orders")||"[]"); }catch(e){ return []; } }
 function saveOrder(){
   var t=cartTotals(); if(t.n===0) return;
+  var _c=getCustomer();
+  if(_c){ var _cn=document.getElementById("cname"); if(_cn && !_cn.value) _cn.value=_c.name||""; var _cp=document.getElementById("cphone"); if(_cp && !_cp.value) _cp.value=_c.phone||""; }
   var items=[];
   Object.keys(cart).forEach(function(id){ var p=findProduct(id); if(p) items.push({name:p.name, brand:p.brand, qty:cart[id], unit:p.unit, price:p.price_taka, total:p.price_taka*cart[id]}); });
   var ord={code:code(), date:new Date().toISOString(), name:document.getElementById("cname").value||"", phone:document.getElementById("cphone").value||"", items:items, custom:customCart.slice(), total:t.total, fee:DATA.delivery_fee_taka||0, grand:t.total+(DATA.delivery_fee_taka||0), status:"sent"};
@@ -420,10 +498,25 @@ function reorder(codeStr){
   o.items.forEach(function(it){ var p=null; DATA.products.forEach(function(x){ if(x.name===it.name) p=x; }); if(p) cart[p.id]=(cart[p.id]||0)+it.qty; });
   saveCart(); renderCart(); showTab("cart");
 }
-function renderMyOrders(){
+async function renderMyOrders(){
+  renderCustomerBox();
+  var el=document.getElementById("myOrders"); if(!el) return;
+  var c=getCustomer();
+  if(c && sb){
+    el.innerHTML="<p>আসছে…</p>";
+    var res=await sb.from("orders").select("*").eq("phone", c.phone||"__none__").order("created_at",{ascending:false}).limit(20);
+    if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
+    var rows=res.data||[];
+    if(!rows.length){ el.innerHTML="<p>লগইন করা আছে — এখনো কোনো অর্ডার নেই। প্রথম অর্ডার দিলে এখানে দেখা যাবে।</p>"; return; }
+    var bnStatus={"New Order":"নতুন অর্ডার","Contacted":"যোগাযোগ হয়েছে","Confirmed":"নিশ্চিত","Preparing":"তৈরি হচ্ছে","Out for Delivery":"ডেলিভারিতে","Delivered":"ডেলিভারি সম্পন্ন","Cancelled":"বাতিল"};
+    el.innerHTML=rows.map(function(o){
+      var d=new Date(o.created_at);
+      return '<div class="ordercard"><b>'+o.order_no+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br><b>'+(bnStatus[o.status]||o.status)+'</b><br>'+(o.items||[]).map(function(it){ return it.name+' — '+bn(it.qty)+' '+(it.unit||"")+' (৳'+bn(it.total||0)+')'; }).join("<br>")+'<br><b>সর্বমোট: ৳'+bn(o.total)+'</b><br><button class="primary" onclick="reorderByNo(\''+o.order_no+'\')">🔁 আবার এই অর্ডারটি করুন</button></div>';
+    }).join("");
+    return;
+  }
   var list=getOrders();
-  var el=document.getElementById("myOrders");
-  if(!list.length){ el.innerHTML="<p>এখনো কোনো অর্ডার নেই। প্রথম অর্ডার দিলে এখানে দেখা যাবে।</p>"; return; }
+  if(!list.length){ el.innerHTML="<p>এখনো কোনো অর্ডার নেই। প্রথম অর্ডার দিলে এখানে দেখা যাবে। অর্ডারের রেকর্ড সেভ রাখতে ওপরে লগইন করুন।</p>"; return; }
   var statusText={sent:"WhatsApp-এ পাঠানো হয়েছে", confirmed:"দোকান নিশ্চিত করেছে", delivered:"ডেলিভারি সম্পন্ন"};
   el.innerHTML=list.map(function(o){
     var d=new Date(o.date);
@@ -506,10 +599,15 @@ function renderAdmin(){
   if(localStorage.getItem("mb-admin-unlocked")==="1"){ openAdmin(); }
 }
 function showAdminTab(t){
-  ["products","packages","settings","publish","orders","profit","supplier"].forEach(function(x){
+  ["products","packages","settings","publish","orders","profit","supplier","customers","visitors"].forEach(function(x){
     document.getElementById("admin-"+x).style.display=(x===t)?"block":"none";
     document.getElementById("atab-"+x).classList.toggle("on", x===t);
   });
+  if(t==="orders") loadAdminOrders();
+  if(t==="profit") loadProfit();
+  if(t==="supplier"){ loadSupplierPrices(); loadSuppliers(); }
+  if(t==="customers") loadCustomers();
+  if(t==="visitors") loadVisitors();
 }
 function saveSettings(){
   DRAFT.shop=document.getElementById("sShop").value;
@@ -706,6 +804,44 @@ async function toggleSupplier(id, active){
 function toggleSupplierBtn(el){
   toggleSupplier(el.getAttribute("data-id"), parseInt(el.getAttribute("data-active"),10));
 }
+/* ---- Admin: customers + visitors ---- */
+async function loadCustomers(){
+  var el=document.getElementById("customerList"); if(!el) return;
+  if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
+  el.innerHTML="<p>আসছে…</p>";
+  var res=await sb.from("customers").select("*").order("created_at",{ascending:false}).limit(100);
+  if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
+  var rows=res.data||[];
+  if(!rows.length){ el.innerHTML="<p>এখনো কেউ লগইন করেনি।</p>"; return; }
+  var ores=await sb.from("orders").select("phone").limit(500);
+  var counts={};
+  (ores.data||[]).forEach(function(o){ if(o.phone) counts[o.phone]=(counts[o.phone]||0)+1; });
+  el.innerHTML='<div class="statgrid"><div class="stat"><b>'+bn(rows.length)+'</b>জন কাস্টমার</div></div>'+rows.map(function(r){
+    var d=new Date(r.created_at);
+    return '<div class="ordercard"><b>'+(r.name||"কাস্টমার")+'</b><br>📱 <a href="tel:'+(r.phone||"")+'">'+(r.phone||"—")+'</a>'+(r.email?('<br>✉️ '+r.email):"")+'<br>অর্ডার: <b>'+bn(counts[r.phone]||0)+'</b>টি • নিবন্ধন: '+d.toLocaleDateString("bn-BD")+'</div>';
+  }).join("");
+}
+async function loadVisitors(){
+  var el=document.getElementById("visitorBox"); if(!el) return;
+  if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
+  el.innerHTML="<p>হিসাব করা হচ্ছে…</p>";
+  var res=await sb.from("visits").select("*").order("created_at",{ascending:false}).limit(200);
+  if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
+  var rows=res.data||[];
+  var today=new Date().toLocaleDateString("bn-BD");
+  var todayN=0, phones={}, byEvent={};
+  rows.forEach(function(v){
+    if(new Date(v.created_at).toLocaleDateString("bn-BD")===today) todayN++;
+    if(v.phone) phones[v.phone]=1;
+    var k=v.event==="open"?"অ্যাপ খোলা":("ট্যাব: "+(v.detail||""));
+    byEvent[k]=(byEvent[k]||0)+1;
+  });
+  var evRows=Object.keys(byEvent).map(function(k){ return '<div class="listrow"><div class="n">'+k+'</div><b>'+bn(byEvent[k])+' বার</b></div>'; }).join("");
+  el.innerHTML='<div class="statgrid"><div class="stat"><b>'+bn(rows.length)+'</b>বার দেখা হয়েছে</div><div class="stat"><b>'+bn(todayN)+'</b>বার আজ</div><div class="stat"><b>'+bn(Object.keys(phones).length)+'</b>জন লগইন করা কাস্টমার</div></div>'+evRows+'<h3 style="margin-top:14px">🕒 সাম্প্রতিক</h3>'+rows.slice(0,30).map(function(v){
+    var d=new Date(v.created_at);
+    return '<div class="listrow"><div class="n">'+(v.event==="open"?"অ্যাপ খোলা":("ট্যাব: "+(v.detail||"")))+'<br><span class="small">'+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'</span></div><b>'+(v.phone||"অতিথি")+'</b></div>';
+  }).join("");
+}
 async function rejectSupplierPrice(id){
   if(!sb) return;
   await sb.from("supplier_prices").update({status:"rejected"}).eq("id", id);
@@ -720,6 +856,7 @@ async function pushWholesaleToSupabase(){
 }
 fetch("products.json?v=3", {cache:"no-store"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(j && j.products && j.packages && j.packages.length>=FALLBACK.packages.length){ DATA=j; } renderShop(); renderCart(); loadWholesale().then(function(){ renderShop(); }); }).catch(function(){ renderShop(); renderCart(); });
 renderShop(); renderCart();
+logVisit("open","");
 </script>
 </body>
 </html>

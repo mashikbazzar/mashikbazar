@@ -40,7 +40,7 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 <h1>🛒 মাসিক বাজার — পাইকারি দাম</h1>
 <p>পাইকারি দোকানদারদের জন্য — পণ্যের দাম পাঠান, মাসিক বাজার দেখবে</p>
 </header>
-<div style="background:#d4a017;color:#111;text-align:center;padding:12px 14px;font-weight:700">
+<div id="installBannerTop" style="background:#d4a017;color:#111;text-align:center;padding:12px 14px;font-weight:700">
 📱 অ্যাপ হিসেবে হোম স্ক্রিনে যোগ করুন
 <button id="installBtn" style="background:#065f46;color:#fff;border:0;border-radius:8px;padding:10px 16px;font-size:16px;margin-left:8px" onclick="installApp()">হোম স্ক্রিনে যোগ করুন</button>
 </div>
@@ -207,10 +207,17 @@ function installApp(){
 }
 if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(function(){}); }
 (function(){
+  var standalone=window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+  var top=document.getElementById("installBannerTop"), steps=document.getElementById("installSteps");
+  if(standalone){ if(top) top.style.display="none"; if(steps) steps.style.display="none"; return; }
   var ua=navigator.userAgent||"";
   var inApp=/WhatsApp|FBAN|FBAV|Instagram|Messenger|Line\//i.test(ua);
   if(inApp){ var h=document.getElementById("installHelp"); if(h) h.style.display="block"; }
 })();
+window.addEventListener("appinstalled", function(){
+  var top=document.getElementById("installBannerTop"), steps=document.getElementById("installSteps");
+  if(top) top.style.display="none"; if(steps) steps.style.display="none";
+});
 </script>
 </body>
 </html>
