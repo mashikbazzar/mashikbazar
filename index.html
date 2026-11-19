@@ -20,24 +20,30 @@ header p{margin:4px 0;color:#e8f5ee}
 .wrap{max-width:900px;margin:0 auto;padding:12px 12px 140px}
 .search{width:100%;padding:13px 16px;font-size:17px;border:2px solid #065f46;border-radius:999px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.06)}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
-.chip{border:1px solid #d1d5db;background:#fff;color:#374151;border-radius:999px;padding:8px 14px;font-size:15px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.chip{border:1px solid #d1d5db;background:#fff;color:#374151;border-radius:999px;padding:10px 16px;font-size:16px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .chip.on{background:#065f46;color:#fff;border-color:#065f46;box-shadow:0 2px 8px rgba(6,95,70,.3)}
 .viewrow{display:flex;gap:8px;margin:6px 0 12px}
 .viewrow button{flex:1;padding:10px;border:1px solid #065f46;background:#fff;color:#065f46;border-radius:10px;font-size:16px;cursor:pointer}
 .viewrow button.on{background:#065f46;color:#fff}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(min-width:640px){.grid{grid-template-columns:1fr 1fr 1fr}}
-.card{background:#fff;border:1px solid #e8e8e8;border-radius:16px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-.card h3{margin:0 0 4px;font-size:17px}
+.card{background:#fff;border:1px solid #e8e8e8;border-radius:18px;padding:16px;box-shadow:0 3px 10px rgba(0,0,0,.07)}
+.steps{display:flex;gap:8px;margin:12px 0}
+.step{flex:1;background:#fff;border:1.5px solid #065f46;border-radius:14px;padding:10px 6px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+.step b{display:block;width:30px;height:30px;line-height:30px;border-radius:50%;background:#065f46;color:#fff;font-size:17px;margin:0 auto 6px}
+.step span{font-size:14px;font-weight:700;color:#065f46}
+.stephead{font-size:18px;color:#065f46;margin:14px 0 4px}
+.cartbar{position:fixed;left:12px;right:12px;bottom:64px;z-index:11;background:#065f46;color:#fff;border-radius:14px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;font-size:17px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.card h3{margin:0 0 4px;font-size:19px}
 .card .brand{color:#666;font-size:14px}
-.caticon{width:46px;height:46px;border-radius:14px;background:#e8f5ee;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:8px}
-.brandsel{width:auto;max-width:160px;padding:7px 10px;font-size:15px;border:1.5px solid #065f46;border-radius:999px;background:#f0fdf4;color:#065f46;font-weight:700;margin:4px 0;cursor:pointer}
+.caticon{width:56px;height:56px;border-radius:16px;background:#e8f5ee;display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:8px}
+.brandsel{width:auto;max-width:170px;padding:9px 12px;font-size:16px;border:1.5px solid #065f46;border-radius:999px;background:#f0fdf4;color:#065f46;font-weight:700;margin:4px 0;cursor:pointer}
 .incart{font-size:13px;color:#065f46;background:#f0fdf4;border-radius:8px;padding:4px 8px;margin-top:6px}
-.price{color:#065f46;font-weight:800;font-size:20px;margin:6px 0}
+.price{color:#065f46;font-weight:800;font-size:22px;margin:6px 0}
 .unit{color:#555;font-size:14px}
-.add{width:100%;background:#065f46;color:#fff;border:0;border-radius:12px;padding:11px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(6,95,70,.3)}
+.add{width:100%;background:#065f46;color:#fff;border:0;border-radius:12px;padding:14px;font-size:18px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(6,95,70,.3)}
 .qty{display:flex;gap:6px;align-items:center;justify-content:center}
-.qty button{width:36px;height:36px;font-size:19px;border-radius:10px;border:1px solid #065f46;background:#fff;color:#065f46;cursor:pointer}
+.qty button{width:44px;height:44px;font-size:22px;border-radius:12px;border:1px solid #065f46;background:#fff;color:#065f46;cursor:pointer}
 .listrow{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #e8e8e8;border-radius:14px;padding:12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
 .arow{display:flex;gap:6px;align-items:flex-start;background:#fff;border:1px solid #d8d8d8;border-radius:12px;padding:8px;margin-bottom:8px}
 .arow .n{flex:1;min-width:0}
@@ -53,7 +59,7 @@ header p{margin:4px 0;color:#e8f5ee}
 .pkg .total{font-size:20px;font-weight:800;color:#065f46}
 section h2{color:#065f46;margin:14px 0 8px}
 input,textarea,select{width:100%;padding:11px;font-size:16px;border:1px solid #999;border-radius:10px;margin:6px 0}
-.wa{display:block;text-align:center;background:#25D366;color:#fff;text-decoration:none;font-weight:800;padding:14px;border-radius:12px;margin-top:10px;font-size:18px}
+.wa{display:block;text-align:center;background:#25D366;color:#fff;text-decoration:none;font-weight:800;padding:18px;border-radius:14px;margin-top:10px;font-size:20px}
 .pdfbtn{width:100%;background:#d4a017;border:0;border-radius:12px;padding:12px;font-size:17px;font-weight:700;cursor:pointer;margin-top:8px}
 .note{background:#fff;border-left:5px solid #d4a017;padding:12px;border-radius:8px;margin:12px 0}
 .warn{background:#fff3cd;border-left:5px solid #b7791f;padding:12px;border-radius:8px;margin:12px 0}
@@ -87,7 +93,7 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 </head>
 <body>
 <header>
-<div class="logo">🛒</div>
+<div class="logo"><svg viewBox="0 0 64 64" width="40" height="40" aria-hidden="true"><path d="M18 30 Q32 12 46 30" fill="none" stroke="#065f46" stroke-width="4" stroke-linecap="round"/><circle cx="24" cy="26" r="5" fill="#f97316"/><circle cx="32" cy="23" r="5.5" fill="#ef4444"/><circle cx="40" cy="26" r="5" fill="#22c55e"/><path d="M14 30 L50 30 L46 52 Q45 55 42 55 L22 55 Q19 55 18 52 Z" fill="#065f46"/><path d="M19 37 L45 37 M20 45 L44 45" stroke="#d4a017" stroke-width="2"/><path d="M46 16 Q54 8 56 16 Q50 22 46 16" fill="#22c55e"/></svg></div>
 <h1 id="shopTitle">মাসিক বাজার</h1>
 <p><span id="companyTitle">নীড়</span> &nbsp;•&nbsp; মাসিক বাজারের সবকিছু, এক জায়গায়</p>
 </header>
@@ -101,6 +107,11 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 <div class="wrap">
 
 <div id="tab-shop">
+<div class="steps">
+<div class="step"><b>১</b><span>পণ্য বেছে নিন</span></div>
+<div class="step"><b>২</b><span>কার্টে যোগ করুন</span></div>
+<div class="step"><b>৩</b><span>WhatsApp-এ পাঠান</span></div>
+</div>
 <input class="search" id="q" placeholder="পণ্য খুঁজুন… যেমন: চাল, তেল, সাবান" oninput="renderShop()">
 <div class="chips" id="chips"></div>
 <div class="viewrow">
@@ -137,8 +148,11 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 
 <div id="tab-cart" style="display:none">
 <section class="adminbox"><h2>🧾 আপনার অর্ডার</h2>
+<p class="stephead"><b>১.</b> আপনার নাম ও মোবাইল লিখুন</p>
 <label>আপনার নাম</label><input id="cname" placeholder="নাম লিখুন" oninput="renderCart()">
 <label>মোবাইল নম্বর</label><input id="cphone" placeholder="01XXXXXXXXX" oninput="renderCart()">
+<p class="stephead"><b>২.</b> আপনার ঠিকানা লিখুন</p>
+<label>ঠিকানা (বাসা / এলাকা)</label><input id="caddr" placeholder="যেমন: হবিগঞ্জ, শায়েস্তাগঞ্জ" oninput="saveAddr();renderCart()">
 <div id="cart"></div>
 <div style="background:#f6f7f2;border-radius:12px;padding:12px;margin-top:10px">
 <label>নিজের পণ্য যোগ করুন (তালিকায় নেই এমন কিছু)</label>
@@ -149,7 +163,9 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 <p><b>পণ্যের মোট: <span id="total">৳০</span></b><br>ডেলিভারি চার্জ: <span id="feeLine">৳০</span><br><b>সর্বমোট: <span id="grand">৳০</span></b></p>
 <p id="cartPriceNote" class="small"></p>
 <p>অর্ডার নম্বর: <b id="ocode"></b></p>
+<p class="stephead"><b>৩.</b> নিচের সবুজ বোতাম চাপুন</p>
 <a class="wa" id="walink" href="#" target="_blank" onclick="saveOrder()">WhatsApp-এ অর্ডার পাঠান</a>
+<p class="small" style="text-align:center">চাপ দিলেই WhatsApp খুলবে — সেখান থেকে পাঠান</p>
 <button class="pdfbtn" onclick="window.print()">🧾 রসিদ প্রিন্ট / PDF করুন</button>
 <p class="small">অর্ডার পাঠালে সেটা এই ফোনে <b>আমার অর্ডার</b>-এ সেভ থাকবে। কার্ট ফোনে সেভ থাকে।</p>
 </section>
@@ -163,6 +179,7 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 
 
 </div>
+<div id="cartBar" class="cartbar" style="display:none" onclick="showTab('cart')"><span id="cartBarText"></span><b>কার্ট দেখুন →</b></div>
 <nav class="bottomnav">
 <button id="nav-shop" class="on" onclick="showTab('shop')">🛒 দোকান</button>
 <button id="nav-packages" onclick="showTab('packages')">📦 প্যাকেজ</button>
@@ -438,6 +455,14 @@ function addCustomItem(){
   saveCart(); renderCart();
 }
 function delCustomItem(id){ customCart=customCart.filter(function(x){ return x.id!==id; }); saveCart(); renderCart(); }
+function updateCartBar(){
+  var b=document.getElementById("cartBar"); if(!b) return;
+  var t=cartTotals();
+  if(t.n===0){ b.style.display="none"; return; }
+  b.style.display="flex";
+  document.getElementById("cartBarText").textContent="🛒 কার্টে "+bn(t.n)+"টি পণ্য"+(canSeePrices()?(" — মোট ৳"+bn(t.total)):"");
+}
+function saveAddr(){ try{ localStorage.setItem("mb-addr", document.getElementById("caddr").value||""); }catch(e){} }
 function cartTotals(){
   var total=0, n=0;
   Object.keys(cart).forEach(function(id){ var p=findProduct(id); if(p){ total+=p.price_taka*cart[id]; n+=cart[id]; } });
@@ -462,13 +487,16 @@ function renderCart(){
   document.getElementById("cartCount").textContent=cartTotals().n?("("+bn(cartTotals().n)+")"):"";
   document.getElementById("ocode").textContent=code();
   var name=document.getElementById("cname").value||"", phone=document.getElementById("cphone").value||"";
-  var msg="আসসালামু আলাইকুম, মাসিক বাজারে অর্ডার দিতে চাই।%0Aঅর্ডার নম্বর: "+code()+"%0Aনাম: "+encodeURIComponent(name)+"%0Aমোবাইল: "+encodeURIComponent(phone)+"%0A----------------%0A";
+  var ca=document.getElementById("caddr"); if(ca && !ca.value){ try{ ca.value=localStorage.getItem("mb-addr")||""; }catch(e){} }
+  var addr=ca?ca.value:"";
+  var msg="আসসালামু আলাইকুম, মাসিক বাজারে অর্ডার দিতে চাই।%0Aঅর্ডার নম্বর: "+code()+"%0Aনাম: "+encodeURIComponent(name)+"%0Aমোবাইল: "+encodeURIComponent(phone)+(addr?("%0Aঠিকানা: "+encodeURIComponent(addr)):"")+"%0A----------------%0A";
   var i=1;
   Object.keys(cart).forEach(function(id){ var p=findProduct(id); if(p) msg+=(i++)+". "+encodeURIComponent(p.name)+((p.brand)?" ("+encodeURIComponent(p.brand)+")":"")+" — "+cart[id]+" "+encodeURIComponent(p.unit)+(canSeePrices()?(" × ৳"+p.price_taka+" = ৳"+(p.price_taka*cart[id])):"")+"%0A"; });
   customCart.forEach(function(c){ msg+=(i++)+". "+encodeURIComponent(c.name)+" — "+encodeURIComponent(c.qty)+" (দাম পরে জানাবেন)%0A"; });
   msg+=canSeePrices()?("----------------%0Aপণ্যের মোট: ৳"+total+"%0Aডেলিভারি চার্জ: ৳"+fee+"%0Aসর্বমোট: ৳"+(total+fee)+"%0A— মাসিক বাজার, "+encodeURIComponent(DATA.company||"নীড়")):("----------------%0A(দাম দোকান থেকে জানানো হবে)%0A— মাসিক বাজার, "+encodeURIComponent(DATA.company||"নীড়"));
   document.getElementById("walink").href="https://wa.me/"+waNumber()+"?text="+msg;
   document.getElementById("walink").textContent="WhatsApp-এ অর্ডার পাঠান — "+(DATA.whatsapp||"");
+  updateCartBar();
 }
 /* ---- my orders (saved on this phone) ---- */
 function getOrders(){ try{ return JSON.parse(localStorage.getItem("mb-orders")||"[]"); }catch(e){ return []; } }
@@ -478,7 +506,7 @@ function saveOrder(){
   if(_c){ var _cn=document.getElementById("cname"); if(_cn && !_cn.value) _cn.value=_c.name||""; var _cp=document.getElementById("cphone"); if(_cp && !_cp.value) _cp.value=_c.phone||""; }
   var items=[];
   Object.keys(cart).forEach(function(id){ var p=findProduct(id); if(p) items.push({name:p.name, brand:p.brand, qty:cart[id], unit:p.unit, price:p.price_taka, total:p.price_taka*cart[id]}); });
-  var ord={code:code(), date:new Date().toISOString(), name:document.getElementById("cname").value||"", phone:document.getElementById("cphone").value||"", items:items, custom:customCart.slice(), total:t.total, fee:DATA.delivery_fee_taka||0, grand:t.total+(DATA.delivery_fee_taka||0), status:"sent"};
+  var ord={code:code(), date:new Date().toISOString(), name:document.getElementById("cname").value||"", phone:document.getElementById("cphone").value||"", address:(document.getElementById("caddr")||{}).value||"", items:items, custom:customCart.slice(), total:t.total, fee:DATA.delivery_fee_taka||0, grand:t.total+(DATA.delivery_fee_taka||0), status:"sent"};
   var list=getOrders(); list.unshift(ord); localStorage.setItem("mb-orders", JSON.stringify(list));
   if(sb){
     var profit=0;
@@ -521,7 +549,7 @@ async function renderMyOrders(){
   el.innerHTML=list.map(function(o){
     var d=new Date(o.date);
     var steps='<div class="timeline"><div class="done">✓ অর্ডার দেওয়া হয়েছে</div><div class="done">✓ WhatsApp-এ পাঠানো হয়েছে</div><div class="'+(o.status==="sent"?"todo":"done")+'">'+(o.status==="sent"?"○":"✓")+' দোকান থেকে নিশ্চিতকরণ — WhatsApp-এ জানানো হবে</div><div class="'+(o.status==="delivered"?"done":"todo")+'">'+(o.status==="delivered"?"✓":"○")+' ডেলিভারি সম্পন্ন</div></div>';
-    return '<div class="ordercard"><b>'+o.code+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br><b>'+statusText[o.status]+'</b><br>'+o.items.map(function(it){ return it.name+(it.brand?(' ('+it.brand+')'):"")+' — '+bn(it.qty)+' '+it.unit+' (৳'+bn(it.total)+')'; }).join("<br>")+(o.custom.length?("<br>"+o.custom.map(function(c){ return c.name+" — "+c.qty; }).join("<br>")):"")+'<br><b>সর্বমোট: ৳'+bn(o.grand)+'</b>'+steps+'<button class="primary" onclick="reorder(\''+o.code+'\')">🔁 আবার এই অর্ডারটি করুন</button> '+(o.status==="sent"?'<button class="ghost" onclick="setOrderStatus(\''+o.code+'\',\'confirmed\')">দোকান নিশ্চিত করেছে</button>':"")+(o.status==="confirmed"?'<button class="ghost" onclick="setOrderStatus(\''+o.code+'\',\'delivered\')">ডেলিভারি পেয়েছি</button>':"")+'</div>';
+    return '<div class="ordercard"><b>'+o.code+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br><b>'+statusText[o.status]+'</b>'+(o.address?('<br>ঠিকানা: '+o.address):"")+'<br>'+o.items.map(function(it){ return it.name+(it.brand?(' ('+it.brand+')'):"")+' — '+bn(it.qty)+' '+it.unit+' (৳'+bn(it.total)+')'; }).join("<br>")+(o.custom.length?("<br>"+o.custom.map(function(c){ return c.name+" — "+c.qty; }).join("<br>")):"")+'<br><b>সর্বমোট: ৳'+bn(o.grand)+'</b>'+steps+'<button class="primary" onclick="reorder(\''+o.code+'\')">🔁 আবার এই অর্ডারটি করুন</button> '+(o.status==="sent"?'<button class="ghost" onclick="setOrderStatus(\''+o.code+'\',\'confirmed\')">দোকান নিশ্চিত করেছে</button>':"")+(o.status==="confirmed"?'<button class="ghost" onclick="setOrderStatus(\''+o.code+'\',\'delivered\')">ডেলিভারি পেয়েছি</button>':"")+'</div>';
   }).join("");
 }
 /* ---- install as app ---- */

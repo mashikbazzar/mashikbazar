@@ -1,1 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><rect width="512" height="512" rx="110" fill="#065f46"/><circle cx="256" cy="256" r="150" fill="#d4a017"/><text x="256" y="300" font-size="120" text-anchor="middle">🛒</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#065f46"/>
+  <circle cx="256" cy="256" r="200" fill="#0b7a4b"/>
+  <circle cx="195" cy="235" r="24" fill="#f97316"/>
+  <circle cx="256" cy="222" r="26" fill="#ef4444"/>
+  <circle cx="317" cy="235" r="24" fill="#22c55e"/>
+  <path d="M185 220 A71 80 0 0 1 327 220" fill="none" stroke="#ffd970" stroke-width="16" stroke-linecap="round"/>
+  <rect x="135" y="250" width="242" height="28" rx="12" fill="#d4a017"/>
+  <path d="M145 278 L367 278 L330 410 L182 410 Z" fill="#ffd970"/>
+  <line x1="157" y1="320" x2="355" y2="320" stroke="#b45309" stroke-width="6"/>
+  <line x1="169" y1="365" x2="343" y2="365" stroke="#b45309" stroke-width="6"/>
+  <polygon points="330,150 360,128 366,158 342,176" fill="#4ade80"/>
+</svg>
