@@ -11,6 +11,7 @@
       "category": "চাল ও আটা",
       "unit": "কেজি",
       "price_taka": 65,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -20,6 +21,7 @@
       "category": "চাল ও আটা",
       "unit": "কেজি",
       "price_taka": 55,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -29,6 +31,7 @@
       "category": "চাল ও আটা",
       "unit": "কেজি",
       "price_taka": 110,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -38,6 +41,7 @@
       "category": "চাল ও আটা",
       "unit": "কেজি",
       "price_taka": 60,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -47,6 +51,7 @@
       "category": "চাল ও আটা",
       "unit": "কেজি",
       "price_taka": 180,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -56,6 +61,7 @@
       "category": "চাল ও আটা",
       "unit": "কেজি",
       "price_taka": 95,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -65,6 +71,7 @@
       "category": "চাল ও আটা",
       "unit": "কেজি",
       "price_taka": 78,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -74,6 +81,7 @@
       "category": "চাল ও আটা",
       "unit": "কেজি",
       "price_taka": 62,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -83,6 +91,7 @@
       "category": "চাল ও আটা",
       "unit": "কেজি",
       "price_taka": 64,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -92,6 +101,7 @@
       "category": "চাল ও আটা",
       "unit": "কেজি",
       "price_taka": 62,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -101,6 +111,7 @@
       "category": "চাল ও আটা",
       "unit": "কেজি",
       "price_taka": 58,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -110,6 +121,7 @@
       "category": "চাল ও আটা",
       "unit": "৫০০ গ্রাম",
       "price_taka": 55,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -119,6 +131,7 @@
       "category": "চাল ও আটা",
       "unit": "কেজি",
       "price_taka": 80,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -128,6 +141,7 @@
       "category": "চাল ও আটা",
       "unit": "৫০০ গ্রাম",
       "price_taka": 45,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -137,6 +151,7 @@
       "category": "তেল ও ঘি",
       "unit": "লিটার",
       "price_taka": 190,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -146,6 +161,7 @@
       "category": "তেল ও ঘি",
       "unit": "লিটার",
       "price_taka": 320,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -155,6 +171,7 @@
       "category": "তেল ও ঘি",
       "unit": "৫০০ গ্রাম",
       "price_taka": 550,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -164,6 +181,7 @@
       "category": "তেল ও ঘি",
       "unit": "লিটার",
       "price_taka": 185,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -173,6 +191,7 @@
       "category": "তেল ও ঘি",
       "unit": "লিটার",
       "price_taka": 195,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -182,6 +201,7 @@
       "category": "তেল ও ঘি",
       "unit": "লিটার",
       "price_taka": 182,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -191,6 +211,7 @@
       "category": "তেল ও ঘি",
       "unit": "লিটার",
       "price_taka": 188,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -200,6 +221,7 @@
       "category": "তেল ও ঘি",
       "unit": "লিটার",
       "price_taka": 310,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -209,6 +231,7 @@
       "category": "তেল ও ঘি",
       "unit": "লিটার",
       "price_taka": 300,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -218,6 +241,7 @@
       "category": "তেল ও ঘি",
       "unit": "৫০০ গ্রাম",
       "price_taka": 680,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -227,6 +251,7 @@
       "category": "তেল ও ঘি",
       "unit": "২০০ মিলি",
       "price_taka": 175,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -236,6 +261,7 @@
       "category": "ডাল ও চিনি",
       "unit": "কেজি",
       "price_taka": 130,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -245,6 +271,7 @@
       "category": "ডাল ও চিনি",
       "unit": "কেজি",
       "price_taka": 125,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -254,6 +281,7 @@
       "category": "ডাল ও চিনি",
       "unit": "কেজি",
       "price_taka": 42,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -263,6 +291,7 @@
       "category": "ডাল ও চিনি",
       "unit": "কেজি",
       "price_taka": 170,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -272,6 +301,7 @@
       "category": "ডাল ও চিনি",
       "unit": "কেজি",
       "price_taka": 95,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -281,6 +311,7 @@
       "category": "ডাল ও চিনি",
       "unit": "কেজি",
       "price_taka": 120,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -290,6 +321,7 @@
       "category": "ডাল ও চিনি",
       "unit": "কেজি",
       "price_taka": 105,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -299,6 +331,7 @@
       "category": "ডাল ও চিনি",
       "unit": "কেজি",
       "price_taka": 150,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -308,6 +341,7 @@
       "category": "ডাল ও চিনি",
       "unit": "কেজি",
       "price_taka": 128,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -317,6 +351,7 @@
       "category": "ডাল ও চিনি",
       "unit": "কেজি",
       "price_taka": 38,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -326,6 +361,7 @@
       "category": "ডাল ও চিনি",
       "unit": "কেজি",
       "price_taka": 40,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -335,6 +371,7 @@
       "category": "ডাল ও চিনি",
       "unit": "কেজি",
       "price_taka": 170,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -344,6 +381,7 @@
       "category": "মসলা",
       "unit": "১০০ গ্রাম",
       "price_taka": 45,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -353,6 +391,7 @@
       "category": "মসলা",
       "unit": "১০০ গ্রাম",
       "price_taka": 55,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -362,6 +401,7 @@
       "category": "মসলা",
       "unit": "১০০ গ্রাম",
       "price_taka": 40,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -371,6 +411,7 @@
       "category": "মসলা",
       "unit": "১০০ গ্রাম",
       "price_taka": 90,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -380,6 +421,7 @@
       "category": "মসলা",
       "unit": "১০০ গ্রাম",
       "price_taka": 120,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -389,6 +431,7 @@
       "category": "মসলা",
       "unit": "১০০ গ্রাম",
       "price_taka": 60,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -398,6 +441,7 @@
       "category": "মসলা",
       "unit": "১০০ গ্রাম",
       "price_taka": 70,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -407,6 +451,7 @@
       "category": "মসলা",
       "unit": "১০০ গ্রাম",
       "price_taka": 55,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -416,6 +461,7 @@
       "category": "মসলা",
       "unit": "১০০ গ্রাম",
       "price_taka": 110,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -425,6 +471,7 @@
       "category": "মসলা",
       "unit": "১০০ গ্রাম",
       "price_taka": 60,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -434,6 +481,7 @@
       "category": "মসলা",
       "unit": "১০০ গ্রাম",
       "price_taka": 80,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -443,6 +491,7 @@
       "category": "মসলা",
       "unit": "৫০ গ্রাম",
       "price_taka": 350,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -452,6 +501,7 @@
       "category": "মসলা",
       "unit": "১০০ গ্রাম",
       "price_taka": 120,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -461,6 +511,7 @@
       "category": "মসলা",
       "unit": "৫০ গ্রাম",
       "price_taka": 200,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -470,6 +521,7 @@
       "category": "মসলা",
       "unit": "প্যাকেট",
       "price_taka": 30,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -479,6 +531,7 @@
       "category": "মসলা",
       "unit": "২৫০ গ্রাম",
       "price_taka": 110,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -488,6 +541,7 @@
       "category": "মসলা",
       "unit": "প্যাকেট",
       "price_taka": 70,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -497,6 +551,7 @@
       "category": "মসলা",
       "unit": "প্যাকেট",
       "price_taka": 65,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -506,6 +561,7 @@
       "category": "মসলা",
       "unit": "প্যাকেট",
       "price_taka": 50,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -515,6 +571,7 @@
       "category": "সাবান ও পরিষ্কারক",
       "unit": "পিস",
       "price_taka": 35,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -524,6 +581,7 @@
       "category": "সাবান ও পরিষ্কারক",
       "unit": "পিস",
       "price_taka": 55,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -533,6 +591,7 @@
       "category": "সাবান ও পরিষ্কারক",
       "unit": "পিস",
       "price_taka": 180,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -542,6 +601,7 @@
       "category": "সাবান ও পরিষ্কারক",
       "unit": "৫০০ গ্রাম",
       "price_taka": 110,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -551,6 +611,7 @@
       "category": "সাবান ও পরিষ্কারক",
       "unit": "পিস",
       "price_taka": 110,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -560,6 +621,7 @@
       "category": "সাবান ও পরিষ্কারক",
       "unit": "পিস",
       "price_taka": 160,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -569,6 +631,7 @@
       "category": "সাবান ও পরিষ্কারক",
       "unit": "পিস",
       "price_taka": 30,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -578,6 +641,7 @@
       "category": "সাবান ও পরিষ্কারক",
       "unit": "পিস",
       "price_taka": 48,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -587,6 +651,7 @@
       "category": "সাবান ও পরিষ্কারক",
       "unit": "পিস",
       "price_taka": 62,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -596,6 +661,7 @@
       "category": "সাবান ও পরিষ্কারক",
       "unit": "পিস",
       "price_taka": 58,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -605,6 +671,7 @@
       "category": "সাবান ও পরিষ্কারক",
       "unit": "৫০০ গ্রাম",
       "price_taka": 85,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -614,6 +681,7 @@
       "category": "সাবান ও পরিষ্কারক",
       "unit": "৫০০ গ্রাম",
       "price_taka": 95,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -623,6 +691,7 @@
       "category": "সাবান ও পরিষ্কারক",
       "unit": "৫০০ গ্রাম",
       "price_taka": 75,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -632,6 +701,7 @@
       "category": "সাবান ও পরিষ্কারক",
       "unit": "পিস",
       "price_taka": 195,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -641,6 +711,7 @@
       "category": "সাবান ও পরিষ্কারক",
       "unit": "পিস",
       "price_taka": 215,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -650,6 +721,7 @@
       "category": "সাবান ও পরিষ্কারক",
       "unit": "পিস",
       "price_taka": 240,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -659,6 +731,7 @@
       "category": "সাবান ও পরিষ্কারক",
       "unit": "পিস",
       "price_taka": 38,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -668,6 +741,7 @@
       "category": "সাবান ও পরিষ্কারক",
       "unit": "পিস",
       "price_taka": 150,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -677,6 +751,7 @@
       "category": "সাবান ও পরিষ্কারক",
       "unit": "৫০০ মিলি",
       "price_taka": 185,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -686,6 +761,7 @@
       "category": "সাবান ও পরিষ্কারক",
       "unit": "পিস",
       "price_taka": 135,
+      "wholesale_price": 0,
       "daily": true
     },
     {
@@ -695,6 +771,7 @@
       "category": "ব্যক্তিগত যত্ন",
       "unit": "পিস",
       "price_taka": 120,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -704,6 +781,7 @@
       "category": "ব্যক্তিগত যত্ন",
       "unit": "পিস",
       "price_taka": 90,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -713,6 +791,7 @@
       "category": "ব্যক্তিগত যত্ন",
       "unit": "পিস",
       "price_taka": 135,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -722,6 +801,7 @@
       "category": "ব্যক্তিগত যত্ন",
       "unit": "পিস",
       "price_taka": 115,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -731,6 +811,7 @@
       "category": "ব্যক্তিগত যত্ন",
       "unit": "পিস",
       "price_taka": 190,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -740,6 +821,7 @@
       "category": "ব্যক্তিগত যত্ন",
       "unit": "পিস",
       "price_taka": 70,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -749,6 +831,7 @@
       "category": "ব্যক্তিগত যত্ন",
       "unit": "পিস",
       "price_taka": 105,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -758,6 +841,7 @@
       "category": "ব্যক্তিগত যত্ন",
       "unit": "পিস",
       "price_taka": 95,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -767,6 +851,7 @@
       "category": "ব্যক্তিগত যত্ন",
       "unit": "পিস",
       "price_taka": 95,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -776,6 +861,7 @@
       "category": "ব্যক্তিগত যত্ন",
       "unit": "২০০ মিলি",
       "price_taka": 320,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -785,6 +871,7 @@
       "category": "ব্যক্তিগত যত্ন",
       "unit": "পিস",
       "price_taka": 175,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -794,6 +881,7 @@
       "category": "ব্যক্তিগত যত্ন",
       "unit": "প্যাকেট",
       "price_taka": 140,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -803,6 +891,7 @@
       "category": "ব্যক্তিগত যত্ন",
       "unit": "প্যাকেট",
       "price_taka": 120,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -812,6 +901,7 @@
       "category": "ব্যক্তিগত যত্ন",
       "unit": "প্যাকেট",
       "price_taka": 650,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -821,6 +911,7 @@
       "category": "ব্যক্তিগত যত্ন",
       "unit": "প্যাকেট",
       "price_taka": 690,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -830,6 +921,7 @@
       "category": "চা ও পানীয়",
       "unit": "২০০ গ্রাম",
       "price_taka": 130,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -839,6 +931,7 @@
       "category": "চা ও পানীয়",
       "unit": "৫০০ গ্রাম",
       "price_taka": 420,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -848,6 +941,7 @@
       "category": "চা ও পানীয়",
       "unit": "২০০ গ্রাম",
       "price_taka": 125,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -857,6 +951,7 @@
       "category": "চা ও পানীয়",
       "unit": "প্যাকেট",
       "price_taka": 320,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -866,6 +961,7 @@
       "category": "চা ও পানীয়",
       "unit": "৪০০ গ্রাম",
       "price_taka": 480,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -875,6 +971,7 @@
       "category": "চা ও পানীয়",
       "unit": "৫০০ গ্রাম",
       "price_taka": 400,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -884,6 +981,7 @@
       "category": "চা ও পানীয়",
       "unit": "৫০০ গ্রাম",
       "price_taka": 410,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -893,6 +991,7 @@
       "category": "চা ও পানীয়",
       "unit": "৫০ গ্রাম",
       "price_taka": 210,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -902,6 +1001,7 @@
       "category": "চা ও পানীয়",
       "unit": "৫০০ গ্রাম",
       "price_taka": 430,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -911,6 +1011,7 @@
       "category": "চা ও পানীয়",
       "unit": "৭৫০ গ্রাম",
       "price_taka": 520,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -920,6 +1021,7 @@
       "category": "নাস্তা",
       "unit": "প্যাকেট",
       "price_taka": 100,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -929,6 +1031,7 @@
       "category": "নাস্তা",
       "unit": "প্যাকেট",
       "price_taka": 85,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -938,6 +1041,7 @@
       "category": "নাস্তা",
       "unit": "প্যাকেট",
       "price_taka": 75,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -947,6 +1051,7 @@
       "category": "নাস্তা",
       "unit": "প্যাকেট",
       "price_taka": 70,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -956,6 +1061,7 @@
       "category": "নাস্তা",
       "unit": "প্যাকেট",
       "price_taka": 60,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -965,6 +1071,7 @@
       "category": "নাস্তা",
       "unit": "প্যাকেট",
       "price_taka": 55,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -974,6 +1081,7 @@
       "category": "নাস্তা",
       "unit": "প্যাকেট",
       "price_taka": 50,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -983,6 +1091,7 @@
       "category": "নাস্তা",
       "unit": "৩০০ গ্রাম",
       "price_taka": 90,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -992,6 +1101,7 @@
       "category": "নাস্তা",
       "unit": "৩০০ গ্রাম",
       "price_taka": 85,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1001,6 +1111,7 @@
       "category": "নাস্তা",
       "unit": "২০০ গ্রাম",
       "price_taka": 45,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1010,6 +1121,7 @@
       "category": "নাস্তা",
       "unit": "২০০ গ্রাম",
       "price_taka": 60,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1019,6 +1131,7 @@
       "category": "নাস্তা",
       "unit": "৫০০ গ্রাম",
       "price_taka": 130,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1028,6 +1141,7 @@
       "category": "নাস্তা",
       "unit": "৫০০ গ্রাম",
       "price_taka": 330,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1037,6 +1151,7 @@
       "category": "নাস্তা",
       "unit": "৪০০ গ্রাম",
       "price_taka": 140,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1046,6 +1161,7 @@
       "category": "নাস্তা",
       "unit": "৩৪০ গ্রাম",
       "price_taka": 85,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1055,6 +1171,7 @@
       "category": "নাস্তা",
       "unit": "৪০০ গ্রাম",
       "price_taka": 150,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1064,6 +1181,7 @@
       "category": "নাস্তা",
       "unit": "২৫০ গ্রাম",
       "price_taka": 280,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1073,6 +1191,7 @@
       "category": "নাস্তা",
       "unit": "২৫০ গ্রাম",
       "price_taka": 320,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1082,6 +1201,7 @@
       "category": "ঘরোয়া সামগ্রী",
       "unit": "প্যাকেট",
       "price_taka": 65,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1091,6 +1211,7 @@
       "category": "ঘরোয়া সামগ্রী",
       "unit": "প্যাকেট",
       "price_taka": 90,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1100,6 +1221,7 @@
       "category": "ঘরোয়া সামগ্রী",
       "unit": "প্যাকেট",
       "price_taka": 75,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1109,6 +1231,7 @@
       "category": "ঘরোয়া সামগ্রী",
       "unit": "পিস",
       "price_taka": 290,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1118,6 +1241,7 @@
       "category": "ঘরোয়া সামগ্রী",
       "unit": "প্যাকেট",
       "price_taka": 60,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1127,6 +1251,7 @@
       "category": "ঘরোয়া সামগ্রী",
       "unit": "জোড়া",
       "price_taka": 70,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1136,6 +1261,7 @@
       "category": "ঘরোয়া সামগ্রী",
       "unit": "প্যাকেট",
       "price_taka": 20,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1145,6 +1271,7 @@
       "category": "অন্যান্য",
       "unit": "কেজি",
       "price_taka": 60,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1154,6 +1281,7 @@
       "category": "অন্যান্য",
       "unit": "কেজি",
       "price_taka": 160,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1163,6 +1291,7 @@
       "category": "অন্যান্য",
       "unit": "কেজি",
       "price_taka": 150,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1172,6 +1301,7 @@
       "category": "অন্যান্য",
       "unit": "ডজন",
       "price_taka": 155,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1181,6 +1311,7 @@
       "category": "অন্যান্য",
       "unit": "২৫০ গ্রাম",
       "price_taka": 130,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1190,6 +1321,7 @@
       "category": "অন্যান্য",
       "unit": "২৫০ গ্রাম",
       "price_taka": 320,
+      "wholesale_price": 0,
       "daily": false
     },
     {
@@ -1199,6 +1331,7 @@
       "category": "অন্যান্য",
       "unit": "৫০০ গ্রাম",
       "price_taka": 280,
+      "wholesale_price": 0,
       "daily": false
     }
   ],
