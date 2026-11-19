@@ -92,7 +92,7 @@ WhatsApp/Messenger/IMO-র ভেতর থেকে ইন্সটল হব�
 <script>
 var SUPABASE_URL = "https://iucgavgdpbvjnxmnuqce.supabase.co";
 var SUPABASE_KEY = "sb_publishable_seDgIW1BHnvbNjuJnyxqvw_dK2AKNug";
-var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+var sb = (window.supabase) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 var supplier = null;
 var products = [];
 var changed = {};
@@ -105,6 +105,7 @@ async function login(){
   var code=document.getElementById("supCode").value.trim();
   var msg=document.getElementById("loginMsg");
   if(!name||!phone||code.length<4){ msg.textContent="নাম, মোবাইল আর ৪ সংখ্যার কোড — তিনটাই লিখুন।"; return; }
+  if(!sb){ msg.textContent="ইন্টারনেট সংযোগ দুর্বল — পাতাটা বন্ধ করে আবার খুলুন।"; return; }
   msg.textContent="যাচাই করা হচ্ছে…";
   var res = await sb.from("suppliers").select("*").eq("phone", phone);
   if(res.error){ msg.textContent="সমস্যা হয়েছে: "+res.error.message; return; }
@@ -174,17 +175,6 @@ async function submitNewProduct(){
     loadMySubs();
   } else alert("পাঠানো যায়নি — আবার চেষ্টা করুন।");
 }
-var deferredPrompt=null;
-window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); deferredPrompt=e; document.getElementById("installBanner").style.display="block"; });
-function installApp(){ if(deferredPrompt){ deferredPrompt.prompt(); } else { document.getElementById("installHelp").style.display="block"; } }
-if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(function(){}); }
-(function(){
-  var ua=navigator.userAgent||"";
-  var inApp=/WhatsApp|FBAN|FBAV|Instagram|Messenger|Line\//i.test(ua);
-  if(inApp){ document.getElementById("installHelp").style.display="block"; }
-  else if(window.matchMedia("(display-mode: standalone)").matches){ /* already installed */ }
-  else { setTimeout(function(){ if(!deferredPrompt) document.getElementById("installBanner").style.display="block"; }, 1500); }
-})();
 async function loadMySubs(){
   var res = await sb.from("supplier_prices").select("*").eq("supplier_id", supplier.id).order("created_at", {ascending:false}).limit(30);
   var el=document.getElementById("mySubs");
@@ -197,6 +187,21 @@ async function loadMySubs(){
     return '<div class="row"><div class="n"><b>'+r.product_name+'</b> '+(r.brand||"")+'<br>৳'+bn(r.price)+' / '+(r.unit||"")+' • '+d.toLocaleDateString("bn-BD")+'</div>'+(badge[r.status]||r.status)+'</div>';
   }).join("");
 }
+</script>
+
+<script>
+var deferredPrompt=null;
+window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); deferredPrompt=e; var b=document.getElementById("installBanner"); if(b) b.style.display="block"; });
+function installApp(){ if(deferredPrompt){ deferredPrompt.prompt(); } else { var h=document.getElementById("installHelp"); if(h) h.style.display="block"; } }
+if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(function(){}); }
+(function(){
+  var ua=navigator.userAgent||"";
+  var inApp=/WhatsApp|FBAN|FBAV|Instagram|Messenger|Line\//i.test(ua);
+  var help=document.getElementById("installHelp"), banner=document.getElementById("installBanner");
+  if(inApp){ if(help) help.style.display="block"; }
+  else if(window.matchMedia("(display-mode: standalone)").matches){ }
+  else { setTimeout(function(){ if(!deferredPrompt && banner) banner.style.display="block"; }, 1500); }
+})();
 </script>
 </body>
 </html>
