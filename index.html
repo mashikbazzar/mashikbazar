@@ -98,7 +98,6 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 <div class="wrap">
 
 <div id="tab-shop">
-<section><h2>🌅 দৈনন্দিন প্রয়োজন</h2><div id="daily" class="grid"></div></section>
 <input class="search" id="q" placeholder="পণ্য খুঁজুন… যেমন: চাল, তেল, সাবান" oninput="renderShop()">
 <div class="chips" id="chips"></div>
 <div class="viewrow">
@@ -107,7 +106,6 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 </div>
 <div id="loginHint"></div>
 <div id="list"></div>
-<div class="note">দৈনন্দিন ব্যবহারের জিনিসগুলো সিরিয়ালের উপরে আছে। দাম দেখতে লগইন করুন — লগইন করলে দামসহ দেখা যাবে।</div>
 </div>
 
 <div id="tab-packages" style="display:none">
@@ -280,8 +278,6 @@ function renderShop(){
   document.getElementById("heroCount").textContent=bn(DATA.products.length)+"টি পণ্য • "+bn(DATA.packages.length)+"টি পরিবার প্যাকেজ • WhatsApp-এ অর্ডার";
   var lh=document.getElementById("loginHint");
   if(lh){ lh.innerHTML = getCustomer()? "" : '<div class="note">🔑 <b>দাম দেখতে লগইন করুন</b> — এখন শুধু পণ্যের নাম আর ব্র্যান্ড দেখা যাচ্ছে। <button class="primary" style="padding:8px 14px" onclick="showTab(\'orders\')">লগইন করুন</button></div>'; }
-  var daily=DATA.products.filter(function(p){ return p.daily; }).slice(0,12);
-  document.getElementById("daily").innerHTML=daily.map(cardHtml).join("");
   var list=DATA.products.filter(function(p){ return (cat==="সব"||p.category===cat)&&(!q||p.name.indexOf(q)>=0||(p.brand||"").indexOf(q)>=0||p.category.indexOf(q)>=0); });
   var el=document.getElementById("list");
   if(view==="grid"){

@@ -154,6 +154,7 @@ function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/"/g,
 var changedMeta={};
 function markMeta(id, field, val){ if(!changedMeta[id]) changedMeta[id]={}; changedMeta[id][field]=val; }
 var supTab="all", supCat="";
+var ROW_COLORS=["#fef9e7","#eafaf1","#eaf2f8","#fdedec","#f4ecf7","#fef5e7","#e8f8f5","#fdf2e9"];
 var SUP_CATS=["চাল ও আটা","তেল ও ঘি","মসলা","ডাল ও চিনি","সাবান ও পরিষ্কারক","ব্যক্তিগত যত্ন","চা ও পানীয়","নাস্তা","ঘরোয়া সামগ্রী","অন্যান্য"];
 function setSupTab(t){ supTab=t; supCat=""; renderProducts(); }
 function setSupCat(c){ supCat=(supCat===c)?"":c; renderProducts(); }
@@ -173,14 +174,15 @@ function renderProducts(){
       return '<button class="'+(supCat===c?'primary':'ghost')+'" style="padding:8px 10px;margin:4px 4px 0 0" onclick="setSupCat(\''+c+'\')">'+c+' ('+bn(n)+')</button>';
     }).join("");
   } else { chips.style.display="none"; chips.innerHTML=""; }
-  document.getElementById("plist").innerHTML=list.map(function(p){
+  document.getElementById("plist").innerHTML=list.map(function(p,i){
     var cur = (changed[p.id]!==undefined)? changed[p.id] : (p.wholesale_price||"");
     var m = changedMeta[p.id]||{};
     var nm = (m.name!==undefined)? m.name : p.name;
     var br = (m.brand!==undefined)? m.brand : (p.brand||"");
     var un = (m.unit!==undefined)? m.unit : p.unit;
     var serial = products.indexOf(p)+1;
-    return '<div class="row srow"><b>'+bn(serial)+'.</b><div class="n"><div style="display:flex;gap:6px"><input style="flex:2" value="'+esc(nm)+'" onchange="markMeta('+p.id+',\'name\',this.value)" placeholder="পণ্যের নাম"><input style="flex:1" value="'+esc(br)+'" onchange="markMeta('+p.id+',\'brand\',this.value)" placeholder="ব্র্যান্ড"></div><div style="display:flex;gap:6px;align-items:center"><input style="flex:1" value="'+esc(un)+'" onchange="markMeta('+p.id+',\'unit\',this.value)" placeholder="পরিমাণ / একক"><span class="small">এখন: '+(p.wholesale_price?("৳"+bn(p.wholesale_price)):"—")+'</span><input type="number" min="0" style="flex:1" value="'+cur+'" placeholder="নতুন দাম ৳" onchange="markChanged('+p.id+',this.value)"></div></div></div>';
+    var bg=ROW_COLORS[i%ROW_COLORS.length];
+    return '<div class="row srow" style="background:'+bg+'"><b>'+bn(serial)+'.</b><div class="n"><div style="display:flex;gap:6px"><input style="flex:2" value="'+esc(nm)+'" onchange="markMeta('+p.id+',\'name\',this.value)" placeholder="পণ্যের নাম"><input style="flex:1" value="'+esc(br)+'" onchange="markMeta('+p.id+',\'brand\',this.value)" placeholder="ব্র্যান্ড"></div><div style="display:flex;gap:6px;align-items:center"><input style="flex:1" value="'+esc(un)+'" onchange="markMeta('+p.id+',\'unit\',this.value)" placeholder="পরিমাণ / একক"><span class="small">এখন: '+(p.wholesale_price?("৳"+bn(p.wholesale_price)):"—")+'</span><input type="number" min="0" style="flex:1" value="'+cur+'" placeholder="নতুন দাম ৳" onchange="markChanged('+p.id+',this.value)"></div></div></div>';
   }).join("")||"<p>কোনো পণ্য পাওয়া যায়নি।</p>";
 }function markChanged(id, val){ changed[id]=parseFloat(val)||0; }
 async function submitPrice(productId, productName, brand, unit, price){
