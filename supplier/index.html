@@ -40,11 +40,19 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 <h1>🛒 মাসিক বাজার — পাইকারি দাম</h1>
 <p>পাইকারি দোকানদারদের জন্য — পণ্যের দাম পাঠান, মাসিক বাজার দেখবে</p>
 </header>
-<div id="installBanner" style="display:none;background:#d4a017;color:#111;text-align:center;padding:12px 14px;font-weight:700">
-📱 অ্যাপ হিসেবে হোম স্ক্রিনে যোগ করুন <button id="installBtn" style="background:#065f46;color:#fff;border:0;border-radius:8px;padding:8px 14px;font-size:15px;margin-left:8px" onclick="installApp()">হোম স্ক্রিনে যোগ করুন</button>
+<div style="background:#d4a017;color:#111;text-align:center;padding:12px 14px;font-weight:700">
+📱 অ্যাপ হিসেবে হোম স্ক্রিনে যোগ করুন
+<button id="installBtn" style="background:#065f46;color:#fff;border:0;border-radius:8px;padding:10px 16px;font-size:16px;margin-left:8px" onclick="installApp()">হোম স্ক্রিনে যোগ করুন</button>
+</div>
+<div id="installSteps" style="background:#fff;border-left:5px solid #065f46;padding:12px 14px;margin:10px 14px 0;border-radius:8px;font-size:16px;line-height:1.9">
+<b>ইন্সটল করার নিয়ম (২ মিনিট):</b><br>
+১️⃣ লিংকটা <b>Chrome</b>-এ খুলুন (WhatsApp-এর ভেতর থেকে হবে না — ওপরে ⋮ চেপে 'Open in Chrome' করুন)<br>
+২️⃣ Chrome-এর ওপরে <b>⋮</b> (তিন ডট) চাপুন<br>
+৩️⃣ <b>'Add to Home screen'</b> চাপুন, তারপর <b>'Add'</b> চাপুন<br>
+<span class="small">হোম স্ক্রিনে "পাইকারি দাম" আইকন আসবে — সেখান থেকে খুলবেন।</span>
 </div>
 <div id="installHelp" style="display:none;background:#fff3cd;color:#7a5b00;text-align:center;padding:10px 14px;font-size:15px">
-WhatsApp/Messenger/IMO-র ভেতর থেকে ইন্সটল হবে না — ওপরে ⋮ চেপে 'Open in Chrome' করুন, তারপর ⋮ → 'Add to Home screen' চাপুন।
+Chrome-এর ⋮ মেনুতে 'Add to Home screen' না দেখালে পাতাটা বন্ধ করে আবার খুলে ৩০ সেকেন্ড অপেক্ষা করুন, তারপর আবার চেষ্টা করুন।
 </div>
 <div class="wrap">
 
@@ -191,16 +199,17 @@ async function loadMySubs(){
 
 <script>
 var deferredPrompt=null;
-window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); deferredPrompt=e; var b=document.getElementById("installBanner"); if(b) b.style.display="block"; });
-function installApp(){ if(deferredPrompt){ deferredPrompt.prompt(); } else { var h=document.getElementById("installHelp"); if(h) h.style.display="block"; } }
+window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); deferredPrompt=e; var b=document.getElementById("installBtn"); if(b) b.textContent="এক ট্যাপে ইন্সটল করুন"; });
+function installApp(){
+  if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt=null; return; }
+  var h=document.getElementById("installHelp"); if(h){ h.style.display="block"; h.scrollIntoView({behavior:"smooth", block:"center"}); }
+  var b=document.getElementById("installBtn"); if(b){ b.textContent="ওপরের নিয়মে ⋮ থেকে যোগ করুন"; }
+}
 if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(function(){}); }
 (function(){
   var ua=navigator.userAgent||"";
   var inApp=/WhatsApp|FBAN|FBAV|Instagram|Messenger|Line\//i.test(ua);
-  var help=document.getElementById("installHelp"), banner=document.getElementById("installBanner");
-  if(inApp){ if(help) help.style.display="block"; }
-  else if(window.matchMedia("(display-mode: standalone)").matches){ }
-  else { setTimeout(function(){ if(!deferredPrompt && banner) banner.style.display="block"; }, 1500); }
+  if(inApp){ var h=document.getElementById("installHelp"); if(h) h.style.display="block"; }
 })();
 </script>
 </body>
