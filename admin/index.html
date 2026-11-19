@@ -453,9 +453,9 @@ function renderAdminProducts(){
     var name=groupNameA(gid);
     var vars=DRAFT.products.filter(function(p){ return p.name===name; });
     var cat0=vars[0].category;
-    var head='<div class="agroup"><div class="ghead"><b>'+bn(gi+1)+'.</b><div class="n"><div style="display:flex;gap:6px;align-items:center"><input style="flex:2;min-width:0" value="'+name.replace(/"/g,"&quot;")+'" onchange="renameGroup('+gid+',this.value)" placeholder="পণ্যের নাম"><select style="flex:1;min-width:0" onchange="setGroupCategory('+gid+',this.value)">'+CATS.map(function(c){ return '<option '+(c===cat0?'selected':'')+'>'+c+'</option>'; }).join("")+'</select><button class="ghost" style="padding:6px 10px" onclick="addVariant('+gid+')">＋ ব্র্যান্ড</button><button class="danger" style="padding:6px 9px" onclick="delGroup('+gid+')">🗑️</button></div><div class="small" style="margin-top:2px">'+bn(vars.length)+'টি ব্র্যান্ড</div></div><span style="display:flex;flex-direction:column;gap:4px"><button onclick="moveGroup('+gid+',-1)">↑</button><button onclick="moveGroup('+gid+',1)">↓</button></span></div>';
+    var head='<div class="agroup"><div class="ghead"><b>'+bn(gi+1)+'.</b><div class="n"><div style="display:flex;gap:6px;align-items:center"><input style="flex:2;min-width:0" value="'+name.replace(/"/g,"&quot;")+'" onchange="renameGroup('+gid+',this.value)" placeholder="পণ্যের নাম"><select style="flex:1;min-width:0" onchange="setGroupCategory('+gid+',this.value)">'+CATS.map(function(c){ return '<option '+(c===cat0?'selected':'')+'>'+c+'</option>'; }).join("")+'</select><button class="ghost" style="padding:6px 10px" onclick="addVariant('+gid+')">＋ ব্র্যান্ড</button><button class="danger" style="padding:6px 9px" onclick="delGroup('+gid+')">'+(pendingDelGroup===gid?'নিশ্চিত?':'🗑️')+'</button></div><div class="small" style="margin-top:2px">'+bn(vars.length)+'টি ব্র্যান্ড</div></div><span style="display:flex;flex-direction:column;gap:4px"><button onclick="moveGroup('+gid+',-1)">↑</button><button onclick="moveGroup('+gid+',1)">↓</button></span></div>';
     var rows=vars.map(function(p){
-      return '<div class="vrow"><input style="flex:1;min-width:0" value="'+(p.brand||"").replace(/"/g,"&quot;")+'" onchange="editProduct('+p.id+',\'brand\',this.value)" placeholder="ব্র্যান্ড"><input type="number" min="0" style="width:84px" value="'+p.price_taka+'" onchange="editProduct('+p.id+',\'price_taka\',this.value)" placeholder="খুচরা ৳"><input type="number" min="0" style="width:84px" value="'+(p.wholesale_price||0)+'" onchange="editProduct('+p.id+',\'wholesale_price\',this.value)" placeholder="পাইকারি ৳"><input style="width:70px" value="'+p.unit+'" onchange="editProduct('+p.id+',\'unit\',this.value)" placeholder="একক"><button onclick="moveVariant('+p.id+',-1)">↑</button><button onclick="moveVariant('+p.id+',1)">↓</button><button class="danger" style="padding:6px 9px" onclick="delProduct('+p.id+')">✕</button></div>';
+      return '<div class="vrow"><input style="flex:1;min-width:0" value="'+(p.brand||"").replace(/"/g,"&quot;")+'" onchange="editProduct('+p.id+',\'brand\',this.value)" placeholder="ব্র্যান্ড"><input type="number" min="0" style="width:84px" value="'+p.price_taka+'" onchange="editProduct('+p.id+',\'price_taka\',this.value)" placeholder="খুচরা ৳"><input type="number" min="0" style="width:84px" value="'+(p.wholesale_price||0)+'" onchange="editProduct('+p.id+',\'wholesale_price\',this.value)" placeholder="পাইকারি ৳"><input style="width:70px" value="'+p.unit+'" onchange="editProduct('+p.id+',\'unit\',this.value)" placeholder="একক"><button onclick="moveVariant('+p.id+',-1)">↑</button><button onclick="moveVariant('+p.id+',1)">↓</button><button class="danger" style="padding:6px 9px" onclick="delProduct('+p.id+')">'+(pendingDelId===p.id?'নিশ্চিত?':'✕')+'</button></div>';
     }).join("");
     return head+rows+'</div>';
   }).join("");
@@ -479,9 +479,15 @@ function addVariant(gid){
   DRAFT.products.splice(lastIdx+1,0,{id:maxId+1, name:name, brand:"", category:vars[0].category, unit:vars[0].unit, price_taka:0, wholesale_price:0, daily:false});
   saveDraft(); renderAdminProducts();
 }
+var pendingDelGroup=null, pendingDelGroupTimer=null;
 function delGroup(gid){
+  if(pendingDelGroup===gid){ clearTimeout(pendingDelGroupTimer); pendingDelGroup=null; doDelGroup(gid); return; }
+  if(pendingDelGroupTimer) clearTimeout(pendingDelGroupTimer);
+  pendingDelGroup=gid; renderAdminProducts();
+  pendingDelGroupTimer=setTimeout(function(){ pendingDelGroup=null; renderAdminProducts(); }, 4000);
+}
+function doDelGroup(gid){
   var name=groupNameA(gid); if(!name) return;
-  if(!confirm("“"+name+"”-এর সব ব্র্যান্ড মুছে দেবেন?")) return;
   var ids={}; DRAFT.products.forEach(function(p){ if(p.name===name) ids[p.id]=true; });
   DRAFT.products=DRAFT.products.filter(function(p){ return p.name!==name; });
   DRAFT.packages.forEach(function(pkg){ pkg.items=pkg.items.filter(function(it){ return !ids[it.product_id]; }); });
@@ -532,8 +538,14 @@ function editProduct(id, field, val){
   DRAFT.products.forEach(function(p){ if(p.id===id){ p[field]=(field==="price_taka"||field==="wholesale_price")?(parseInt(val,10)||0):val; } });
   recalcPackages(DRAFT); saveDraft(); renderAdminPackages();
 }
+var pendingDelId=null, pendingDelTimer=null;
 function delProduct(id){
-  if(!confirm("এই পণ্যটা মুছে দেবেন?")) return;
+  if(pendingDelId===id){ clearTimeout(pendingDelTimer); pendingDelId=null; doDelProduct(id); return; }
+  if(pendingDelTimer) clearTimeout(pendingDelTimer);
+  pendingDelId=id; renderAdminProducts();
+  pendingDelTimer=setTimeout(function(){ pendingDelId=null; renderAdminProducts(); }, 4000);
+}
+function doDelProduct(id){
   DRAFT.products=DRAFT.products.filter(function(p){ return p.id!==id; });
   DRAFT.packages.forEach(function(pkg){ pkg.items=pkg.items.filter(function(it){ return it.product_id!==id; }); });
   recalcPackages(DRAFT); saveDraft(); renderAdminProducts(); renderAdminPackages();
@@ -553,7 +565,7 @@ function addProduct(){
 }
 function renderAdminPackages(){
   document.getElementById("adminPackages").innerHTML=DRAFT.packages.map(function(pkg){
-    return '<div class="pkg"><label>প্যাকেজের নাম</label><input value="'+pkg.name.replace(/"/g,"&quot;")+'" onchange="editPackage('+pkg.id+',\'name\',this.value)"><label>ট্যাগলাইন</label><input value="'+(pkg.tagline||"").replace(/"/g,"&quot;")+'" onchange="editPackage('+pkg.id+',\'tagline\',this.value)"><div>'+pkg.items.map(function(it,idx){ return '<div class="listrow"><div class="n"><b>'+it.name+'</b> <span style="color:#666">(৳'+bn(it.line_total_taka||0)+')</span></div><input style="width:90px" value="'+it.qty_label+'" onchange="editPkgItemQty('+pkg.id+','+idx+',this.value)"><button class="danger" onclick="delPkgItem('+pkg.id+','+idx+')">✕</button></div>'; }).join("")+'</div><button class="ghost" onclick="togglePkgPicker('+pkg.id+')">➕ পণ্য যোগ করুন (সব পণ্যের তালিকা)</button><div id="pkgPicker'+pkg.id+'">'+(pkgPickerId===pkg.id?renderPkgPicker(pkg.id):"")+'</div><p class="total">আনুমানিক মোট: ৳'+bn(pkgTotal(pkg))+'</p><button class="danger" onclick="delPackage('+pkg.id+')">প্যাকেজটি মুছুন</button></div>';
+    return '<div class="pkg"><label>প্যাকেজের নাম</label><input value="'+pkg.name.replace(/"/g,"&quot;")+'" onchange="editPackage('+pkg.id+',\'name\',this.value)"><label>ট্যাগলাইন</label><input value="'+(pkg.tagline||"").replace(/"/g,"&quot;")+'" onchange="editPackage('+pkg.id+',\'tagline\',this.value)"><div>'+pkg.items.map(function(it,idx){ return '<div class="listrow"><div class="n"><b>'+it.name+'</b> <span style="color:#666">(৳'+bn(it.line_total_taka||0)+')</span></div><input style="width:90px" value="'+it.qty_label+'" onchange="editPkgItemQty('+pkg.id+','+idx+',this.value)"><button class="danger" onclick="delPkgItem('+pkg.id+','+idx+')">✕</button></div>'; }).join("")+'</div><button class="ghost" onclick="togglePkgPicker('+pkg.id+')">➕ পণ্য যোগ করুন (সব পণ্যের তালিকা)</button><div id="pkgPicker'+pkg.id+'">'+(pkgPickerId===pkg.id?renderPkgPicker(pkg.id):"")+'</div><p class="total">আনুমানিক মোট: ৳'+bn(pkgTotal(pkg))+'</p><button class="danger" onclick="delPackage('+pkg.id+')">'+(pendingDelPkg===pkg.id?'নিশ্চিত? প্যাকেজটি মুছুন':'প্যাকেজটি মুছুন')+'</button></div>';
   }).join("");
 }
 function editPackage(id, field, val){ DRAFT.packages.forEach(function(p){ if(p.id===id) p[field]=val; }); saveDraft(); }
@@ -595,7 +607,13 @@ function addPkgItem(pkgId){
   DRAFT.packages.forEach(function(pkg){ if(pkg.id===pkgId){ var exists=false; pkg.items.forEach(function(it){ if(it.product_id===p.id) exists=true; }); if(!exists) pkg.items.push({product_id:p.id, name:p.name, brand:p.brand, qty_label:"১ "+p.unit, qty_multiplier:1, line_total_taka:p.price_taka}); } });
   recalcPackages(DRAFT); saveDraft(); renderAdminPackages();
 }
-function delPackage(id){ if(!confirm("এই প্যাকেজটি মুছে দেবেন?")) return; DRAFT.packages=DRAFT.packages.filter(function(p){ return p.id!==id; }); saveDraft(); renderAdminPackages(); }
+var pendingDelPkg=null, pendingDelPkgTimer=null;
+function delPackage(id){
+  if(pendingDelPkg===id){ clearTimeout(pendingDelPkgTimer); pendingDelPkg=null; DRAFT.packages=DRAFT.packages.filter(function(p){ return p.id!==id; }); saveDraft(); renderAdminPackages(); return; }
+  if(pendingDelPkgTimer) clearTimeout(pendingDelPkgTimer);
+  pendingDelPkg=id; renderAdminPackages();
+  pendingDelPkgTimer=setTimeout(function(){ pendingDelPkg=null; renderAdminPackages(); }, 4000);
+}
 function addPackage(){
   var maxId=0; DRAFT.packages.forEach(function(p){ if(p.id>maxId) maxId=p.id; });
   var name=prompt("নতুন প্যাকেজের নাম লিখুন (যেমন: ৯ জনের পরিবার প্যাকেজ):"); if(!name) return;
