@@ -26,6 +26,7 @@ button.danger{background:#b91c1c;color:#fff;border:0;border-radius:10px;padding:
 .row{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #e8e8e8;border-radius:14px;padding:12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
 .srow{align-items:flex-start;padding:10px}
 .srow input{padding:7px;font-size:15px;margin:2px 0}
+input[readonly]{background:#f5f5f5;color:#555}
 .row .n{flex:1}
 .price{color:#1e40af;font-weight:800;font-size:20px}
 .small{font-size:14px;color:#555}
@@ -67,13 +68,14 @@ Chrome-এর ⋮ মেনুতে 'Add to Home screen' না দেখাল
 <label>মোবাইল নম্বর</label><input id="supPhone" placeholder="01XXXXXXXXX">
 <label>কোড (৪ সংখ্যা)</label><input id="supCode" type="password" inputmode="numeric" maxlength="6" placeholder="কোড লিখুন">
 <button class="primary" onclick="login()">লগইন / নিবন্ধন করুন</button>
+<p class="note">প্রথমবার নাম, মোবাইল আর নিজের পছন্দের ৪ সংখ্যার কোড লিখে চাপ দিন — আপনার অ্যাকাউন্ট তৈরি হয়ে যাবে। কোডটি মনে রাখবেন — এটা দিয়েই পরে লগইন করবেন। অ্যাডমিন কোড দেয় না।</p>
 <p id="loginMsg" class="small"></p>
 </div>
 
 <div id="appBox" style="display:none">
 <div class="card">
 <h2>👋 <span id="helloName"></span></h2>
-<p class="small">নিচের পণ্যগুলোর আজকের পাইকারি দাম বসিয়ে <b>পাঠান</b> চাপুন। দাম বাড়লে বা কমলে যেকোনো সময় আবার আপডেট করতে পারবেন। নাম, ব্র্যান্ড বা একক ভুল থাকলে ঠিক করে দিতে পারবেন — সেটা অ্যাডমিনের কাছে যাবে, অ্যাডমিন বসালে ঠিক হয়ে যাবে।</p>
+<p class="small">নিচের পণ্যগুলোর আজকের পাইকারি দাম বসিয়ে <b>পাঠান</b> চাপুন। দাম বাড়লে বা কমলে যেকোনো সময় আবার আপডেট করতে পারবেন। নাম/ব্র্যান্ড/একক ঠিক করতে হলে নিচের 'তালিকায় নেই এমন পণ্য' ফর্মে লিখুন বা অ্যাডমিনকে জানান।</p>
 <button class="ghost" onclick="logout()">লগআউট</button>
 </div>
 
@@ -84,6 +86,7 @@ Chrome-এর ⋮ মেনুতে 'Add to Home screen' না দেখাল
 <input id="newUnit" placeholder="একক — যেমন: কেজি / পিস / লিটার">
 <input id="newPrice" type="number" min="0" placeholder="পাইকারি দাম (টাকা)">
 <button class="gold" onclick="submitNewProduct()">এই পণ্যের দাম পাঠান</button>
+<p id="newProdMsg" class="small"></p>
 </div>
 
 <input class="search" id="q" placeholder="পণ্য খুঁজুন… যেমন: চাল, তেল, সাবান" oninput="renderProducts()">
@@ -140,7 +143,7 @@ async function login(){
   localStorage.setItem("mb-supplier", JSON.stringify(supplier));
   showApp();
 }
-function logout(){ localStorage.removeItem("mb-supplier"); supplier=null; document.getElementById("appBox").style.display="none"; document.getElementById("loginBox").style.display="block"; }
+function logout(){ localStorage.removeItem("mb-supplier"); supplier=null; document.getElementById("supName").value=""; document.getElementById("supPhone").value=""; document.getElementById("supCode").value=""; document.getElementById("loginMsg").textContent=""; document.getElementById("appBox").style.display="none"; document.getElementById("loginBox").style.display="block"; }
 async function showApp(){
   document.getElementById("loginBox").style.display="none";
   document.getElementById("appBox").style.display="block";
@@ -184,7 +187,7 @@ function renderProducts(){
     var un = (m.unit!==undefined)? m.unit : p.unit;
     var serial = products.indexOf(p)+1;
     var bg=ROW_COLORS[i%ROW_COLORS.length];
-    return '<div class="row srow" style="background:'+bg+'"><b>'+bn(serial)+'.</b><div class="n"><div style="display:flex;gap:6px"><input style="flex:2" value="'+esc(nm)+'" onchange="markMeta('+p.id+',\'name\',this.value)" placeholder="পণ্যের নাম"><input style="flex:1" value="'+esc(br)+'" onchange="markMeta('+p.id+',\'brand\',this.value)" placeholder="ব্র্যান্ড"></div><div style="display:flex;gap:6px;align-items:center"><input style="flex:1" value="'+esc(un)+'" onchange="markMeta('+p.id+',\'unit\',this.value)" placeholder="পরিমাণ / একক"><span class="small">এখন: '+(p.wholesale_price?("৳"+bn(p.wholesale_price)):"—")+'</span><input type="number" min="0" style="flex:1" value="'+cur+'" placeholder="নতুন দাম ৳" onchange="markChanged('+p.id+',this.value)"></div></div></div>';
+    return '<div class="row srow" style="background:'+bg+'"><b>'+bn(serial)+'.</b><div class="n"><div style="display:flex;gap:6px"><input style="flex:2" readonly value="'+esc(nm)+'" placeholder="পণ্যের নাম"><input style="flex:1" readonly value="'+esc(br)+'" placeholder="ব্র্যান্ড"></div><div style="display:flex;gap:6px;align-items:center"><input style="flex:1" readonly value="'+esc(un)+'" placeholder="পরিমাণ / একক"><span class="small">এখন: '+(p.wholesale_price?("৳"+bn(p.wholesale_price)):"—")+'</span><input type="number" min="0" style="flex:1" value="'+cur+'" placeholder="নতুন দাম ৳" onchange="markChanged('+p.id+',this.value)"></div></div></div>';
   }).join("")||"<p>কোনো পণ্য পাওয়া যায়নি।</p>";
 }function markChanged(id, val){ changed[id]=parseFloat(val)||0; }
 async function submitPrice(productId, productName, brand, unit, price){
@@ -197,7 +200,7 @@ async function submitAllChanged(){
   var idMap={};
   Object.keys(changed).forEach(function(k){ idMap[k]=1; });
   Object.keys(changedMeta).forEach(function(k){ idMap[k]=1; });
-  var ids=Object.keys(idMap); if(!ids.length){ msg.textContent="কিছু বদলাননি — প্রথমে দাম লিখুন বা নাম/ব্র্যান্ড/একক ঠিক করুন।"; return; }
+  var ids=Object.keys(idMap); if(!ids.length){ msg.textContent="কিছু বদলাননি — প্রথমে দাম লিখুন।"; return; }
   msg.textContent="পাঠানো হচ্ছে…";
   var ok=0, fail=0;
   for(var i=0;i<ids.length;i++){
@@ -213,21 +216,24 @@ async function submitAllChanged(){
   changed={}; changedMeta={};
   msg.textContent = ok? ("✅ "+bn(ok)+"টি দাম পাঠানো হয়েছে। অ্যাডমিন দেখে পাইকারি দামে বসাবে।") : "পাঠানো যায়নি — আবার চেষ্টা করুন।";
   if(fail) msg.textContent += " ("+bn(fail)+"টি পাঠানো যায়নি।)";
-  renderProducts(); loadMySubs();
+  renderProducts(); refreshMySubs();
 }
 async function submitNewProduct(){
   var name=document.getElementById("newName").value.trim();
   var brand=document.getElementById("newBrand").value.trim();
   var unit=document.getElementById("newUnit").value.trim()||"পিস";
   var price=parseFloat(document.getElementById("newPrice").value)||0;
-  if(!name||!price){ alert("পণ্যের নাম আর দাম — দুটোই লিখুন।"); return; }
+  var m=document.getElementById("newProdMsg");
+  if(!name||!price){ if(m) m.textContent="পণ্যের নাম আর দাম — দুটোই লিখুন।"; return; }
+  if(m) m.textContent="পাঠানো হচ্ছে…";
   var done = await submitPrice(null, name, brand, unit, price);
   if(done){
-    alert("পাঠানো হয়েছে। অ্যাডমিন দেখে পণ্যটা তালিকায় যোগ করবে।");
+    if(m) m.textContent="✅ পাঠানো হয়েছে। অ্যাডমিন দেখে পণ্যটা তালিকায় যোগ করবে।";
     document.getElementById("newName").value=""; document.getElementById("newBrand").value=""; document.getElementById("newUnit").value=""; document.getElementById("newPrice").value="";
-    loadMySubs();
-  } else alert("পাঠানো যায়নি — আবার চেষ্টা করুন।");
+    refreshMySubs();
+  } else { if(m) m.textContent="পাঠানো যায়নি — আবার চেষ্টা করুন।"; }
 }
+function refreshMySubs(){ var hs=document.getElementById("mySubs"); if(hs && hs.textContent.indexOf("এখনো কোনো দাম পাঠাননি")>=0){ hs.innerHTML="<p>পাঠানো দাম আসছে…</p>"; } loadMySubs(); }
 async function loadMySubs(){
   var res = await sb.from("supplier_prices").select("*").eq("supplier_id", supplier.id).order("created_at", {ascending:false}).limit(30);
   var el=document.getElementById("mySubs");
@@ -237,7 +243,7 @@ async function loadMySubs(){
   var badge={pending:'<span class="badge pending">অপেক্ষায়</span>', applied:'<span class="badge applied">বসানো হয়েছে</span>', rejected:'<span class="badge rejected">বাতিল</span>'};
   el.innerHTML=rows.map(function(r){
     var d=new Date(r.created_at);
-    return '<div class="row"><div class="n"><b>'+r.product_name+'</b> '+(r.brand||"")+'<br>৳'+bn(r.price)+' / '+(r.unit||"")+' • '+d.toLocaleDateString("bn-BD")+'</div>'+(badge[r.status]||r.status)+'</div>';
+    return '<div class="row"><div class="n"><b>'+r.product_name+'</b>'+(r.brand?(' '+r.brand):"")+'<br>৳'+bn(r.price)+' / '+(r.unit||"")+' • '+d.toLocaleDateString("bn-BD")+'</div>'+(badge[r.status]||r.status)+'</div>';
   }).join("");
 }
 </script>
@@ -255,6 +261,7 @@ if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catc
   var standalone=window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
   var top=document.getElementById("installBannerTop"), steps=document.getElementById("installSteps");
   if(standalone){ if(top) top.style.display="none"; if(steps) steps.style.display="none"; return; }
+  if(window.innerWidth>768){ if(top) top.style.display="none"; if(steps) steps.style.display="none"; return; }
   var ua=navigator.userAgent||"";
   var inApp=/WhatsApp|FBAN|FBAV|Instagram|Messenger|Line\//i.test(ua);
   if(inApp){ var h=document.getElementById("installHelp"); if(h) h.style.display="block"; }
