@@ -36,7 +36,14 @@ header p{margin:4px 0;color:#e8f5ee}
 .qty{display:flex;gap:6px;align-items:center;justify-content:center}
 .qty button{width:36px;height:36px;font-size:19px;border-radius:10px;border:1px solid #065f46;background:#fff;color:#065f46;cursor:pointer}
 .listrow{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #d8d8d8;border-radius:12px;padding:10px;margin-bottom:8px}
-.arow{display:flex;gap:6px;align-items:flex-start;background:#fff;border:1px solid #d8d8d8;border-radius:12px;padding:8px;margin-bottom:8px}
+.arow{display:flex;gap:6px;align-items:flex-start;background:#fff;border:1px solid #e8e8e8;border-radius:14px;padding:10px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.agroup{background:#fff;border:1px solid #e8e8e8;border-radius:16px;padding:10px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.ghead{display:flex;gap:6px;align-items:flex-start;padding:2px 2px 8px;border-bottom:1px dashed #e5e7eb;margin-bottom:8px}
+.ghead .n{flex:1;min-width:0}
+.vrow{display:flex;gap:6px;align-items:center;padding:7px 4px;border-bottom:1px solid #f3f4f6}
+.vrow:last-child{border-bottom:0}
+.vrow input,.vrow select{padding:7px;font-size:14px;margin:0}
+.vrow button{padding:6px 8px;flex:none}
 .arow .n{flex:1;min-width:0}
 .arow input,.arow select{padding:7px;font-size:14px;margin:2px 0}
 .arow .mini{display:flex;gap:4px;align-items:center}
@@ -56,13 +63,13 @@ input,textarea,select{width:100%;padding:11px;font-size:16px;border:1px solid #9
 .bottomnav{position:fixed;left:0;right:0;bottom:0;background:#065f46;display:flex;z-index:10}
 .bottomnav button{flex:1;background:none;border:0;color:#fff;padding:12px 1px;font-size:13px;cursor:pointer;min-width:0}
 .bottomnav button.on{background:#044d38;font-weight:700}
-.adminbox{background:#fff;border:2px solid #065f46;border-radius:16px;padding:14px;margin-top:12px}
+.adminbox{background:#fff;border:2px solid #065f46;border-radius:18px;padding:16px;margin-top:12px;box-shadow:0 2px 10px rgba(6,95,70,.12)}
 .adminbox h3{color:#065f46;margin:8px 0}
 .small{font-size:14px;color:#555}
-button.primary{background:#065f46;color:#fff;border:0;border-radius:10px;padding:12px 16px;font-size:16px;cursor:pointer}
-button.gold{background:#d4a017;color:#111;border:0;border-radius:10px;padding:12px 16px;font-size:16px;font-weight:700;cursor:pointer}
-button.danger{background:#b91c1c;color:#fff;border:0;border-radius:10px;padding:8px 12px;font-size:15px;cursor:pointer}
-button.ghost{background:#fff;border:1px solid #065f46;color:#065f46;border-radius:10px;padding:8px 12px;font-size:15px;cursor:pointer}
+button.primary{background:#065f46;color:#fff;border:0;border-radius:12px;padding:12px 16px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(6,95,70,.3)}
+button.gold{background:#d4a017;color:#111;border:0;border-radius:12px;padding:12px 16px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(212,160,23,.3)}
+button.danger{background:#b91c1c;color:#fff;border:0;border-radius:10px;padding:8px 12px;font-size:15px;cursor:pointer;box-shadow:0 1px 4px rgba(185,28,28,.3)}
+button.ghost{background:#fff;border:1px solid #065f46;color:#065f46;border-radius:10px;padding:8px 12px;font-size:15px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .statgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
 .stat{background:#e8f5ee;border-radius:12px;padding:10px;text-align:center}
 .stat b{font-size:22px;color:#065f46;display:block}
@@ -432,13 +439,75 @@ function applyMargin(){
 }
 function saveToken(){ localStorage.setItem("mb-gh-token", document.getElementById("ghToken").value.trim()); }
 var draggedId=null;
+function groupNameA(gid){ var p=null; DRAFT.products.forEach(function(x){ if(x.id===gid) p=x; }); return p?p.name:""; }
 function renderAdminProducts(){
   var q=(document.getElementById("adminQ").value||"").trim();
-  var list=DRAFT.products.filter(function(p){ return !q||p.name.indexOf(q)>=0||(p.brand||"").indexOf(q)>=0; });
-  document.getElementById("adminProducts").innerHTML=list.map(function(p, idx){
-    var serial=DRAFT.products.indexOf(p)+1;
-    return '<div class="arow dragrow" draggable="true" data-id="'+p.id+'" ondragstart="dragStart(event,'+p.id+')" ondragover="dragOver(event)" ondrop="dropRow(event,'+p.id+')" ondragend="dragEnd()"><span class="handle" title="নাম ধরে টেনে সিরিয়াল বদলান">⋮⋮</span><b>'+bn(serial)+'.</b><div class="n"><div style="display:flex;gap:6px;align-items:center"><input style="flex:2;min-width:0" value="'+p.name.replace(/"/g,"&quot;")+'" onchange="editProduct('+p.id+',\'name\',this.value)" placeholder="পণ্যের নাম"><input style="flex:1;min-width:0" value="'+(p.brand||"").replace(/"/g,"&quot;")+'" onchange="editProduct('+p.id+',\'brand\',this.value)" placeholder="ব্র্যান্ড"><button class="danger" style="padding:6px 9px" onclick="delProduct('+p.id+')">✕</button></div><div class="mini"><input type="number" min="0" value="'+p.price_taka+'" onchange="editProduct('+p.id+',\'price_taka\',this.value)" placeholder="খুচরা ৳"><input type="number" min="0" value="'+(p.wholesale_price||0)+'" onchange="editProduct('+p.id+',\'wholesale_price\',this.value)" placeholder="পাইকারি ৳"><input value="'+p.unit+'" onchange="editProduct('+p.id+',\'unit\',this.value)" placeholder="একক"><select onchange="editProduct('+p.id+',\'category\',this.value)">'+CATS.map(function(c){ return '<option '+(c===p.category?'selected':'')+'>'+c+'</option>'; }).join("")+'</select><button onclick="moveProduct('+p.id+',-1)">↑</button><button onclick="moveProduct('+p.id+',1)">↓</button></div></div></div>';
-  }).join("")||"<p>কোনো পণ্য পাওয়া যায়নি।</p>";
+  var seen={}, gids=[];
+  DRAFT.products.forEach(function(p){ if(!seen[p.name]){ seen[p.name]=true; gids.push(p.id); } });
+  var ghtml=gids.filter(function(gid){
+    if(!q) return true;
+    var name=groupNameA(gid);
+    if(name.indexOf(q)>=0) return true;
+    return DRAFT.products.some(function(p){ return p.name===name && ((p.brand||"").indexOf(q)>=0); });
+  }).map(function(gid, gi){
+    var name=groupNameA(gid);
+    var vars=DRAFT.products.filter(function(p){ return p.name===name; });
+    var cat0=vars[0].category;
+    var head='<div class="agroup"><div class="ghead"><b>'+bn(gi+1)+'.</b><div class="n"><div style="display:flex;gap:6px;align-items:center"><input style="flex:2;min-width:0" value="'+name.replace(/"/g,"&quot;")+'" onchange="renameGroup('+gid+',this.value)" placeholder="পণ্যের নাম"><select style="flex:1;min-width:0" onchange="setGroupCategory('+gid+',this.value)">'+CATS.map(function(c){ return '<option '+(c===cat0?'selected':'')+'>'+c+'</option>'; }).join("")+'</select><button class="ghost" style="padding:6px 10px" onclick="addVariant('+gid+')">＋ ব্র্যান্ড</button><button class="danger" style="padding:6px 9px" onclick="delGroup('+gid+')">🗑️</button></div><div class="small" style="margin-top:2px">'+bn(vars.length)+'টি ব্র্যান্ড</div></div><span style="display:flex;flex-direction:column;gap:4px"><button onclick="moveGroup('+gid+',-1)">↑</button><button onclick="moveGroup('+gid+',1)">↓</button></span></div>';
+    var rows=vars.map(function(p){
+      return '<div class="vrow"><input style="flex:1;min-width:0" value="'+(p.brand||"").replace(/"/g,"&quot;")+'" onchange="editProduct('+p.id+',\'brand\',this.value)" placeholder="ব্র্যান্ড"><input type="number" min="0" style="width:84px" value="'+p.price_taka+'" onchange="editProduct('+p.id+',\'price_taka\',this.value)" placeholder="খুচরা ৳"><input type="number" min="0" style="width:84px" value="'+(p.wholesale_price||0)+'" onchange="editProduct('+p.id+',\'wholesale_price\',this.value)" placeholder="পাইকারি ৳"><input style="width:70px" value="'+p.unit+'" onchange="editProduct('+p.id+',\'unit\',this.value)" placeholder="একক"><button onclick="moveVariant('+p.id+',-1)">↑</button><button onclick="moveVariant('+p.id+',1)">↓</button><button class="danger" style="padding:6px 9px" onclick="delProduct('+p.id+')">✕</button></div>';
+    }).join("");
+    return head+rows+'</div>';
+  }).join("");
+  document.getElementById("adminProducts").innerHTML=ghtml||"<p>কোনো পণ্য পাওয়া যায়নি।</p>";
+}
+function renameGroup(gid, newName){
+  var old=groupNameA(gid); if(!old||!newName||newName===old) return;
+  DRAFT.products.forEach(function(p){ if(p.name===old) p.name=newName; });
+  recalcPackages(DRAFT); saveDraft(); renderAdminProducts(); renderAdminPackages();
+}
+function setGroupCategory(gid, cat){
+  var name=groupNameA(gid); if(!name) return;
+  DRAFT.products.forEach(function(p){ if(p.name===name) p.category=cat; });
+  recalcPackages(DRAFT); saveDraft(); renderAdminProducts();
+}
+function addVariant(gid){
+  var name=groupNameA(gid); if(!name) return;
+  var vars=DRAFT.products.filter(function(p){ return p.name===name; });
+  var maxId=0; DRAFT.products.forEach(function(p){ if(p.id>maxId) maxId=p.id; });
+  var lastIdx=DRAFT.products.indexOf(vars[vars.length-1]);
+  DRAFT.products.splice(lastIdx+1,0,{id:maxId+1, name:name, brand:"", category:vars[0].category, unit:vars[0].unit, price_taka:0, wholesale_price:0, daily:false});
+  saveDraft(); renderAdminProducts();
+}
+function delGroup(gid){
+  var name=groupNameA(gid); if(!name) return;
+  if(!confirm("“"+name+"”-এর সব ব্র্যান্ড মুছে দেবেন?")) return;
+  var ids={}; DRAFT.products.forEach(function(p){ if(p.name===name) ids[p.id]=true; });
+  DRAFT.products=DRAFT.products.filter(function(p){ return p.name!==name; });
+  DRAFT.packages.forEach(function(pkg){ pkg.items=pkg.items.filter(function(it){ return !ids[it.product_id]; }); });
+  recalcPackages(DRAFT); saveDraft(); renderAdminProducts(); renderAdminPackages();
+}
+function moveVariant(id,d){
+  var i=DRAFT.products.findIndex(function(p){ return p.id===id; }); if(i<0) return;
+  var name=DRAFT.products[i].name;
+  var j=i+d;
+  while(j>=0&&j<DRAFT.products.length&&DRAFT.products[j].name!==name) j+=d;
+  if(j<0||j>=DRAFT.products.length) return;
+  var t=DRAFT.products[i]; DRAFT.products[i]=DRAFT.products[j]; DRAFT.products[j]=t;
+  saveDraft(); renderAdminProducts();
+}
+function moveGroup(gid,d){
+  var name=groupNameA(gid); if(!name) return;
+  var seen={}, order=[];
+  DRAFT.products.forEach(function(p){ if(!seen[p.name]){ seen[p.name]=true; order.push(p.name); } });
+  var i=order.indexOf(name); var j=i+d; if(i<0||j<0||j>=order.length) return;
+  var t=order[i]; order[i]=order[j]; order[j]=t;
+  var byName={};
+  DRAFT.products.forEach(function(p){ (byName[p.name]=byName[p.name]||[]).push(p); });
+  var np=[];
+  order.forEach(function(n){ byName[n].forEach(function(p){ np.push(p); }); });
+  DRAFT.products=np;
+  saveDraft(); renderAdminProducts();
 }
 function dragStart(e,id){ draggedId=id; e.dataTransfer.effectAllowed="move"; var r=e.target.closest(".dragrow"); if(r) r.classList.add("dragging"); }
 function dragOver(e){ e.preventDefault(); e.dataTransfer.dropEffect="move"; }
@@ -476,7 +545,9 @@ function addProduct(){
   var unit=prompt("একক লিখুন (যেমন: কেজি / পিস / লিটার):", "পিস")||"পিস";
   var brand=prompt("ব্র্যান্ড (না থাকলে খালি রাখুন):", "")||"";
   var cat=prompt("ক্যাটাগরি লিখুন:", "অন্যান্য")||"অন্যান্য";
-  DRAFT.products.unshift({id:maxId+1, name:name, brand:brand, category:cat, unit:unit, price_taka:price, daily:false});
+  var newP={id:maxId+1, name:name, brand:brand, category:cat, unit:unit, price_taka:price, daily:false};
+  var lastIdx=-1; DRAFT.products.forEach(function(p,i){ if(p.name===name) lastIdx=i; });
+  if(lastIdx>=0) DRAFT.products.splice(lastIdx+1,0,newP); else DRAFT.products.unshift(newP);
   if(CATS.indexOf(cat)<0) CATS.push(cat);
   saveDraft(); renderAdminProducts();
 }
