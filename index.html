@@ -33,6 +33,16 @@ header p{margin:4px 0;color:#e8f5ee}
 .step b{display:block;width:30px;height:30px;line-height:30px;border-radius:50%;background:#065f46;color:#fff;font-size:17px;margin:0 auto 6px}
 .step span{font-size:14px;font-weight:700;color:#065f46}
 .stephead{font-size:18px;color:#065f46;margin:14px 0 4px}
+.prizebanner{background:linear-gradient(135deg,#ffd970,#f5d76e);border:2px solid #d4a017;border-radius:16px;padding:14px;margin:12px 0;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(212,160,23,.3)}
+.prizebanner b{font-size:18px;color:#111}
+.prizebanner span{font-size:14px;color:#444;display:block;margin-top:4px}
+.chatfab{position:fixed;right:12px;bottom:64px;z-index:12;background:#d4a017;color:#111;border:0;border-radius:999px;padding:14px 18px;font-size:17px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.chatpanel{position:fixed;left:0;right:0;bottom:0;z-index:20;background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -4px 24px rgba(0,0,0,.3);max-height:82vh;display:flex;flex-direction:column}
+.chatlog{flex:1;overflow:auto;padding:12px}
+.chatmsg{margin:6px 0;padding:10px 12px;border-radius:14px;max-width:88%;line-height:1.6;white-space:pre-wrap;word-wrap:break-word}
+.chatmsg.me{background:#065f46;color:#fff;margin-left:auto}
+.chatmsg.bot{background:#f0f0f0;color:#111}
+.chatchip{border:1px solid #065f46;background:#fff;color:#065f46;border-radius:999px;padding:8px 12px;font-size:14px;cursor:pointer}
 .cartbar{position:fixed;left:12px;right:12px;bottom:64px;z-index:11;background:#065f46;color:#fff;border-radius:14px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;font-size:17px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25)}
 .card h3{margin:0 0 4px;font-size:19px}
 .card .brand{color:#666;font-size:14px}
@@ -97,7 +107,7 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 <h1 id="shopTitle">মাসিক বাজার</h1>
 <p><span id="companyTitle">নীড়</span> &nbsp;•&nbsp; মাসিক বাজারের সবকিছু, এক জায়গায়</p>
 </header>
-<div class="hero"><b>Fresh Groceries Delivered Fast</b><br><span id="heroCount">১৩৩টি পণ্য • ৭টি পরিবার প্যাকেজ • WhatsApp-এ অর্ডার</span></div>
+<div class="hero"><b>মাসের বাজার, এখন আপনার দরজায়</b><br><span id="heroCount">১৩৩টি পণ্য • ৭টি পরিবার প্যাকেজ • WhatsApp-এ অর্ডার</span></div>
 <div id="installBanner" style="display:none;background:#ffd970;color:#111;padding:14px 16px;text-align:center;border-bottom:3px solid #065f46">
 <b>📲 অ্যাপ হিসেবে হোম স্ক্রিনে যোগ করুন</b><br><span id="installText">এক ট্যাপে ফোনে অ্যাপের মতো রাখুন — পরে আর লিংক খুঁজতে হবে না।</span><br>
 <button class="primary" id="installBtn" style="margin-top:8px" onclick="doInstall()">হোম স্ক্রিনে যোগ করুন</button>
@@ -107,6 +117,7 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 <div class="wrap">
 
 <div id="tab-shop">
+<div class="prizebanner" onclick="showTab(\'feedback\')">💡 <b>নতুন আইডিয়া দিন, পুরস্কার জিতুন!</b><span>আমাদের সেবা কেমন? অ্যাপটি কেমন হলে আপনি আরও ভালোভাবে ব্যবহার করতে পারতেন? আপনার আইডিয়া জানান — সেরা আইডিয়ার জন্য থাকছে পুরস্কার!</span></div>
 <div class="steps">
 <div class="step"><b>১</b><span>পণ্য বেছে নিন</span></div>
 <div class="step"><b>২</b><span>কার্টে যোগ করুন</span></div>
@@ -176,15 +187,36 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 <section><h2>📋 আমার অর্ডার</h2><p class="small">লগইন করলে আপনার অর্ডারগুলো সেভ থাকবে — ফোন বদলালেও দেখা যাবে। লগইন ছাড়াও পণ্য দেখা ও অর্ডার করা যাবে।</p><div id="customerBox" class="adminbox"></div><div id="myOrders"></div></section>
 </div>
 
+<div id="tab-feedback" style="display:none">
+<section class="adminbox"><h2>💬 মতামত</h2>
+<p>আপনার অভিযোগ, পরামর্শ বা নতুন আইডিয়া জানান — অ্যাডমিন দেখে সমাধান করবেন। নতুন আইডিয়া দিলে সেরা আইডিয়ার জন্য পুরস্কার আছে!</p>
+<label>আপনার নাম</label><input id="fbName" placeholder="নাম লিখুন">
+<label>মোবাইল নম্বর</label><input id="fbPhone" placeholder="01XXXXXXXXX">
+<label>ধরন</label>
+<select id="fbType"><option>অভিযোগ</option><option>পরামর্শ</option><option>নতুন আইডিয়া</option></select>
+<label>আপনার বার্তা</label><textarea id="fbMsg" rows="4" placeholder="এখানে লিখুন…"></textarea>
+<button class="primary" style="width:100%" onclick="sendFeedback()">পাঠান</button>
+<p id="fbOut" class="small"></p>
+</section>
+</div>
+
 
 
 </div>
-<div id="cartBar" class="cartbar" style="display:none" onclick="showTab('cart')"><span id="cartBarText"></span><b>কার্ট দেখুন →</b></div>
+<div id="cartBar" class="cartbar" style="display:none" onclick="showTab(\'cart\')"><span id="cartBarText"></span><b>কার্ট দেখুন →</b></div>
+<button id="chatFab" class="chatfab" onclick="toggleChat(true)">💬 সাহায্য</button>
+<div id="chatPanel" class="chatpanel" style="display:none">
+<div style="padding:12px 16px;background:#065f46;color:#fff;border-radius:20px 20px 0 0;display:flex;justify-content:space-between;align-items:center"><b>💬 মাসিক বাজার সহকারী</b><button onclick="toggleChat(false)" style="background:none;border:0;color:#fff;font-size:22px;cursor:pointer">✕</button></div>
+<div id="chatLog" class="chatlog"></div>
+<div id="chatChips" style="display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px"></div>
+<div style="display:flex;gap:6px;padding:8px 12px 16px"><input id="chatInput" placeholder="এখানে লিখুন…" style="flex:1;margin:0" onkeydown="if(event.key===\'Enter\')sendChat()"><button class="primary" onclick="sendChat()">পাঠান</button></div>
+</div>
 <nav class="bottomnav">
 <button id="nav-shop" class="on" onclick="showTab('shop')">🛒 দোকান</button>
 <button id="nav-packages" onclick="showTab('packages')">📦 প্যাকেজ</button>
 <button id="nav-cart" onclick="showTab('cart')">🧾 কার্ট <span id="cartCount"></span></button>
-<button id="nav-orders" onclick="showTab('orders')">📋 আমার অর্ডার</button>
+<button id="nav-orders" onclick="showTab(\'orders\')">📋 আমার অর্ডার</button>
+<button id="nav-feedback" onclick="showTab(\'feedback\')">💬 মতামত</button>
 </nav>
 <footer>মাসিক বাজার • নীড় • অর্ডার যাবে WhatsApp-এ</footer>
 
@@ -272,12 +304,13 @@ function brandSelectHtml(p, fnName, arg){
 }
 function chgCartBrand(oldId, newId){ oldId=parseInt(oldId,10); newId=parseInt(newId,10); if(oldId===newId||!cart[oldId]) return; cart[newId]=(cart[newId]||0)+cart[oldId]; delete cart[oldId]; saveCart(); renderCart(); renderShop(); }
 function showTab(t){
-  ["shop","packages","cart","orders"].forEach(function(x){
+  ["shop","packages","cart","orders","feedback"].forEach(function(x){
     document.getElementById("tab-"+x).style.display = (x===t)?"block":"none";
     document.getElementById("nav-"+x).classList.toggle("on", x===t);
   });
   if(t==="cart") renderCart();
   if(t==="orders") renderMyOrders();
+  if(t==="feedback") renderFeedback();
   logVisit("tab", t);
 }
 function setView(v){ view=v; document.getElementById("vGrid").classList.toggle("on",v==="grid"); document.getElementById("vList").classList.toggle("on",v==="list"); renderShop(); }
@@ -458,6 +491,7 @@ function delCustomItem(id){ customCart=customCart.filter(function(x){ return x.i
 function updateCartBar(){
   var b=document.getElementById("cartBar"); if(!b) return;
   var t=cartTotals();
+  var fab=document.getElementById("chatFab"); if(fab) fab.style.bottom=(t.n===0)?"64px":"128px";
   if(t.n===0){ b.style.display="none"; return; }
   b.style.display="flex";
   document.getElementById("cartBarText").textContent="🛒 কার্টে "+bn(t.n)+"টি পণ্য"+(canSeePrices()?(" — মোট ৳"+bn(t.total)):"");
@@ -552,6 +586,298 @@ async function renderMyOrders(){
     return '<div class="ordercard"><b>'+o.code+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br><b>'+statusText[o.status]+'</b>'+(o.address?('<br>ঠিকানা: '+o.address):"")+'<br>'+o.items.map(function(it){ return it.name+(it.brand?(' ('+it.brand+')'):"")+' — '+bn(it.qty)+' '+it.unit+' (৳'+bn(it.total)+')'; }).join("<br>")+(o.custom.length?("<br>"+o.custom.map(function(c){ return c.name+" — "+c.qty; }).join("<br>")):"")+'<br><b>সর্বমোট: ৳'+bn(o.grand)+'</b>'+steps+'<button class="primary" onclick="reorder(\''+o.code+'\')">🔁 আবার এই অর্ডারটি করুন</button> '+(o.status==="sent"?'<button class="ghost" onclick="setOrderStatus(\''+o.code+'\',\'confirmed\')">দোকান নিশ্চিত করেছে</button>':"")+(o.status==="confirmed"?'<button class="ghost" onclick="setOrderStatus(\''+o.code+'\',\'delivered\')">ডেলিভারি পেয়েছি</button>':"")+'</div>';
   }).join("");
 }
+/* ---- AI সহকারী (নিয়ম-ভিত্তিক, অফলাইনে চলে) ---- */
+var CHAT_CHIPS=["দাম জানতে চাই","প্যাকেজ দেখাও","অর্ডার কিভাবে করবো","আমার অর্ডার","অভিযোগ জানাতে চাই","ফোনে কথা বলতে চাই"];
+var chatState=null;
+var chatOpened=false;
+function toggleChat(open){
+  var p=document.getElementById("chatPanel"); if(!p) return;
+  p.style.display=open?"flex":"none";
+  if(open && !chatOpened){
+    chatOpened=true;
+    addChatMsg("bot","আসসালামু আলাইকুম! 👋 আমি মাসিক বাজারের সহকারী। দাম জানতে, প্যাকেজ দেখতে, অর্ডার করতে বা আপনার অর্ডারের খবর দিতে পারি। নিচের যেকোনো একটা চাপুন, বা আপনার প্রশ্ন লিখুন।");
+  }
+  if(open){ var inp=document.getElementById("chatInput"); if(inp) inp.focus(); }
+}
+function addChatMsg(who, text){
+  var log=document.getElementById("chatLog"); if(!log) return;
+  var d=document.createElement("div");
+  d.className="chatmsg "+who;
+  d.innerHTML=text;
+  log.appendChild(d);
+  log.scrollTop=log.scrollHeight;
+}
+function renderChatChips(){
+  var el=document.getElementById("chatChips"); if(!el) return;
+  el.innerHTML=CHAT_CHIPS.map(function(c){ return '<button class="chatchip" onclick="chatChip(\''+c+'\')">'+c+'</button>'; }).join("");
+}
+function chatChip(text){ document.getElementById("chatInput").value=text; sendChat(); }
+function escChat(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+async function sendChat(){
+  var inp=document.getElementById("chatInput");
+  var text=(inp.value||"").trim(); if(!text) return;
+  inp.value="";
+  addChatMsg("me", escChat(text));
+  var reply=await aiReply(text);
+  addChatMsg("bot", reply);
+}
+function coreName(name){ return name.split("(")[0].trim(); }
+function stripPoss(q){ return q.split(/\s+/).map(function(w){ return w.replace(/[এে]র$/,""); }).join(" "); }
+var STOPWORDS={"দাম":1,"কত":1,"আছে":1,"জানতে":1,"চাই":1,"করো":1,"করুন":1,"যোগ":1,"কিভাবে":1,"কীভাবে":1,"কেমন":1,"করে":1,"প্যাকেজ":1,"অর্ডার":1,"ডেলিভারি":1,"চার্জ":1,"খরচ":1,"স্টক":1,"পাওয়া":1,"যাবে":1,"টা":1,"টি":1,"এর":1,"কি":1,"কী":1,"এবং":1,"বা":1,"আমার":1,"একটু":1,"দিন":1,"দেন":1,"বলেন":1,"বলুন":1,"দেখাও":1,"দেখান":1,"নম্বর":1,"ফোন":1,"কল":1,"কনফার্ম":1,"হ্যাঁ":1,"হ্যালো":1,"সালাম":1,"আসসালামু":1,"আলাইকুম":1,"মতামত":1,"অভিযোগ":1,"পরামর্শ":1,"আইডিয়া":1,"আইডিয়া":1,"সেবা":1,"ভালো":1,"আরো":1,"আরও":1,"দাও":1,"দেওয়ার":1,"দেব":1,"হবে":1,"হয়":1,"কোন":1,"কোনটা":1,"কোনটি":1,"থেকে":1,"জন্য":1,"সাথে":1,"এখন":1,"সব":1,"গুলো":1,"গুলি":1,"টাকা":1,"লিটার":1,"কেজি":1,"গ্রাম":1,"পিস":1,"প্যাকেট":1};
+function bnToLatin(s){ return String(s).replace(/[০-৯]/g,function(d){ return "০১২৩৪৫৬৭৮৯".indexOf(d); }); }
+function findProductsByText(q){
+  var qn=stripPoss(q);
+  var hits=[];
+  groupList().forEach(function(gid){
+    var name=groupName(gid);
+    var core=coreName(name);
+    if(core && qn.indexOf(core)>=0) hits.push({gid:gid, len:core.length});
+    else if(qn.indexOf(name)>=0) hits.push({gid:gid, len:name.length});
+  });
+  if(!hits.length){
+    var words=qn.split(/\s+/).filter(function(w){ return w.length>=3 && !STOPWORDS[w]; });
+    groupList().forEach(function(gid){
+      var name=groupName(gid);
+      words.forEach(function(w){ if(name.indexOf(w)>=0) hits.push({gid:gid, len:w.length}); });
+    });
+  }
+  var seen={}, out=[];
+  hits.sort(function(a,b){ return b.len-a.len; }).forEach(function(h){ if(!seen[h.gid]){ seen[h.gid]=1; out.push(h); } });
+  return out;
+}
+function priceTextFor(gid){
+  var vars=groupVars(gid);
+  var name=groupName(gid);
+  if(!canSeePrices()) return "“"+name+"”-এর দাম দেখতে লগইন করুন — আমার অর্ডার ট্যাবে লগইন করলে দাম দেখা যাবে। লগইন করলে আমি সব ব্র্যান্ডের দাম বলে দেবো।";
+  var lines=vars.map(function(v){ return "• "+(v.brand||"সাধারণ")+" — ৳"+bn(v.price_taka)+" / "+v.unit; });
+  return "“"+name+"”-এর দাম:\n"+lines.join("\n");
+}
+function parseNamePhone(text){
+  var t=bnToLatin(text);
+  var m=t.match(/0?1[3-9]\d{8}/);
+  var phone=m?m[0]:"";
+  if(phone.length===10) phone="0"+phone;
+  var name=text;
+  if(phone) name=name.replace(bnToLatin(phone), "").replace(phone,"");
+  name=name.replace(/[0-9০-৯]/g,"").replace(/আমার নাম|নাম|মোবাইল|নম্বর|ফোন|হলো|হচ্ছে|আমি/g,"").replace(/[,\.।:]/g," ").trim();
+  return {name:name, phone:phone};
+}
+async function saveFeedbackRow(row){
+  if(sb){
+    try{
+      var res=await sb.from("feedback").insert([row]);
+      if(!res.error) return true;
+    }catch(e){}
+  }
+  var pend=[]; try{ pend=JSON.parse(localStorage.getItem("mb-feedback-pending")||"[]"); }catch(e){}
+  pend.push(row);
+  try{ localStorage.setItem("mb-feedback-pending", JSON.stringify(pend)); }catch(e){}
+  return false;
+}
+async function flushPendingFeedback(){
+  if(!sb) return;
+  var pend=[]; try{ pend=JSON.parse(localStorage.getItem("mb-feedback-pending")||"[]"); }catch(e){}
+  if(!pend.length) return;
+  try{
+    var res=await sb.from("feedback").insert(pend);
+    if(!res.error){ try{ localStorage.removeItem("mb-feedback-pending"); }catch(e){} }
+  }catch(e){}
+}
+function renderFeedback(){
+  var c=getCustomer();
+  var n=document.getElementById("fbName"), p=document.getElementById("fbPhone");
+  if(c){ if(n && !n.value) n.value=c.name||""; if(p && !p.value) p.value=c.phone||""; }
+}
+async function sendFeedback(){
+  var name=(document.getElementById("fbName").value||"").trim();
+  var phone=(document.getElementById("fbPhone").value||"").trim();
+  var type=document.getElementById("fbType").value;
+  var msg=(document.getElementById("fbMsg").value||"").trim();
+  var out=document.getElementById("fbOut");
+  var c=getCustomer();
+  if(!name && c) name=c.name||"";
+  if(!phone && c) phone=c.phone||"";
+  if(!msg){ out.textContent="বার্তাটা লিখুন।"; return; }
+  out.textContent="পাঠানো হচ্ছে…";
+  var saved=await saveFeedbackRow({name:name||"কাস্টমার", phone:phone||"", type:type, message:msg, status:"new"});
+  document.getElementById("fbMsg").value="";
+  out.textContent=saved?"ধন্যবাদ! আপনার বার্তা পৌঁছেছে — অ্যাডমিন দেখে সমাধান করবেন।":"ধন্যবাদ! ইন্টারনেট নেই — বার্তাটা ফোনে সেভ থাকলো, অনলাইন হলে পাঠানো হবে।";
+}
+function cartSummaryText(){
+  var t=cartTotals();
+  var lines=[];
+  Object.keys(cart).forEach(function(id){ var p=findProduct(id); if(p) lines.push("• "+p.name+" ("+(p.brand||"সাধারণ")+") — "+bn(cart[id])+" "+p.unit+(canSeePrices()?(" (৳"+bn(p.price_taka*cart[id])+")"):"")); });
+  customCart.forEach(function(c){ lines.push("• "+c.name+" — "+c.qty); });
+  return "🛒 আপনার কার্টে "+bn(t.n)+"টি পণ্য:\n"+lines.join("\n")+(canSeePrices()?("\nসর্বমোট: ৳"+bn(t.total+(DATA.delivery_fee_taka||0))):"\n(দাম লগইন করলে দেখা যাবে)");
+}
+function confirmOrderNow(){
+  var t=cartTotals();
+  if(t.n===0) return "কার্ট খালি — আগে দোকান থেকে পণ্য যোগ করুন, তারপর কনফার্ম করবো।";
+  var c=getCustomer();
+  var cn=document.getElementById("cname"), cp=document.getElementById("cphone");
+  if(c){ if(cn && !cn.value) cn.value=c.name||""; if(cp && !cp.value) cp.value=c.phone||""; }
+  renderCart();
+  var href=document.getElementById("walink").href;
+  var ordNo=code();
+  saveOrder();
+  window.open(href,"_blank");
+  return "✅ অর্ডার পাঠানো হচ্ছে! WhatsApp খুলছে — সেখান থেকে পাঠান। আপনার অর্ডার নম্বর: "+ordNo+"। দোকান থেকে নিশ্চিত করা হবে।";
+}
+async function findOrderByNo(no){
+  var o=null;
+  getOrders().forEach(function(x){ if(x.code===no) o=x; });
+  if(o){
+    var st={sent:"WhatsApp-এ পাঠানো হয়েছে", confirmed:"দোকান নিশ্চিত করেছে", delivered:"ডেলিভারি সম্পন্ন"}[o.status]||o.status;
+    return "অর্ডার "+o.code+" — "+st+"।\n"+o.items.map(function(it){ return "• "+it.name+(it.brand?(" ("+it.brand+")"):"")+" — "+bn(it.qty)+" "+it.unit+" (৳"+bn(it.total)+")"; }).join("\n")+"\nসর্বমোট: ৳"+bn(o.grand)+"।";
+  }
+  var c=getCustomer();
+  if(c && sb){
+    try{
+      var res=await sb.from("orders").select("*").eq("order_no", no).limit(1);
+      var r=(res.data||[])[0];
+      if(r){
+        var bnStatus={"New Order":"নতুন অর্ডার","Contacted":"যোগাযোগ হয়েছে","Confirmed":"নিশ্চিত","Preparing":"তৈরি হচ্ছে","Out for Delivery":"ডেলিভারিতে","Delivered":"ডেলিভারি সম্পন্ন","Cancelled":"বাতিল"};
+        return "অর্ডার "+r.order_no+" — "+(bnStatus[r.status]||r.status)+"।\n"+(r.items||[]).map(function(it){ return "• "+it.name+(it.brand?(" ("+it.brand+")"):"")+" — "+bn(it.qty)+" "+(it.unit||""); }).join("\n")+"\nসর্বমোট: ৳"+bn(r.total)+"।";
+      }
+    }catch(e){}
+  }
+  return null;
+}
+async function aiReply(q){
+  var text=(q||"").trim();
+  /* --- pending two-step flows --- */
+  if(chatState){
+    if(chatState.kind==="call"){
+      var np=parseNamePhone(text);
+      if(!np.phone){ return "মোবাইল নম্বরটি পাইনি — আপনার নাম ও মোবাইল নম্বর একসাথে লিখুন (যেমন: রহিম 01712345678)।"; }
+      chatState=null;
+      var saved=await saveFeedbackRow({name:np.name||"কাস্টমার", phone:np.phone, type:"ফোনে কনফার্ম", message:"কাস্টমার ফোনে কনফার্ম চান।"+(cartTotals().n?(" কার্টে "+bn(cartTotals().n)+"টি পণ্য আছে।"):""), status:"new"});
+      return "ধন্যবাদ, "+escChat(np.name||"")+"! ✅ দোকান থেকে আপনাকে "+np.phone+" নম্বরে ফোন করা হবে অর্ডার কনফার্ম করার জন্য।"+(saved?"":" (ইন্টারনেট নেই — অনুরোধটি ফোনে সেভ থাকলো, অনলাইন হলে পাঠানো হবে।)");
+    }
+    if(chatState.kind==="confirmInfo"){
+      var np2=parseNamePhone(text);
+      if(!np2.phone){ return "মোবাইল নম্বরটি পাইনি — নাম ও মোবাইল নম্বর লিখুন (যেমন: রহিম 01712345678)।"; }
+      var cn=document.getElementById("cname"), cp=document.getElementById("cphone");
+      if(cn) cn.value=np2.name||"";
+      if(cp) cp.value=np2.phone||"";
+      renderCart();
+      chatState={kind:"confirm"};
+      return "ঠিক আছে!\n"+cartSummaryText()+"\nনাম: "+escChat(np2.name||"")+" — মোবাইল: "+np2.phone+"।\nসব ঠিক থাকলে 'হ্যাঁ, কনফার্ম করুন' লিখুন — তাহলে WhatsApp-এ অর্ডার পাঠিয়ে দেবো।";
+    }
+    if(chatState.kind==="confirm"){
+      if(text.indexOf("কনফার্ম")>=0 || /^(হ্যাঁ|হ্যা|জি|জ্বি|জী)/.test(text) || text.toLowerCase()==="ok"){
+        chatState=null;
+        return confirmOrderNow();
+      }
+      chatState=null;
+    }
+  }
+  /* --- greeting only (no other intent in the message) --- */
+  if(/^(আসসালামু|সালাম|হ্যালো|হাই|আদাব|নমস্কার)/.test(text) && !/(দাম|কত|আছে|যোগ|প্যাকেজ|অর্ডার|অভিযোগ|পরামর্শ|আইডিয়া|ফোন|কল|কনফার্ম|ডেলিভারি|নম্বর)/.test(text)){
+    return "আসসালামু আলাইকুম! 👋 আমি মাসিক বাজারের সহকারী। দাম জানতে, প্যাকেজ দেখতে, অর্ডার করতে বা আপনার অর্ডারের খবর দিতে পারি। নিচের যেকোনো একটা চাপুন, বা আপনার প্রশ্ন লিখুন।";
+  }
+  /* --- call request --- */
+  if(/(ফোনে কথা|কল করুন|কল কর|কল চাই|ফোন করুন|ফোনে কনফার্ম|ফোনে বল)/.test(text)){
+    var c=getCustomer();
+    if(c && c.phone){
+      var saved2=await saveFeedbackRow({name:c.name||"কাস্টমার", phone:c.phone, type:"ফোনে কনফার্ম", message:"কাস্টমার ফোনে কনফার্ম চান।"+(cartTotals().n?(" কার্টে "+bn(cartTotals().n)+"টি পণ্য আছে।"):""), status:"new"});
+      return "ঠিক আছে! দোকান থেকে আপনাকে "+c.phone+" নম্বরে ফোন করা হবে অর্ডার কনফার্ম করার জন্য।"+(saved2?"":" (ইন্টারনেট নেই — অনুরোধটি ফোনে সেভ থাকলো, অনলাইন হলে পাঠানো হবে।)");
+    }
+    chatState={kind:"call"};
+    return "অবশ্যই! দোকান থেকে আপনাকে ফোন করা হবে। আপনার নাম ও মোবাইল নম্বর লিখুন (যেমন: রহিম 01712345678)।";
+  }
+  /* --- confirm order --- */
+  if(text.indexOf("কনফার্ম")>=0 || text.indexOf("অর্ডার পাঠাও")>=0 || text.indexOf("অর্ডার দাও")>=0){
+    var t=cartTotals();
+    if(t.n===0) return "কার্ট খালি — আগে দোকান থেকে পণ্য যোগ করুন, তারপর 'অর্ডার কনফার্ম করো' বলুন।";
+    var c2=getCustomer();
+    var nm=(document.getElementById("cname")||{}).value||"", ph=(document.getElementById("cphone")||{}).value||"";
+    if(c2){ nm=nm||c2.name||""; ph=ph||c2.phone||""; }
+    if(!ph){
+      chatState={kind:"confirmInfo"};
+      return "অর্ডার কনফার্ম করতে আপনার নাম ও মোবাইল নম্বর লিখুন (যেমন: রহিম 01712345678)।";
+    }
+    chatState={kind:"confirm"};
+    return cartSummaryText()+"\nনাম: "+escChat(nm)+" — মোবাইল: "+ph+"।\nসব ঠিক থাকলে 'হ্যাঁ, কনফার্ম করুন' লিখুন — তাহলে WhatsApp-এ অর্ডার পাঠিয়ে দেবো।";
+  }
+  /* --- complaint / suggestion / idea --- */
+  if(/(অভিযোগ|পরামর্শ|আইডিয়া|আইডিয়া|মতামত|সাজেশন)/.test(text)){
+    return "আপনার অভিযোগ, পরামর্শ বা নতুন আইডিয়া জানাতে 💬 মতামত ট্যাবে লিখুন — অ্যাডমিন দেখে সমাধান করবেন। সেরা আইডিয়ার জন্য পুরস্কারও আছে! 🎁<br><button class=\"primary\" onclick=\"showTab(\'feedback\');toggleChat(false)\">মতামত লিখুন →</button>";
+  }
+  /* --- my order / order status --- */
+  if(text.indexOf("আমার অর্ডার")>=0 || /(অর্ডার.*(কেমন|খবর|স্ট্যাটাস|অবস্থা))/.test(text) || /MB-[A-Z0-9]{6}/i.test(text)){
+    var m=text.match(/MB-[A-Z0-9]{6}/i);
+    if(m){
+      var found=await findOrderByNo(m[0].toUpperCase());
+      if(found) return found;
+      return "“"+m[0].toUpperCase()+"” নম্বরের অর্ডারটি এই ফোনে পাওয়া যায়নি। নম্বরটি ঠিক আছে কি না দেখুন, বা WhatsApp-এ যোগাযোগ করুন (01631421995)।";
+    }
+    var list=getOrders();
+    if(list.length){
+      var o=list[0];
+      var st2={sent:"WhatsApp-এ পাঠানো হয়েছে", confirmed:"দোকান নিশ্চিত করেছে", delivered:"ডেলিভারি সম্পন্ন"}[o.status]||o.status;
+      return "আপনার শেষ অর্ডার: "+o.code+" — "+st2+"।\n"+o.items.map(function(it){ return "• "+it.name+" — "+bn(it.qty)+" "+it.unit; }).join("\n")+"\nসর্বমোট: ৳"+bn(o.grand)+"।\nবিস্তারিত দেখতে 📋 আমার অর্ডার ট্যাবে যান।<br><button class=\"primary\" onclick=\"showTab(\'orders\');toggleChat(false)\">আমার অর্ডার দেখুন →</button>";
+    }
+    return "এই ফোনে এখনো কোনো অর্ডার নেই। অর্ডার নম্বর থাকলে লিখুন (যেমন: MB-XXXXXX), বা 📋 আমার অর্ডার ট্যাবে দেখুন।";
+  }
+  /* --- how to order --- */
+  if(/(কিভাবে|কীভাবে|কেমন করে|অর্ডার করব|অর্ডার করি|অর্ডার দেওয়ার|অর্ডার দেব)/.test(text)){
+    return "অর্ডার করা খুব সহজ — ৩ ধাপ:\n১. পণ্য বেছে নিন (নামে চাপ দিন, পরিমাণ ঠিক করুন, যোগ করুন চাপুন)\n২. কার্টে যোগ করুন\n৩. কার্টে গিয়ে নাম-মোবাইল-ঠিকানা লিখে সবুজ WhatsApp বোতাম চাপুন — সেখান থেকে পাঠান।\nদোকান থেকে নিশ্চিত করা হবে।";
+  }
+  /* --- delivery charge --- */
+  if(text.indexOf("ডেলিভারি")>=0 && (text.indexOf("চার্জ")>=0 || text.indexOf("খরচ")>=0 || text.indexOf("কত")>=0)){
+    var fee=DATA.delivery_fee_taka||0;
+    return fee?("ডেলিভারি চার্জ ৳"+bn(fee)+"।"):("ডেলিভারি চার্জ দোকান থেকে জানানো হবে — অর্ডার দিলে WhatsApp-এ জানিয়ে দেওয়া হবে।");
+  }
+  /* --- packages --- */
+  if(text.indexOf("প্যাকেজ")>=0){
+    var pm=text.match(/([২-৮2-8])\s*জন/);
+    if(pm){
+      var size=parseInt(bnToLatin(pm[1]),10);
+      var pkg=null; DATA.packages.forEach(function(p){ if(p.size===size) pkg=p; });
+      if(pkg){
+        var items=pkg.items.map(function(it){ return "• "+it.name+" — "+it.qty_label; }).join("\n");
+        return "📦 "+pkg.name+" ("+bn(pkg.items.length)+"টি পণ্য):\n"+items+"\n"+(canSeePrices()?("আনুমানিক মোট: ৳"+bn(pkgTotal(pkg))):"আনুমানিক মোট: লগইন করলে দেখা যাবে।")+"\nপ্যাকেজটি খুলতে উপরে 📦 প্যাকেজ ট্যাবে চাপুন।";
+      }
+    }
+    var lines=DATA.packages.map(function(p){ return "• "+p.name+" — "+bn(p.items.length)+"টি পণ্য"+(canSeePrices()?(" (আনুমানিক ৳"+bn(pkgTotal(p))+")"):""); });
+    return "📦 আমাদের ৭টি পরিবার প্যাকেজ আছে (২–৮ জন):\n"+lines.join("\n")+(canSeePrices()?"":"\nদাম দেখতে লগইন করুন — আমার অর্ডার ট্যাবে লগইন করলে দাম দেখা যাবে।")+"\nপ্যাকেজ দেখতে উপরে 📦 প্যাকেজ ট্যাবে চাপুন।";
+  }
+  /* --- shop contact --- */
+  if(/(দোকানের নম্বর|যোগাযোগ|ফোন নম্বর|নম্বরটা|হোয়াটসঅ্যাপ|whatsapp)/i.test(text)){
+    return "দোকানের WhatsApp নম্বর: 01631421995।<br><a href=\"https://wa.me/8801631421995\" target=\"_blank\" style=\"color:#065f46;font-weight:700\">WhatsApp-এ মেসেজ করুন →</a>";
+  }
+  /* --- add to cart --- */
+  if(text.indexOf("যোগ কর")>=0 || text.indexOf("যোগ করুন")>=0 || text.indexOf("কার্টে নিন")>=0){
+    var hits=findProductsByText(text);
+    if(!hits.length) return "কোন পণ্যটি যোগ করবো বুঝতে পারিনি — পণ্যের নামটা লিখুন (যেমন: 'চাল ২ কেজি যোগ করো')।";
+    var gid=hits[0].gid;
+    var v=selectedVariantG(gid);
+    if(!v) return "পণ্যটি পাওয়া যায়নি।";
+    var qm=bnToLatin(text).match(/([0-9]+(?:\.[0-9]+)?)/);
+    var qty=qm?parseFloat(qm[1]):1;
+    if(!(qty>0)) qty=1;
+    cart[v.id]=(cart[v.id]||0)+qty;
+    saveCart(); renderShop(); renderCart();
+    return "✅ "+v.name+" ("+(v.brand||"সাধারণ")+") — "+bn(qty)+" "+v.unit+" কার্টে যোগ করা হয়েছে। কার্টে এখন "+bn(cartTotals().n)+"টি পণ্য আছে। আরও কিছু যোগ করতে চাইলে নাম লিখুন, বা 'অর্ডার কনফার্ম করো' বলুন।";
+  }
+  /* --- price / availability --- */
+  if(/(দাম|কত|আছে|পাওয়া যাবে|স্টক)/.test(text)){
+    var hits2=findProductsByText(text);
+    if(!hits2.length) return "কোন পণ্যটির দাম জানতে চান বুঝতে পারিনি — পণ্যের নামটা লিখুন (যেমন: 'সয়াবিন তেলের দাম কত')।";
+    if(hits2.length>1 && hits2[0].len===hits2[1].len){
+      var names=hits2.slice(0,5).map(function(h){ return "• "+groupName(h.gid); });
+      return "এই নামে কয়েকটি পণ্য আছে:\n"+names.join("\n")+"\nকোনটার দাম জানতে চান? পুরো নামটা লিখুন।";
+    }
+    var g=hits2[0].gid;
+    if(text.indexOf("দাম")>=0 || text.indexOf("কত")>=0) return priceTextFor(g);
+    var vars=groupVars(g);
+    var brands=vars.map(function(x){ return x.brand||"সাধারণ"; }).join(", ");
+    return "হ্যাঁ, “"+groupName(g)+"” আছে — ব্র্যান্ড: "+brands+"।"+(canSeePrices()?" দাম জানতে 'দাম কত' লিখুন।":" দাম দেখতে লগইন করুন।");
+  }
+  /* --- fallback --- */
+  return "দুঃখিত, বুঝতে পারিনি — নিচের যেকোনো একটা চাপুন, বা অভিযোগ/পরামর্শ ট্যাবে লিখুন, বা WhatsApp-এ যোগাযোগ করুন (01631421995)।";
+}
 /* ---- install as app ---- */
 var deferredPrompt=null;
 function isStandalone(){ return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone; }
@@ -579,6 +905,7 @@ showInstallBanner();
 <script>
 fetch("products.json?v=3", {cache:"no-store"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(j && j.products && j.packages && j.packages.length>=FALLBACK.packages.length){ DATA=j; } renderShop(); renderCart(); }).catch(function(){ renderShop(); renderCart(); });
 renderShop(); renderCart();
+renderChatChips(); flushPendingFeedback();
 logVisit("open","");
 </script>
 </body>
