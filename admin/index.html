@@ -357,7 +357,7 @@ async function unlockAdmin(){
     }
   }catch(e){ msg.textContent="ইন্টারনেট চেক করুন, আবার চেষ্টা করুন।"; }
 }
-function lockAdmin(){ localStorage.removeItem("mb-admin-unlocked2"); document.getElementById("masikView").style.display="none"; document.getElementById("homeView").style.display="none"; document.getElementById("adminBody").style.display="none"; document.getElementById("pinBox").style.display="block"; document.getElementById("pinInput").value=""; }
+function lockAdmin(){ localStorage.removeItem("mb-admin-unlocked2"); document.getElementById("masikView").style.display="none"; document.getElementById("homeView").style.display="none"; document.getElementById("adminBody").style.display="none"; document.getElementById("pinBox").style.display="block"; document.getElementById("pinInput").value=""; document.getElementById("pinMsg").textContent=""; var sbx=document.getElementById("setupBox"); if(sbx) sbx.style.display="none"; var cp=document.getElementById("changePinBox"); if(cp) cp.style.display="none"; var pe=document.getElementById("pinEntry"); if(pe) pe.style.display="block"; renderAdmin(); }
 function openAdmin(){
   loadDraft();
   document.getElementById("pinBox").style.display="none";
