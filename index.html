@@ -99,6 +99,13 @@ button.ghost{background:#fff;border:1px solid #065f46;color:#065f46;border-radiu
 .ordercard{background:#fff;border:1px solid #d8d8d8;border-radius:14px;padding:12px;margin-bottom:10px}
 footer{text-align:center;color:#555;padding:16px;font-size:14px}
 @media print{.bottomnav,.viewrow,.chips,.search,.add,.qty,.wa,.pdfbtn,#installBanner{display:none!important}}
+#memoOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;overflow:auto;padding:12px;display:none}
+#memoPaper{background:#fff;max-width:640px;margin:0 auto;padding:20px;border-radius:8px;color:#111}
+#memoPaper table{width:100%;border-collapse:collapse;margin:10px 0}
+#memoPaper th,#memoPaper td{border:1px solid #ccc;padding:6px 8px;font-size:15px;text-align:left;vertical-align:top}
+#memoPaper th{background:#e8f5ee;color:#065f46}
+#memoPaper input{padding:6px;font-size:15px;border:1px solid #999;border-radius:6px;margin:0}
+@media print{body *{visibility:hidden} #memoOverlay,#memoOverlay *{visibility:visible} #memoOverlay{position:absolute;left:0;top:0;width:100%;background:#fff;padding:0} .noprint{display:none!important}}
 </style>
 </head>
 <body>
@@ -117,7 +124,7 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 <div class="wrap">
 
 <div id="tab-shop">
-<div class="prizebanner" onclick="showTab(\'feedback\')">💡 <b>নতুন আইডিয়া দিন, পুরস্কার জিতুন!</b><span>আমাদের সেবা কেমন? অ্যাপটি কেমন হলে আপনি আরও ভালোভাবে ব্যবহার করতে পারতেন? আপনার আইডিয়া জানান — সেরা আইডিয়ার জন্য থাকছে পুরস্কার!</span></div>
+<div class="prizebanner" onclick="showTab('feedback')">💡 <b>নতুন আইডিয়া দিন, পুরস্কার জিতুন!</b><span>আমাদের সেবা কেমন? অ্যাপটি কেমন হলে আপনি আরও ভালোভাবে ব্যবহার করতে পারতেন? আপনার আইডিয়া জানান — সেরা আইডিয়ার জন্য থাকছে পুরস্কার!</span></div>
 <div class="steps">
 <div class="step"><b>১</b><span>পণ্য বেছে নিন</span></div>
 <div class="step"><b>২</b><span>কার্টে যোগ করুন</span></div>
@@ -203,20 +210,20 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 
 
 </div>
-<div id="cartBar" class="cartbar" style="display:none" onclick="showTab(\'cart\')"><span id="cartBarText"></span><b>কার্ট দেখুন →</b></div>
+<div id="cartBar" class="cartbar" style="display:none" onclick="showTab('cart')"><span id="cartBarText"></span><b>কার্ট দেখুন →</b></div>
 <button id="chatFab" class="chatfab" onclick="toggleChat(true)">💬 সাহায্য</button>
 <div id="chatPanel" class="chatpanel" style="display:none">
 <div style="padding:12px 16px;background:#065f46;color:#fff;border-radius:20px 20px 0 0;display:flex;justify-content:space-between;align-items:center"><b>💬 মাসিক বাজার সহকারী</b><button onclick="toggleChat(false)" style="background:none;border:0;color:#fff;font-size:22px;cursor:pointer">✕</button></div>
 <div id="chatLog" class="chatlog"></div>
 <div id="chatChips" style="display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px"></div>
-<div style="display:flex;gap:6px;padding:8px 12px 16px"><input id="chatInput" placeholder="এখানে লিখুন…" style="flex:1;margin:0" onkeydown="if(event.key===\'Enter\')sendChat()"><button class="primary" onclick="sendChat()">পাঠান</button></div>
+<div style="display:flex;gap:6px;padding:8px 12px 16px"><input id="chatInput" placeholder="এখানে লিখুন…" style="flex:1;margin:0" onkeydown="if(event.key==='Enter')sendChat()"><button class="primary" onclick="sendChat()">পাঠান</button></div>
 </div>
 <nav class="bottomnav">
 <button id="nav-shop" class="on" onclick="showTab('shop')">🛒 দোকান</button>
 <button id="nav-packages" onclick="showTab('packages')">📦 প্যাকেজ</button>
 <button id="nav-cart" onclick="showTab('cart')">🧾 কার্ট <span id="cartCount"></span></button>
-<button id="nav-orders" onclick="showTab(\'orders\')">📋 আমার অর্ডার</button>
-<button id="nav-feedback" onclick="showTab(\'feedback\')">💬 মতামত</button>
+<button id="nav-orders" onclick="showTab('orders')">📋 আমার অর্ডার</button>
+<button id="nav-feedback" onclick="showTab('feedback')">💬 মতামত</button>
 </nav>
 <footer>মাসিক বাজার • নীড় • অর্ডার যাবে WhatsApp-এ</footer>
 
@@ -560,6 +567,66 @@ function reorder(codeStr){
   o.items.forEach(function(it){ var p=null; DATA.products.forEach(function(x){ if(x.name===it.name && (x.brand||"")===(it.brand||"")) p=x; }); if(!p) DATA.products.forEach(function(x){ if(x.name===it.name) p=x; }); if(p) cart[p.id]=(cart[p.id]||0)+it.qty; });
   saveCart(); renderCart(); showTab("cart");
 }
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+var receiptOrders={};
+var memoData=null;
+function openReceipt(key){
+  var o=receiptOrders[key]; if(!o) return;
+  var items=[];
+  if(o.items){ items=o.items.map(function(it){ return {name:it.name||"", brand:it.brand||"", qty:+it.qty||0, unit:it.unit||"", price:+it.price||0}; }); }
+  if(o.custom){ o.custom.forEach(function(c){ items.push({name:c.name||"", brand:"", qty:1, unit:c.qty||"", price:0}); }); }
+  memoData={no:o.order_no||o.code||"", date:o.created_at||o.date||"", name:o.customer_name||o.name||"", phone:o.phone||"", address:o.address||"—",
+    items:items, fee:+(o.delivery_fee!=null?o.delivery_fee:(o.fee||0))};
+  renderMemo(false);
+  document.getElementById("memoOverlay").style.display="block";
+  window.scrollTo(0,0);
+}
+function memoTotals(){
+  var sub=0; memoData.items.forEach(function(it){ sub+=(+it.qty||0)*(+it.price||0); });
+  var fee=+memoData.fee||0; return {sub:sub, fee:fee, grand:sub+fee};
+}
+function renderMemo(editable){
+  var m=memoData; if(!m) return;
+  var d=new Date(m.date);
+  var t=memoTotals();
+  var head='<div style="text-align:center;border-bottom:2px solid #065f46;padding-bottom:10px;margin-bottom:12px"><h2 style="margin:0;color:#065f46">মাসিক বাজার</h2><p style="margin:2px 0">নীড় • WhatsApp: 01631421995</p><h3 style="margin:8px 0 0">🧾 ক্যাশ মেমো</h3></div>';
+  var info='<p>অর্ডার নম্বর: <b>'+esc(m.no)+'</b><br>তারিখ: '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br>কাস্টমার: <b>'+esc(m.name||"—")+'</b><br>মোবাইল: '+esc(m.phone||"—")+'<br>ঠিকানা: '+esc(m.address||"—")+'</p>';
+  var rows=m.items.map(function(it,i){
+    var line=(+it.qty||0)*(+it.price||0);
+    if(editable){
+      return '<tr><td>'+esc(it.name)+'</td><td><input type="text" value="'+esc(it.brand)+'" onchange="memoChg('+i+',\'brand\',this.value)" style="width:90px"></td><td><input type="number" min="0" step="any" value="'+it.qty+'" oninput="memoChg('+i+',\'qty\',this.value)" style="width:64px"></td><td>'+esc(it.unit)+'</td><td><input type="number" min="0" step="any" value="'+it.price+'" oninput="memoChg('+i+',\'price\',this.value)" style="width:80px"></td><td style="text-align:right"><b id="memoLine'+i+'">৳'+bn(line)+'</b></td><td class="noprint"><button class="danger" onclick="memoDelRow('+i+')">✕</button></td></tr>';
+    }
+    return '<tr><td>'+esc(it.name)+'</td><td>'+esc(it.brand||"—")+'</td><td>'+bn(it.qty)+' '+esc(it.unit)+'</td><td style="text-align:right">৳'+bn(it.price)+'</td><td style="text-align:right"><b>৳'+bn(line)+'</b></td></tr>';
+  }).join("");
+  var thead=editable?'<tr><th>পণ্য</th><th>ব্র্যান্ড</th><th>পরিমাণ</th><th>একক</th><th>দর (৳)</th><th>মোট</th><th class="noprint"></th></tr>':'<tr><th>পণ্য</th><th>ব্র্যান্ড</th><th>পরিমাণ</th><th>দর (৳)</th><th>মোট</th></tr>';
+  var feeRow=editable?'<p>ডেলিভারি চার্জ: ৳ <input id="memoFee" type="number" min="0" step="any" value="'+m.fee+'" oninput="memoFeeChg(this.value)" style="width:90px"></p>':'<p>ডেলিভারি চার্জ: ৳'+bn(t.fee)+'</p>';
+  var foot='<p style="font-size:20px">সর্বমোট: <b id="memoGrand">৳'+bn(t.grand)+'</b></p><p style="text-align:center">ধন্যবাদ — আবার আসবেন!</p>';
+  var btns='<div class="noprint" style="display:flex;gap:8px;margin-top:12px"><button class="primary" style="flex:1" onclick="window.print()">🖨️ প্রিন্ট / PDF করুন</button><button class="ghost" onclick="closeMemo()">✕ বন্ধ করুন</button></div>';
+  document.getElementById("memoPaper").innerHTML=head+info+'<table>'+thead+rows+'</table>'+feeRow+foot+btns;
+}
+function memoChg(i,field,val){
+  if(!memoData) return;
+  var it=memoData.items[i]; if(!it) return;
+  if(field==="brand"){ it.brand=val; return; }
+  if(field==="qty"){ it.qty=parseFloat(val)||0; }
+  if(field==="price"){ it.price=parseFloat(val)||0; }
+  var line=(+it.qty||0)*(+it.price||0);
+  var el=document.getElementById("memoLine"+i); if(el) el.textContent="৳"+bn(line);
+  var t=memoTotals(); var g=document.getElementById("memoGrand"); if(g) g.textContent="৳"+bn(t.grand);
+}
+function memoFeeChg(val){
+  if(!memoData) return;
+  memoData.fee=parseFloat(val)||0;
+  var t=memoTotals(); var g=document.getElementById("memoGrand"); if(g) g.textContent="৳"+bn(t.grand);
+}
+function memoDelRow(i){
+  if(!memoData) return;
+  memoData.items.splice(i,1);
+  renderMemo(true);
+}
+function closeMemo(){
+  document.getElementById("memoOverlay").style.display="none";
+}
 async function renderMyOrders(){
   renderCustomerBox();
   var el=document.getElementById("myOrders"); if(!el) return;
@@ -569,21 +636,23 @@ async function renderMyOrders(){
     var res=await sb.from("orders").select("*").eq("phone", c.phone||"__none__").order("created_at",{ascending:false}).limit(20);
     if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
     var rows=res.data||[];
+    receiptOrders={}; rows.forEach(function(o){ receiptOrders[o.order_no]=o; });
     if(!rows.length){ el.innerHTML="<p>লগইন করা আছে — এখনো কোনো অর্ডার নেই। প্রথম অর্ডার দিলে এখানে দেখা যাবে।</p>"; return; }
     var bnStatus={"New Order":"নতুন অর্ডার","Contacted":"যোগাযোগ হয়েছে","Confirmed":"নিশ্চিত","Preparing":"তৈরি হচ্ছে","Out for Delivery":"ডেলিভারিতে","Delivered":"ডেলিভারি সম্পন্ন","Cancelled":"বাতিল"};
     el.innerHTML=rows.map(function(o){
       var d=new Date(o.created_at);
-      return '<div class="ordercard"><b>'+o.order_no+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br><b>'+(bnStatus[o.status]||o.status)+'</b><br>'+(o.items||[]).map(function(it){ return it.name+(it.brand?(' ('+it.brand+')'):"")+' — '+bn(it.qty)+' '+(it.unit||"")+' (৳'+bn(it.total||0)+')'; }).join("<br>")+'<br><b>সর্বমোট: ৳'+bn(o.total)+'</b><br><button class="primary" onclick="reorderByNo(\''+o.order_no+'\')">🔁 আবার এই অর্ডারটি করুন</button></div>';
+      return '<div class="ordercard"><b>'+o.order_no+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br><b>'+(bnStatus[o.status]||o.status)+'</b><br>'+(o.items||[]).map(function(it){ return it.name+(it.brand?(' ('+it.brand+')'):"")+' — '+bn(it.qty)+' '+(it.unit||"")+' (৳'+bn(it.total||0)+')'; }).join("<br>")+'<br><b>সর্বমোট: ৳'+bn(o.total)+'</b><br><button class="primary" onclick="reorderByNo(\''+o.order_no+'\')">🔁 আবার এই অর্ডারটি করুন</button> <button class="gold" onclick="openReceipt(\''+o.order_no+'\')">🧾 রসিদ</button></div>';
     }).join("");
     return;
   }
   var list=getOrders();
+  receiptOrders={}; list.forEach(function(o){ receiptOrders[o.code]=o; });
   if(!list.length){ el.innerHTML="<p>এখনো কোনো অর্ডার নেই। প্রথম অর্ডার দিলে এখানে দেখা যাবে। অর্ডারের রেকর্ড সেভ রাখতে ওপরে লগইন করুন।</p>"; return; }
   var statusText={sent:"WhatsApp-এ পাঠানো হয়েছে", confirmed:"দোকান নিশ্চিত করেছে", delivered:"ডেলিভারি সম্পন্ন"};
   el.innerHTML=list.map(function(o){
     var d=new Date(o.date);
     var steps='<div class="timeline"><div class="done">✓ অর্ডার দেওয়া হয়েছে</div><div class="done">✓ WhatsApp-এ পাঠানো হয়েছে</div><div class="'+(o.status==="sent"?"todo":"done")+'">'+(o.status==="sent"?"○":"✓")+' দোকান থেকে নিশ্চিতকরণ — WhatsApp-এ জানানো হবে</div><div class="'+(o.status==="delivered"?"done":"todo")+'">'+(o.status==="delivered"?"✓":"○")+' ডেলিভারি সম্পন্ন</div></div>';
-    return '<div class="ordercard"><b>'+o.code+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br><b>'+statusText[o.status]+'</b>'+(o.address?('<br>ঠিকানা: '+o.address):"")+'<br>'+o.items.map(function(it){ return it.name+(it.brand?(' ('+it.brand+')'):"")+' — '+bn(it.qty)+' '+it.unit+' (৳'+bn(it.total)+')'; }).join("<br>")+(o.custom.length?("<br>"+o.custom.map(function(c){ return c.name+" — "+c.qty; }).join("<br>")):"")+'<br><b>সর্বমোট: ৳'+bn(o.grand)+'</b>'+steps+'<button class="primary" onclick="reorder(\''+o.code+'\')">🔁 আবার এই অর্ডারটি করুন</button> '+(o.status==="sent"?'<button class="ghost" onclick="setOrderStatus(\''+o.code+'\',\'confirmed\')">দোকান নিশ্চিত করেছে</button>':"")+(o.status==="confirmed"?'<button class="ghost" onclick="setOrderStatus(\''+o.code+'\',\'delivered\')">ডেলিভারি পেয়েছি</button>':"")+'</div>';
+    return '<div class="ordercard"><b>'+o.code+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br><b>'+statusText[o.status]+'</b>'+(o.address?('<br>ঠিকানা: '+o.address):"")+'<br>'+o.items.map(function(it){ return it.name+(it.brand?(' ('+it.brand+')'):"")+' — '+bn(it.qty)+' '+it.unit+' (৳'+bn(it.total)+')'; }).join("<br>")+(o.custom.length?("<br>"+o.custom.map(function(c){ return c.name+" — "+c.qty; }).join("<br>")):"")+'<br><b>সর্বমোট: ৳'+bn(o.grand)+'</b>'+steps+'<button class="primary" onclick="reorder(\''+o.code+'\')">🔁 আবার এই অর্ডারটি করুন</button> <button class="gold" onclick="openReceipt(\''+o.code+'\')">🧾 রসিদ</button> '+(o.status==="sent"?'<button class="ghost" onclick="setOrderStatus(\''+o.code+'\',\'confirmed\')">দোকান নিশ্চিত করেছে</button>':"")+(o.status==="confirmed"?'<button class="ghost" onclick="setOrderStatus(\''+o.code+'\',\'delivered\')">ডেলিভারি পেয়েছি</button>':"")+'</div>';
   }).join("");
 }
 /* ---- AI সহকারী (নিয়ম-ভিত্তিক, অফলাইনে চলে) ---- */
@@ -654,7 +723,7 @@ function priceTextFor(gid){
 }
 function parseNamePhone(text){
   var t=bnToLatin(text);
-  var m=t.match(/0?1[3-9]\d{8}/);
+  var m=t.match(/0?1\d{9}/);
   var phone=m?m[0]:"";
   if(phone.length===10) phone="0"+phone;
   var name=text;
@@ -908,5 +977,6 @@ renderShop(); renderCart();
 renderChatChips(); flushPendingFeedback();
 logVisit("open","");
 </script>
+<div id="memoOverlay"><div id="memoPaper"></div></div>
 </body>
 </html>
