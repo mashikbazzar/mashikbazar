@@ -3,6 +3,8 @@
   "company": "নীড়",
   "whatsapp": "01631421995",
   "delivery_fee_taka": 0,
+  "show_prices": true,
+  "margin_pct": 0,
   "products": [
     {
       "id": 1,
