@@ -817,7 +817,8 @@ function addChatMsg(who, text){
   d.className="chatmsg "+who;
   d.innerHTML=text;
   log.appendChild(d);
-  log.scrollTop=log.scrollHeight;
+  if(who==="bot"){ try{ d.scrollIntoView(); }catch(e){ log.scrollTop=log.scrollHeight; } }
+  else { log.scrollTop=log.scrollHeight; }
 }
 function renderChatChips(){
   var el=document.getElementById("chatChips"); if(!el) return;
