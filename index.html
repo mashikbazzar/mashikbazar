@@ -17,7 +17,7 @@ h1{margin:0;font-size:30px;color:#ffd970}
 header p{margin:4px 0;color:#e8f5ee}
 .hero{background:#0b7a4b;color:#fff;text-align:center;padding:12px}
 .hero b{color:#ffd970}
-.wrap{max-width:900px;margin:0 auto;padding:12px 12px 140px}
+.wrap{max-width:900px;margin:0 auto;padding:12px 12px 200px}
 .search{width:100%;padding:13px 16px;font-size:17px;border:2px solid #065f46;border-radius:999px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.06)}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
 .chip{border:1px solid #d1d5db;background:#fff;color:#374151;border-radius:999px;padding:10px 16px;font-size:16px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06)}
@@ -38,6 +38,7 @@ header p{margin:4px 0;color:#e8f5ee}
 .prizebanner span{font-size:14px;color:#444;display:block;margin-top:4px}
 .poprow{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 12px;margin:4px 0}
 .poprow .card{min-width:180px;flex:0 0 180px}
+@media(max-width:640px){.poprow{display:grid;grid-template-columns:1fr 1fr;overflow-x:visible}.poprow .card{min-width:0;flex:none}}
 .track{display:flex;gap:4px;margin:10px 0;overflow-x:auto}
 .track .st{flex:1;min-width:54px;text-align:center;font-size:12px;color:#999}
 .track .st .dot{width:26px;height:26px;line-height:26px;border-radius:50%;background:#e5e7eb;color:#666;margin:0 auto 4px;font-size:14px;font-weight:700}
@@ -60,8 +61,8 @@ header p{margin:4px 0;color:#e8f5ee}
 .incart{font-size:13px;color:#065f46;background:#f0fdf4;border-radius:8px;padding:4px 8px;margin-top:6px}
 .price{color:#065f46;font-weight:800;font-size:22px;margin:6px 0}
 .unit{color:#555;font-size:14px}
-.add{width:100%;background:#065f46;color:#fff;border:0;border-radius:12px;padding:14px;font-size:18px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(6,95,70,.3)}
-.qty{display:flex;gap:6px;align-items:center;justify-content:center}
+.add{width:100%;background:#065f46;color:#fff;border:0;border-radius:12px;padding:14px;font-size:18px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(6,95,70,.3);white-space:nowrap}
+.qty{display:flex;gap:6px;align-items:center;justify-content:center}.qty b{min-width:28px;text-align:center}
 .qty button{width:44px;height:44px;font-size:22px;border-radius:12px;border:1px solid #065f46;background:#fff;color:#065f46;cursor:pointer}
 .listrow{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #e8e8e8;border-radius:14px;padding:12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
 .arow{display:flex;gap:6px;align-items:flex-start;background:#fff;border:1px solid #d8d8d8;border-radius:12px;padding:8px;margin-bottom:8px}
@@ -72,7 +73,7 @@ header p{margin:4px 0;color:#e8f5ee}
 .arow .qty{display:flex;flex-direction:column;gap:4px}
 .arow .qty button{padding:6px 9px}
 .picker{max-height:320px;overflow:auto;border:1px solid #d8d8d8;border-radius:10px;padding:6px;margin-top:6px}
-.listrow .n{flex:1}
+.listrow .n{flex:1;min-width:0}
 .pkg{background:linear-gradient(180deg,#fff8e1,#fffdf5);border:2px solid #d4a017;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 2px 10px rgba(212,160,23,.15)}
 .pkg h3{margin:0;color:#065f46}
 .pkg .total{font-size:20px;font-weight:800;color:#065f46}
@@ -82,8 +83,8 @@ input,textarea,select{width:100%;padding:11px;font-size:16px;border:1px solid #9
 .pdfbtn{width:100%;background:#d4a017;border:0;border-radius:12px;padding:12px;font-size:17px;font-weight:700;cursor:pointer;margin-top:8px}
 .note{background:#fff;border-left:5px solid #d4a017;padding:12px;border-radius:8px;margin:12px 0}
 .warn{background:#fff3cd;border-left:5px solid #b7791f;padding:12px;border-radius:8px;margin:12px 0}
-.bottomnav{position:fixed;left:0;right:0;bottom:0;background:#065f46;display:flex;z-index:10}
-.bottomnav button{flex:1;background:none;border:0;color:#fff;padding:12px 1px;font-size:13px;cursor:pointer;min-width:0}
+.bottomnav{position:fixed;left:0;right:0;bottom:0;background:#065f46;display:flex;z-index:10;padding-bottom:env(safe-area-inset-bottom,0px)}
+.bottomnav button{flex:1;background:none;border:0;color:#fff;padding:14px 2px;font-size:13px;cursor:pointer;min-width:0;white-space:nowrap}
 .bottomnav button.on{background:#044d38;font-weight:700}
 .adminbox{background:#fff;border:2px solid #065f46;border-radius:16px;padding:14px;margin-top:12px}
 .adminbox h3{color:#065f46;margin:8px 0}
@@ -144,8 +145,8 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 <div class="chips" id="chips"></div>
 <div id="popWrap"><h2 class="stephead">🔥 জনপ্রিয় পণ্য</h2><div class="poprow" id="popRow"></div></div>
 <div class="viewrow">
-<button id="vGrid" class="on" onclick="setView('grid')">▦ গ্রিড</button>
-<button id="vList" onclick="setView('list')">☰ সিরিয়াল লিস্ট</button>
+<button id="vGrid" onclick="setView('grid')">▦ গ্রিড</button>
+<button id="vList" class="on" onclick="setView('list')">☰ সিরিয়াল লিস্ট</button>
 </div>
 <div id="loginHint"></div>
 <div id="list"></div>
@@ -248,7 +249,7 @@ var FALLBACK = {"shop": "মাসিক বাজার", "company": "নীড
 var CATS = ["চাল ও আটা", "তেল ও ঘি", "ডাল ও চিনি", "মসলা", "সাবান ও পরিষ্কারক", "ব্যক্তিগত যত্ন", "চা ও পানীয়", "নাস্তা", "ঘরোয়া সামগ্রী", "অন্যান্য"];
 var DATA = FALLBACK;
 var DRAFT = null;
-var view="grid", cat="সব", cart={}, customCart=[];
+var view="list", cat="সব", cart={}, customCart=[];
 var POPULAR=["চাল (কোলা চাল)","সয়াবিন তেল","চিনি","মসুর ডাল","লবণ","আটা","পেঁয়াজ","ডিম"];
 function setSearch(v){ document.getElementById("q").value=v; renderShop(); var i=document.getElementById("q"); if(i) i.focus(); }
 try{ cart = JSON.parse(localStorage.getItem("mb-cart")||"{}"); }catch(e){ cart={}; }
@@ -386,8 +387,8 @@ function cardHtml(gid){
   var pq=pickQty[gid]||1;
   var ctrl;
   if(q){ ctrl='<div class="qty"><button onclick="chg('+v.id+',-1)">−</button><b>'+bn(q)+'</b><button onclick="chg('+v.id+',1)">+</button></div>'; }
-  else{ ctrl='<div style="display:flex;gap:6px;align-items:center;margin-top:8px"><span class="small">পরিমাণ</span><div class="qty"><button onclick="pickChg('+gid+',-1)">−</button><b>'+bn(pq)+'</b><button onclick="pickChg('+gid+',1)">+</button></div><button class="add" style="flex:1" onclick="addPickedByName('+gid+')">যোগ করুন</button></div>'; }
-  return '<div class="card"><div class="caticon">'+(CAT_EMOJI[cat0]||"📦")+'</div><h3>'+name+'</h3><div>'+nameBrandSelectG(gid)+' <span style="color:#666;font-size:13px">• '+cat0+'</span></div>'+(canSeePrices()?'<div class="price">৳'+bn(v.price_taka)+' <span class="unit">/ '+v.unit+'</span></div>':'<div class="small">দাম দেখতে লগইন করুন</div>')+inCartLineG(gid)+ctrl+'</div>';
+  else{ ctrl='<div style="margin-top:8px"><div class="qty" style="margin-bottom:8px"><span class="small">পরিমাণ</span><button onclick="pickChg('+gid+',-1)">−</button><b>'+bn(pq)+'</b><button onclick="pickChg('+gid+',1)">+</button></div><button class="add" onclick="addPickedByName('+gid+')">যোগ করুন</button></div>'; }
+  return '<div class="card"><div class="caticon">'+(CAT_EMOJI[cat0]||"📦")+'</div><h3>'+name+'</h3><div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;min-height:44px">'+nameBrandSelectG(gid)+' <span style="color:#666;font-size:13px;white-space:nowrap">• '+cat0+'</span></div>'+(canSeePrices()?'<div class="price">৳'+bn(v.price_taka)+' <span class="unit">/ '+v.unit+'</span></div>':'<div class="small">দাম দেখতে লগইন করুন</div>')+inCartLineG(gid)+ctrl+'</div>';
 }
 function listRowHtml(gid,i){
   var name=groupName(gid);
@@ -397,7 +398,7 @@ function listRowHtml(gid,i){
   var pq=pickQty[gid]||1;
   var ctrl;
   if(q){ ctrl='<div class="qty"><button onclick="chg('+v.id+',-1)">−</button><b>'+bn(q)+'</b><button onclick="chg('+v.id+',1)">+</button></div>'; }
-  else{ ctrl='<span style="display:flex;gap:6px;align-items:center"><span class="qty"><button onclick="pickChg('+gid+',-1)">−</button><b>'+bn(pq)+'</b><button onclick="pickChg('+gid+',1)">+</button></span><button class="add" style="width:auto;padding:8px 12px" onclick="addPickedByName('+gid+')">যোগ করুন</button></span>'; }
+  else{ ctrl='<span style="display:flex;gap:6px;align-items:center;flex-shrink:0"><span class="qty"><button onclick="pickChg('+gid+',-1)">−</button><b>'+bn(pq)+'</b><button onclick="pickChg('+gid+',1)">+</button></span><button class="add" style="width:auto;padding:8px 12px" onclick="addPickedByName('+gid+')">যোগ করুন</button></span>'; }
   return '<div class="listrow"><b>'+bn(i+1)+'.</b><div class="n"><b>'+name+'</b> '+nameBrandSelectG(gid)+'<br>'+(canSeePrices()?'<span class="price">৳'+bn(v.price_taka)+'</span> <span class="unit">/ '+v.unit+'</span>':'<span class="small">দাম দেখতে লগইন করুন</span>')+inCartLineG(gid)+'</div>'+ctrl+'</div>';
 }
 function renderShop(){
@@ -593,9 +594,13 @@ function saveOrder(){
     sb.from("orders").insert([{order_no:ord.code, customer_name:ord.name, phone:ord.phone, items:ord.items.concat(ord.custom.map(function(c){ return {name:c.name, brand:"", qty:1, unit:c.qty, price:0, total:0}; })), subtotal:ord.total, delivery_fee:ord.fee, total:ord.grand, profit:Math.round(profit), status:"New Order"}]).then(function(r){ if(r.error) console.log("order sync failed", r.error.message); });
   }
   localStorage.removeItem("mb-code");
-  // WhatsApp লিংকের ঠিকানাটা ক্লিকের আগেই বানানো — এখনই কার্ট খালি করলে লিংকটাও খালি হয়ে যাবে, তাই ১.৫ সেকেন্ড পরে খালি করা হবে (ততক্ষণে WhatsApp খুলে যাবে)।
-  setTimeout(function(){ cart={}; customCart=[]; saveCart(); renderCart(); }, 1500);
+  // কার্ট এখনই খালি করা হবে না — WhatsApp-এ পাঠানোর পর কাস্টমার অ্যাপে ফিরে এলে তখন খালি হবে। (আগে ১.৫ সেকেন্ড পরে খালি হতো — WhatsApp খুলতে দেরি হলে পাঠানোর আগেই কার্ট মুছে যেত।)
+  waPendingClear=true;
 }
+var waPendingClear=false;
+function maybeClearCartAfterWA(){ if(waPendingClear && !document.hidden){ waPendingClear=false; cart={}; customCart=[]; saveCart(); renderCart(); } }
+document.addEventListener("visibilitychange", maybeClearCartAfterWA);
+window.addEventListener("focus", maybeClearCartAfterWA);
 function setOrderStatus(codeStr, status){
   var list=getOrders(); list.forEach(function(o){ if(o.code===codeStr) o.status=status; });
   localStorage.setItem("mb-orders", JSON.stringify(list)); renderMyOrders();
