@@ -371,9 +371,9 @@ async function customerLogin(){
     setCustomer({id:r.id, name:r.name, phone:r.phone, email:r.email});
     msg.textContent="নিবন্ধন ও লগইন হয়েছে।";
   }
-  renderCustomerBox(); renderMyOrders(); renderShop(); renderCart();
+  renderCustomerBox(); renderMyOrders(); usualsLoaded=false; renderShop(); renderCart();
 }
-function customerLogout(){ setCustomer(null); renderCustomerBox(); renderMyOrders(); renderShop(); renderCart(); }
+function customerLogout(){ setCustomer(null); usualsLoaded=false; renderCustomerBox(); renderMyOrders(); renderShop(); renderCart(); }
 function reorderByNo(no){
   if(!sb) return;
   sb.from("orders").select("items").eq("order_no", no).limit(1).then(function(res){
@@ -764,11 +764,11 @@ async function applyPromo(){
   if(!sb){ m.textContent="ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।"; return; }
   m.textContent="দেখা হচ্ছে…";
   var res=await sb.from("coupons").select("*").eq("code",code).eq("active",true).limit(1);
-  if(res.error || !res.data || !res.data.length){ promo=null; m.textContent="এই কোডটি পাওয়া যায়নি।"; renderCart(); return; }
+  if(res.error || !res.data || !res.data.length){ m.textContent="এই কোডটি পাওয়া যায়নি।"; renderCart(); return; }
   var cp=res.data[0];
-  if(cp.expires_at && new Date(cp.expires_at)<new Date()){ promo=null; m.textContent="এই কোডের মেয়াদ শেষ।"; renderCart(); return; }
+  if(cp.expires_at && new Date(cp.expires_at)<new Date()){ m.textContent="এই কোডের মেয়াদ শেষ।"; renderCart(); return; }
   var sub=cartTotals().total;
-  if(sub<(cp.min_order||0)){ promo=null; m.textContent="এই কোডে ন্যূনতম অর্ডার ৳"+bn(cp.min_order||0)+" লাগবে।"; renderCart(); return; }
+  if(sub<(cp.min_order||0)){ m.textContent="এই কোডে ন্যূনতম অর্ডার ৳"+bn(cp.min_order||0)+" লাগবে।"; renderCart(); return; }
   promo=cp;
   m.textContent="✅ কোড প্রয়োগ হয়েছে — "+(cp.discount_type==="percent"?("ছাড় "+bn(cp.discount_value)+"%"):("ছাড় ৳"+bn(cp.discount_value)));
   renderCart();
@@ -814,7 +814,7 @@ function renderCart(){
   var ds=(document.getElementById("delSlot")||{}).value||"";
   var sc=(document.getElementById("subChoice")||{}).value||"";
   msg+="%0Aডেলিভারি: "+encodeURIComponent(dd+", "+ds)+"%0Aপণ্য না থাকলে: "+encodeURIComponent(sc);
-  if(disc>0) msg+="%0Aকুপন "+encodeURIComponent(promo.code)+": -৳"+disc;
+  if(disc>0) msg+="%0Aকুপন "+encodeURIComponent(promo.code)+": -৳"+disc+"%0A";
   msg+=canSeePrices()?("----------------%0Aপণ্যের মোট: ৳"+total+(disc>0?("%0Aছাড়: -৳"+disc):"")+"%0Aডেলিভারি চার্জ: ৳"+fee+"%0Aসর্বমোট: ৳"+(total-disc+fee)+"%0A— মাসিক বাজার, "+encodeURIComponent(DATA.company||"নীড়")):("----------------%0A(দাম দোকান থেকে জানানো হবে)%0A— মাসিক বাজার, "+encodeURIComponent(DATA.company||"নীড়"));
   document.getElementById("walink").href="https://wa.me/"+waNumber()+"?text="+msg;
   document.getElementById("walink").textContent="WhatsApp-এ অর্ডার পাঠান — "+(DATA.whatsapp||"");
