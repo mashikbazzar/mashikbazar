@@ -97,7 +97,8 @@ Chrome-এর ⋮ মেনুতে 'Add to Home screen' না দেখাল
 <div id="appBox" style="display:none">
 <div class="card">
 <h2>👋 <span id="helloName"></span></h2>
-<p class="small">নিচে প্রতিটা পণ্যের <b>একটাই ক্রমিক নম্বর</b>, আর পণ্যের নাম <b>মোটা (বোল্ড) অক্ষরে</b> দেখা যাবে। একটা পণ্য এডিট করতে তার পাশের <b>✏️ এডিট</b> চাপুন — নাম আর দাম বদলে <b>✓ সংরক্ষণ</b> চাপুন। একটা ক্যাটাগরির সব পণ্য একসাথে এডিট করতে <b>🗂️ ক্যাটাগরি</b> থেকে ক্যাটাগরি বেছে <b>✏️ এই ক্যাটাগরি এডিট করুন</b> চাপুন, তারপর <b>✓ সব পাঠান</b> চাপুন। ব্র্যান্ড বেছে দাম পাঠাতে পারবেন — ব্র্যান্ডের নামের পাশেই আপনার দেওয়া দাম দেখা যাবে। দামের পাশে পরিমাণও লিখুন — কেজির পণ্যে প্রতি-কেজি দাম × পরিমাণ = মোট দাম দেখা যাবে। তালিকায় নেই এমন ব্র্যান্ড থাকলে <b>+ নতুন ব্র্যান্ড যোগ করুন</b> বেছে নাম লিখুন।</p>
+<p id="helloNote" class="small"></p>
+<p class="small">প্রতিটা পণ্যের <b>একটাই ক্রমিক নম্বর</b>, নাম <b>মোটা অক্ষরে</b>।<br>একটা পণ্যের দাম পাঠাতে পাশের <b>✏️ এডিট</b> চাপুন → ব্র্যান্ড বেছে দাম আর পরিমাণ লিখুন → <b>✓ সংরক্ষণ</b> চাপুন।<br>একটা ক্যাটাগরির সব পণ্য একসাথে এডিট করতে <b>🗂️ ক্যাটাগরি</b> থেকে ক্যাটাগরি বেছে <b>✏️ এই ক্যাটাগরি এডিট করুন</b> চাপুন, তারপর <b>✓ সব পাঠান</b> চাপুন।</p>
 <button class="ghost" onclick="logout()">লগআউট</button>
 </div>
 
@@ -153,19 +154,21 @@ async function login(){
   msg.textContent="যাচাই করা হচ্ছে…";
   var res = await sb.from("suppliers").select("*").eq("phone", phone);
   if(res.error){ msg.textContent="সমস্যা হয়েছে: "+res.error.message; return; }
+  var isNew=false;
   if(res.data && res.data.length){
     var s=res.data[0];
-    if(s.code!==code){ msg.textContent="কোড ভুল। অ্যাডমিনের কাছ থেকে ঠিক কোডটা নিন।"; return; }
+    if(s.code!==code){ msg.textContent="কোড ভুল। নিবন্ধনের সময় দেওয়া ৪ সংখ্যার কোডটি লিখুন।"; return; }
     if(!s.active){ msg.textContent="এই অ্যাকাউন্ট বন্ধ আছে। অ্যাডমিনের সঙ্গে যোগাযোগ করুন।"; return; }
     supplier=s;
   } else {
     var ins = await sb.from("suppliers").insert([{name:name, phone:phone, code:code}]).select();
     if(ins.error){ msg.textContent="নিবন্ধন হয়নি: "+ins.error.message; return; }
-    supplier=ins.data[0];
+    supplier=ins.data[0]; isNew=true;
     msg.textContent="নিবন্ধন হয়েছে। অ্যাডমিন আপনাকে দেখতে পাবে।";
   }
   localStorage.setItem("mb-supplier", JSON.stringify(supplier));
   showApp();
+  if(isNew){ var hn=document.getElementById("helloNote"); if(hn) hn.textContent="✅ নিবন্ধন হয়েছে — অ্যাডমিন আপনাকে দেখতে পাবে। দাম পাঠাতে নিচের তালিকা থেকে পণ্য বেছে নিন।"; }
 }
 function logout(){ localStorage.removeItem("mb-supplier"); supplier=null; document.getElementById("supName").value=""; document.getElementById("supPhone").value=""; document.getElementById("supCode").value=""; document.getElementById("loginMsg").textContent=""; document.getElementById("appBox").style.display="none"; document.getElementById("loginBox").style.display="block"; }
 async function showApp(){
