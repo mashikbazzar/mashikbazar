@@ -37,6 +37,10 @@ input[readonly]{background:#f5f5f5;color:#555}
 .note{background:#fff;border-left:5px solid #d4a017;padding:12px;border-radius:8px;margin:12px 0}
 .warn{background:#fff3cd;border-left:5px solid #b7791f;padding:12px;border-radius:8px;margin:12px 0}
 footer{text-align:center;color:#555;padding:16px;font-size:14px}
+.tick{background:#16a34a;color:#fff;border:0;border-radius:10px;padding:12px 18px;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 2px 8px rgba(22,163,74,.3);white-space:nowrap}
+.brandrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.brandrow select{flex:1;min-width:150px}
+.mine{font-size:14px;color:#444;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px;margin-top:8px;line-height:1.9}
 </style>
 </head>
 <body>
@@ -75,7 +79,7 @@ Chrome-এর ⋮ মেনুতে 'Add to Home screen' না দেখাল
 <div id="appBox" style="display:none">
 <div class="card">
 <h2>👋 <span id="helloName"></span></h2>
-<p class="small">নিচের পণ্যগুলোর আজকের পাইকারি দাম বসিয়ে <b>পাঠান</b> চাপুন। দাম বাড়লে বা কমলে যেকোনো সময় আবার আপডেট করতে পারবেন। নাম/ব্র্যান্ড/একক ঠিক করতে হলে নিচের 'তালিকায় নেই এমন পণ্য' ফর্মে লিখুন বা অ্যাডমিনকে জানান।</p>
+<p class="small">নিচে প্রতিটা পণ্যের <b>একটাই ক্রমিক নম্বর</b>। ব্র্যান্ড বেছে দাম লিখে <b>✓ পাঠান</b> চাপুন — একটা একটা করে ব্র্যান্ডের দাম পাঠান। যতগুলো ব্র্যান্ড আছে, সবগুলোর দাম এভাবেই পাঠাতে পারবেন, আর প্রতিটা পণ্যের নিচে 'আমার দেওয়া দাম'-এ সবগুলো দেখতে পারবেন। তালিকায় নেই এমন ব্র্যান্ড থাকলে <b>+ নতুন ব্র্যান্ড যোগ করুন</b> বেছে নাম লিখুন। দাম বাড়লে বা কমলে যেকোনো সময় আবার আপডেট করতে পারবেন।</p>
 <button class="ghost" onclick="logout()">লগআউট</button>
 </div>
 
@@ -96,8 +100,6 @@ Chrome-এর ⋮ মেনুতে 'Add to Home screen' না দেখাল
 </div>
 <div id="catChips" style="display:none;margin-bottom:6px"></div>
 <div id="plist"></div>
-<button class="gold" style="width:100%" onclick="submitAllChanged()">✅ বদলানো সব দাম একসাথে পাঠান</button>
-<p id="sendMsg" class="small"></p>
 
 <div class="card">
 <h3>📋 আমার পাঠানো দাম</h3>
@@ -115,7 +117,6 @@ var SUPABASE_KEY = "sb_publishable_seDgIW1BHnvbNjuJnyxqvw_dK2AKNug";
 var sb = (window.supabase) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 var supplier = null;
 var products = [];
-var changed = {};
 function bn(n){ return String(n).replace(/\d/g, function(d){ return "০১২৩৪৫৬৭৮৯"[+d]; }); }
 try{ supplier = JSON.parse(localStorage.getItem("mb-supplier")||"null"); }catch(e){ supplier=null; }
 if(supplier){ showApp(); }
@@ -153,11 +154,20 @@ async function showApp(){
   products=res.data||[];
   var CAT_ORDER=["চাল ও আটা","তেল ও ঘি","মসলা","ডাল ও চিনি","সাবান ও পরিষ্কারক","ব্যক্তিগত যত্ন","চা ও পানীয়","নাস্তা","ঘরোয়া সামগ্রী","অন্যান্য"];
   products.sort(function(a,b){ var ia=CAT_ORDER.indexOf(a.category); if(ia<0) ia=99; var ib=CAT_ORDER.indexOf(b.category); if(ib<0) ib=99; if(ia!==ib) return ia-ib; return (a.sort_order||0)-(b.sort_order||0); });
+  groups=[]; var gmap={};
+  products.forEach(function(p){
+    var g=gmap[p.name];
+    if(!g){ g={name:p.name, category:p.category, unit:p.unit, variants:[]}; gmap[p.name]=g; groups.push(g); }
+    g.variants.push(p);
+  });
   renderProducts(); loadMySubs();
 }
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-var changedMeta={};
-function markMeta(id, field, val){ if(!changedMeta[id]) changedMeta[id]={}; changedMeta[id][field]=val; }
+var groups=[];
+var selBrand={};
+var newBrandName={};
+var typedPrice={};
+var myPricesByName={};
 var supTab="all", supCat="";
 var ROW_COLORS=["#fef9e7","#eafaf1","#eaf2f8","#fdedec","#f4ecf7","#fef5e7","#e8f8f5","#fdf2e9"];
 var SUP_CATS=["চাল ও আটা","তেল ও ঘি","মসলা","ডাল ও চিনি","সাবান ও পরিষ্কারক","ব্যক্তিগত যত্ন","চা ও পানীয়","নাস্তা","ঘরোয়া সামগ্রী","অন্যান্য"];
@@ -165,9 +175,11 @@ function setSupTab(t){ supTab=t; supCat=""; renderProducts(); }
 function setSupCat(c){ supCat=(supCat===c)?"":c; renderProducts(); }
 function renderProducts(){
   var q=(document.getElementById("q").value||"").trim();
-  var list=products.filter(function(p){
-    if(supTab==="cat" && supCat && p.category!==supCat) return false;
-    return !q||p.name.indexOf(q)>=0||(p.brand||"").indexOf(q)>=0||p.category.indexOf(q)>=0;
+  var list=groups.filter(function(g){
+    if(supTab==="cat" && supCat && g.category!==supCat) return false;
+    if(!q) return true;
+    if(g.name.indexOf(q)>=0||g.category.indexOf(q)>=0) return true;
+    return g.variants.some(function(v){ return (v.brand||"").indexOf(q)>=0; });
   });
   document.getElementById("supTabAll").className=(supTab==="all")?"primary":"ghost";
   document.getElementById("supTabCat").className=(supTab==="cat")?"primary":"ghost";
@@ -175,48 +187,78 @@ function renderProducts(){
   if(supTab==="cat"){
     chips.style.display="block";
     chips.innerHTML=SUP_CATS.map(function(c){
-      var n=0; products.forEach(function(p){ if(p.category===c) n++; });
+      var n=0; groups.forEach(function(g){ if(g.category===c) n++; });
       return '<button class="'+(supCat===c?'primary':'ghost')+'" style="padding:8px 10px;margin:4px 4px 0 0" onclick="setSupCat(\''+c+'\')">'+c+' ('+bn(n)+')</button>';
     }).join("");
   } else { chips.style.display="none"; chips.innerHTML=""; }
-  document.getElementById("plist").innerHTML=list.map(function(p,i){
-    var cur = (changed[p.id]!==undefined)? changed[p.id] : (p.wholesale_price||"");
-    var m = changedMeta[p.id]||{};
-    var nm = (m.name!==undefined)? m.name : p.name;
-    var br = (m.brand!==undefined)? m.brand : (p.brand||"");
-    var un = (m.unit!==undefined)? m.unit : p.unit;
-    var serial = products.indexOf(p)+1;
+  document.getElementById("plist").innerHTML=list.map(function(g,i){
+    var gi=groups.indexOf(g);
+    var serial=gi+1;
     var bg=ROW_COLORS[i%ROW_COLORS.length];
-    return '<div class="row srow" style="background:'+bg+'"><b>'+bn(serial)+'.</b><div class="n"><div style="display:flex;gap:6px"><input style="flex:2" readonly value="'+esc(nm)+'" placeholder="পণ্যের নাম"><input style="flex:1" readonly value="'+esc(br)+'" placeholder="ব্র্যান্ড"></div><div style="display:flex;gap:6px;align-items:center"><input style="flex:1" readonly value="'+esc(un)+'" placeholder="পরিমাণ / একক"><span class="small">এখন: '+(p.wholesale_price?("৳"+bn(p.wholesale_price)):"—")+'</span><input type="number" min="0" style="flex:1" value="'+cur+'" placeholder="নতুন দাম ৳" onchange="markChanged('+p.id+',this.value)"></div></div></div>';
+    var brands=[];
+    g.variants.forEach(function(v){ var b=v.brand||""; if(brands.indexOf(b)<0) brands.push(b); });
+    (myPricesByName[g.name]||[]).forEach(function(mp){ if(brands.indexOf(mp.brand)<0) brands.push(mp.brand); });
+    var sel=selBrand[g.name];
+    if(sel===undefined || (sel!=="__new__" && brands.indexOf(sel)<0)){ sel=brands.length?brands[0]:""; selBrand[g.name]=sel; }
+    if(q){
+      var mb=null;
+      g.variants.forEach(function(v){ if((v.brand||"").indexOf(q)>=0 && mb===null) mb=v.brand||""; });
+      if(mb!==null && sel!==mb && sel!=="__new__"){ sel=mb; selBrand[g.name]=sel; }
+    }
+    var isNew = sel==="__new__";
+    var curVar=null;
+    if(!isNew){ g.variants.forEach(function(v){ if((v.brand||"")===sel) curVar=v; }); }
+    var curPrice = curVar? (curVar.wholesale_price||"") : "";
+    var key = gi+"|"+sel;
+    var priceVal = (typedPrice[key]!==undefined)? typedPrice[key] : curPrice;
+    var opts = brands.map(function(b){
+      var label = b==="" ? "ব্র্যান্ড ছাড়া" : b;
+      return '<option value="'+esc(b)+'"'+(sel===b?" selected":"")+'>'+esc(label)+'</option>';
+    }).join("");
+    opts += '<option value="__new__"'+(isNew?" selected":"")+'>+ নতুন ব্র্যান্ড যোগ করুন</option>';
+    var newInput = isNew ? '<input placeholder="নতুন ব্র্যান্ডের নাম লিখুন" value="'+esc(newBrandName[g.name]||"")+'" oninput="setNewBrandName('+gi+', this.value)">' : "";
+    var mine = (myPricesByName[g.name]||[]);
+    var mineHtml = mine.length ? '<div class="mine">আমার দেওয়া দাম: '+mine.map(function(mp){ var bl = mp.brand===""?"ব্র্যান্ড ছাড়া":mp.brand; var st = mp.status==="applied"?"বসানো হয়েছে":(mp.status==="rejected"?"বাতিল":"অপেক্ষায়"); return esc(bl)+" ৳"+bn(mp.price)+" ("+st+")"; }).join(" • ")+'</div>' : "";
+    return '<div class="row srow" style="background:'+bg+'"><b>'+bn(serial)+'.</b><div class="n">'
+      +'<div><b>'+esc(g.name)+'</b> <span class="small">• '+esc(g.category)+' • '+esc(g.unit||"")+'</span></div>'
+      +'<div class="brandrow"><select onchange="setGroupBrand('+gi+', this.value)">'+opts+'</select>'
+      +'<input type="number" min="0" id="pr-'+gi+'" style="flex:1;min-width:110px" value="'+priceVal+'" placeholder="পাইকারি দাম ৳" oninput="setTypedPrice('+gi+', this.value)">'
+      +'<button class="tick" onclick="submitGroupPrice('+gi+')">✓ পাঠান</button></div>'
+      +newInput
+      +'<div class="small">এখন: '+(curVar && curVar.wholesale_price?("৳"+bn(curVar.wholesale_price)):"—")+'</div>'
+      +mineHtml
+      +'<div class="small" id="gs-'+gi+'"></div>'
+      +'</div></div>';
   }).join("")||"<p>কোনো পণ্য পাওয়া যায়নি।</p>";
-}function markChanged(id, val){ changed[id]=parseFloat(val)||0; }
-async function submitPrice(productId, productName, brand, unit, price){
-  if(price===undefined || price===null) return false;
-  var res = await sb.from("supplier_prices").insert([{supplier_id:supplier.id, supplier_name:supplier.name, product_id:productId, product_name:productName, brand:brand||"", unit:unit||"", price:price, status:"pending"}]);
-  return !res.error;
 }
-async function submitAllChanged(){
-  var msg=document.getElementById("sendMsg");
-  var idMap={};
-  Object.keys(changed).forEach(function(k){ idMap[k]=1; });
-  Object.keys(changedMeta).forEach(function(k){ idMap[k]=1; });
-  var ids=Object.keys(idMap); if(!ids.length){ msg.textContent="কিছু বদলাননি — প্রথমে দাম লিখুন।"; return; }
-  msg.textContent="পাঠানো হচ্ছে…";
-  var ok=0, fail=0;
-  for(var i=0;i<ids.length;i++){
-    var p=null; products.forEach(function(x){ if(String(x.id)===String(ids[i])) p=x; }); if(!p) continue;
-    var m=changedMeta[p.id]||{};
-    var nm=(m.name!==undefined)?m.name:p.name;
-    var br=(m.brand!==undefined)?m.brand:(p.brand||"");
-    var un=(m.unit!==undefined)?m.unit:p.unit;
-    var price=(changed[p.id]!==undefined)?changed[p.id]:(p.wholesale_price||0);
-    var done = await submitPrice(p.id, nm, br, un, price);
-    if(done) ok++; else fail++;
+function setGroupBrand(gi, val){ var g=groups[gi]; if(!g) return; selBrand[g.name]=val; renderProducts(); }
+function setTypedPrice(gi, val){ var g=groups[gi]; if(!g) return; var sel=selBrand[g.name]; typedPrice[gi+"|"+sel]=val; }
+function setNewBrandName(gi, val){ var g=groups[gi]; if(!g) return; newBrandName[g.name]=val; }
+function setGroupStatus(gi, msg){ var el=document.getElementById("gs-"+gi); if(el) el.textContent=msg; }
+async function submitGroupPrice(gi){
+  var g=groups[gi]; if(!g||!supplier) return;
+  var sel=selBrand[g.name];
+  if(sel===undefined) sel=(g.variants[0]||{}).brand||"";
+  var brand=sel;
+  if(sel==="__new__"){
+    brand=(newBrandName[g.name]||"").trim();
+    if(!brand){ setGroupStatus(gi,"নতুন ব্র্যান্ডের নাম লিখুন।"); return; }
   }
-  changed={}; changedMeta={};
-  msg.textContent = ok? ("✅ "+bn(ok)+"টি দাম পাঠানো হয়েছে। অ্যাডমিন দেখে পাইকারি দামে বসাবে।") : "পাঠানো যায়নি — আবার চেষ্টা করুন।";
-  if(fail) msg.textContent += " ("+bn(fail)+"টি পাঠানো যায়নি।)";
-  renderProducts(); refreshMySubs();
+  var priceEl=document.getElementById("pr-"+gi);
+  var price=priceEl? parseFloat(priceEl.value)||0 : 0;
+  if(!price){ setGroupStatus(gi,"দাম লিখুন।"); return; }
+  setGroupStatus(gi,"পাঠানো হচ্ছে…");
+  var varId=null;
+  g.variants.forEach(function(v){ if((v.brand||"")===brand) varId=v.id; });
+  var done = await submitPrice(varId, g.name, brand, g.unit||"", price);
+  if(done){
+    delete typedPrice[gi+"|"+sel];
+    if(sel==="__new__"){ newBrandName[g.name]=""; selBrand[g.name]=brand; }
+    setGroupStatus(gi,"✅ পাঠানো হয়েছে — অ্যাডমিন দেখে বসাবে।");
+    loadMySubs();
+  } else {
+    setGroupStatus(gi,"পাঠানো যায়নি — আবার চেষ্টা করুন।");
+  }
 }
 async function submitNewProduct(){
   var name=document.getElementById("newName").value.trim();
@@ -235,16 +277,29 @@ async function submitNewProduct(){
 }
 function refreshMySubs(){ var hs=document.getElementById("mySubs"); if(hs && hs.textContent.indexOf("এখনো কোনো দাম পাঠাননি")>=0){ hs.innerHTML="<p>পাঠানো দাম আসছে…</p>"; } loadMySubs(); }
 async function loadMySubs(){
-  var res = await sb.from("supplier_prices").select("*").eq("supplier_id", supplier.id).order("created_at", {ascending:false}).limit(30);
+  var res = await sb.from("supplier_prices").select("*").eq("supplier_id", supplier.id).order("created_at", {ascending:false}).limit(500);
   var el=document.getElementById("mySubs");
-  if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
+  if(res.error){ if(el) el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
   var rows=res.data||[];
-  if(!rows.length){ el.innerHTML="<p>এখনো কোনো দাম পাঠাননি।</p>"; return; }
-  var badge={pending:'<span class="badge pending">অপেক্ষায়</span>', applied:'<span class="badge applied">বসানো হয়েছে</span>', rejected:'<span class="badge rejected">বাতিল</span>'};
-  el.innerHTML=rows.map(function(r){
-    var d=new Date(r.created_at);
-    return '<div class="row"><div class="n"><b>'+r.product_name+'</b>'+(r.brand?(' '+r.brand):"")+'<br>৳'+bn(r.price)+' / '+(r.unit||"")+' • '+d.toLocaleDateString("bn-BD")+'</div>'+(badge[r.status]||r.status)+'</div>';
-  }).join("");
+  myPricesByName={};
+  var seen={};
+  rows.forEach(function(r){
+    var key=r.product_name+"|"+(r.brand||"");
+    if(seen[key]) return; seen[key]=1;
+    if(!myPricesByName[r.product_name]) myPricesByName[r.product_name]=[];
+    myPricesByName[r.product_name].push({brand:r.brand||"", price:r.price, status:r.status});
+  });
+  if(el){
+    if(!rows.length){ el.innerHTML="<p>এখনো কোনো দাম পাঠাননি।</p>"; }
+    else {
+      var badge={pending:'<span class="badge pending">অপেক্ষায়</span>', applied:'<span class="badge applied">বসানো হয়েছে</span>', rejected:'<span class="badge rejected">বাতিল</span>'};
+      el.innerHTML=rows.slice(0,30).map(function(r){
+        var d=new Date(r.created_at);
+        return '<div class="row"><div class="n"><b>'+esc(r.product_name)+'</b>'+(r.brand?(' '+esc(r.brand)):"")+'<br>৳'+bn(r.price)+' / '+(r.unit||"")+' • '+d.toLocaleDateString("bn-BD")+'</div>'+(badge[r.status]||esc(r.status))+'</div>';
+      }).join("");
+    }
+  }
+  renderProducts();
 }
 </script>
 
