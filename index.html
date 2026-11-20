@@ -352,9 +352,9 @@ async function customerLogin(){
     setCustomer({id:r.id, name:r.name, phone:r.phone, email:r.email});
     msg.textContent="নিবন্ধন ও লগইন হয়েছে।";
   }
-  renderCustomerBox(); renderMyOrders();
+  renderCustomerBox(); renderMyOrders(); renderShop(); renderCart();
 }
-function customerLogout(){ setCustomer(null); renderCustomerBox(); renderMyOrders(); }
+function customerLogout(){ setCustomer(null); renderCustomerBox(); renderMyOrders(); renderShop(); renderCart(); }
 function reorderByNo(no){
   if(!sb) return;
   sb.from("orders").select("items").eq("order_no", no).limit(1).then(function(res){
@@ -441,9 +441,16 @@ function inCartLineG(gid){
   return parts.length?'<div class="incart">🛒 কার্টে আরও আছে: '+parts.join(", ")+'</div>':"";
 }
 function qtyShownG(gid){ var v=selectedVariantG(gid); if(!v) return 1; if(cart[v.id]) return cart[v.id]; return pickQty[gid]||1; }
-function pickStepperHtml(gid){ var v=selectedVariantG(gid); if(!v) return ""; var st=unitStep(v.unit); var q=qtyShownG(gid); return '<span class="qmini"><button onclick="adjPick('+gid+',-'+st+')">−</button><input type="number" min="0" step="'+st+'" inputmode="decimal" value="'+fmtQty(q)+'" onchange="setPick('+gid+',this.value)"><button onclick="adjPick('+gid+','+st+')">+</button></span>'; }
+function pickStepperHtml(gid){ var v=selectedVariantG(gid); if(!v) return ""; var st=unitStep(v.unit); var q=qtyShownG(gid); return '<span class="qmini"><button onclick="adjPick('+gid+',-'+st+')">−</button><input type="number" min="0" step="'+st+'" inputmode="decimal" value="'+fmtQty(q)+'" onchange="setPick('+gid+',this.value)" oninput="liveTotal('+gid+',this.value)"><button onclick="adjPick('+gid+','+st+')">+</button></span>'; }
 function adjPick(gid,d){ var v=selectedVariantG(gid); if(!v) return; if(cart[v.id]){ chg(v.id,d); return; } var st=unitStep(v.unit); pickQty[gid]=Math.round(Math.max(st,(pickQty[gid]||1)+d)*100)/100; renderShop(); }
 function setPick(gid,val){ var v=selectedVariantG(gid); if(!v) return; var q=Math.round((parseFloat(val)||0)*100)/100; if(cart[v.id]){ setQty(v.id,val); return; } if(q>0){ pickQty[gid]=q; } else { renderShop(); } }
+function liveTotal(gid, val){
+  var v=selectedVariantG(gid); if(!v) return;
+  var q=Math.round((parseFloat(val)||0)*100)/100;
+  var el=document.getElementById("tot"+gid);
+  if(el && canSeePrices()){ el.innerHTML='মোট: <b>৳'+bn(Math.round(v.price_taka*q))+'</b> ('+bn(fmtQty(q))+' '+v.unit+')'; }
+  if(q>0){ pickQty[gid]=q; }
+}
 function addPickedByName(gid){ var v=selectedVariantG(gid); if(!v) return; var q=Math.round((pickQty[gid]||1)*100)/100; if(q<=0) return; cart[v.id]=q; pickQty[gid]=q; saveCart(); renderShop(); renderCart(); }
 function fmtQty(q){ q=Math.round(Number(q||0)*100)/100; return String(q); }
 function unitStep(u){ return (u==="কেজি"||u==="লিটার")?0.5:1; }
@@ -471,7 +478,7 @@ function productBlockHtml(gid, serial){
   var v=selectedVariantG(gid);
   if(!v) return "";
   var q=qtyShownG(gid);
-  var priceHtml=canSeePrices()?'<span><span class="price">৳'+bn(v.price_taka)+' <span class="unit">/ '+v.unit+'</span></span><br><span class="small">মোট: <b>৳'+bn(Math.round(v.price_taka*q))+'</b> ('+bn(fmtQty(q))+' '+v.unit+')</span></span>':'<span class="small">দাম দেখতে লগইন করুন • প্রতি '+v.unit+'</span>';
+  var priceHtml=canSeePrices()?'<span><span class="price">৳'+bn(v.price_taka)+' <span class="unit">/ '+v.unit+'</span></span><br><span class="small" id="tot'+gid+'">মোট: <b>৳'+bn(Math.round(v.price_taka*q))+'</b> ('+bn(fmtQty(q))+' '+v.unit+')</span></span>':'<span class="small">দাম দেখতে লগইন করুন • প্রতি '+v.unit+'</span>';
   return '<div class="pl1">'+(serial?'<span class="psno">'+bn(serial)+'.</span>':"")+'<span class="pname">'+name+'</span>'+nameBrandSelectG(gid)+pickStepperHtml(gid)+'<span class="unit">'+v.unit+'</span></div>'
     +'<div class="pl2">'+priceHtml+'<button class="add" onclick="addPickedByName('+gid+')">যোগ করুন</button></div>'
     +inCartLineG(gid);
