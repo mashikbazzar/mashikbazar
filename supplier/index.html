@@ -274,6 +274,14 @@ function setGroupBrand(gi, val){ var g=groups[gi]; if(!g) return; selBrand[g.nam
 function setTypedPrice(gi, val){ var g=groups[gi]; if(!g) return; var sel=selBrand[g.name]; typedPrice[gi+"|"+sel]=val; }
 function setNewBrandName(gi, val){ var g=groups[gi]; if(!g) return; newBrandName[g.name]=val; }
 function setGroupStatus(gi, msg){ var el=document.getElementById("gs-"+gi); if(el) el.textContent=msg; }
+async function submitPrice(productId, productName, brand, unit, price){
+  if(price===undefined || price===null) return false;
+  if(!sb || !supplier) return false;
+  try{
+    var res = await sb.from("supplier_prices").insert([{supplier_id:supplier.id, supplier_name:supplier.name, product_id:productId, product_name:productName, brand:brand||"", unit:unit||"", price:price, status:"pending"}]);
+    return !res.error;
+  }catch(e){ return false; }
+}
 async function saveOne(gi){
   var g=groups[gi]; if(!g||!supplier) return;
   var sel=selBrand[g.name];
