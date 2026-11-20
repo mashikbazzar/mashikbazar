@@ -330,7 +330,7 @@ function brandVariants(name){ return DATA.products.filter(function(x){ return x.
 function brandSelectHtml(p, fnName, arg){
   var vars=brandVariants(p.name);
   if(vars.length<=1) return (p.brand||"");
-  return '<select style="max-width:130px;padding:4px;font-size:14px" onchange="'+fnName+'('+arg+',parseInt(this.value,10))">'+vars.map(function(v){ return '<option value="'+v.id+'"'+(v.id===p.id?' selected':'')+'>'+(v.brand||("৳"+bn(v.price_taka)))+'</option>'; }).join("")+'</select>';
+  return '<select style="max-width:130px;padding:4px;font-size:14px" onchange="'+fnName+'('+arg+',parseInt(this.value,10))">'+vars.map(function(v){ return '<option value="'+v.id+'"'+(v.id===p.id?' selected':'')+'>'+(v.brand||"ব্র্যান্ড ছাড়া")+'</option>'; }).join("")+'</select>';
 }
 function chgCartBrand(oldId, newId){ oldId=parseInt(oldId,10); newId=parseInt(newId,10); if(oldId===newId||!cart[oldId]) return; cart[newId]=(cart[newId]||0)+cart[oldId]; delete cart[oldId]; saveCart(); renderCart(); renderShop(); }
 function showTab(t){
@@ -359,7 +359,7 @@ function nameBrandSelectG(gid){
   var vars=groupVars(gid);
   if(vars.length<=1) return '<span class="brand">'+(vars[0]?(vars[0].brand||""):"")+'</span>';
   var cur=selectedVariantG(gid);
-  return '<select class="brandsel" onchange="setSelBrand('+gid+',this.value)">'+vars.map(function(x){ return '<option value="'+x.id+'"'+(cur&&x.id===cur.id?' selected':'')+'>'+(x.brand||("৳"+bn(x.price_taka)+" / "+x.unit))+'</option>'; }).join("")+'</select>';
+  return '<select class="brandsel" onchange="setSelBrand('+gid+',this.value)">'+vars.map(function(x){ return '<option value="'+x.id+'"'+(cur&&x.id===cur.id?' selected':'')+'>'+(x.brand||"ব্র্যান্ড ছাড়া")+'</option>'; }).join("")+'</select>';
 }
 function inCartLineG(gid){
   var v=selectedVariantG(gid);
