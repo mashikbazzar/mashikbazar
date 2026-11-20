@@ -899,7 +899,7 @@ function orderProfit(o){
   return Math.round(pr);
 }
 function openAdmin(){
-  loadDraft(); fixOldRiceName(); mergeNewProducts(); mergeNewPackages();
+  loadDraft(); fixOldRiceName(); mergeNewProducts(); mergeNewPackages(); loadWholesale(); if(DRAFT){ recalcPackages(DRAFT); saveDraft(); }
   document.getElementById("pinBox").style.display="none";
   document.getElementById("sShop").value=DRAFT.shop||"";
   document.getElementById("sCompany").value=DRAFT.company||"";
@@ -1047,6 +1047,7 @@ async function toggleCoupon(id, active){
 async function loadBulkTiers(){
   var el=document.getElementById("bulkTierList"); if(!el) return;
   if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
+  await loadWholesale();
   var res=await sb.from("bulk_discount_tiers").select("*").order("min_order",{ascending:true});
   if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
   var rows=res.data||[];
@@ -1228,7 +1229,7 @@ function renderPriceList(){
   h+='<p class="small">মোট '+bn(groups.length)+'টি পণ্য • '+bn(DRAFT.products.length)+'টি ব্র্যান্ড। দাম লিখলেই সাথে সাথে সংরক্ষণ হবে — আলাদা করে সংরক্ষণ করতে হবে না। শেষে প্রকাশ ট্যাবে গিয়ে প্রকাশ করলেই কাস্টমার নতুন দাম দেখবে।</p>';
   h+='<div class="card" style="background:#eff6ff"><b>⚙️ মার্জিন দিয়ে খুচরা দাম বসান</b><div style="display:flex;gap:8px;margin-top:8px;align-items:center"><input id="marginPct2" type="number" min="0" placeholder="লাভের হার % (যেমন: ১০)" style="flex:1"><button class="gold" onclick="applyMargin2()">সব খুচরা দাম বসান</button></div><p class="small">পাইকারি দাম থেকে খুচরা দাম হিসাব হবে (পাইকারি × (১০০+লাভ%) ÷ ১০০)। যাদের পাইকারি দাম নেই, তাদের দাম বদলাবে না।</p></div>';
   h+=list.map(function(g){
-    return '<div class="agroup"><b>'+esc(g.name)+'</b> <span class="pcat">'+esc(g.category)+'</span>'
+    return '<div class="agroup"><b>'+esc(g.name)+'</b>'+(g.vars.some(function(v){ return v.special; })?' ⭐':'')+' <span class="pcat">'+esc(g.category)+'</span>'
       + g.vars.map(function(v){
           return '<div class="listrow"><div class="n">'+((v.brand||"").trim()?'<b>'+esc(v.brand)+'</b> ':'')+'<span class="small">/'+esc(v.unit||"")+'</span></div>'
           +'<div><label class="small">পাইকারি ৳</label><input type="number" min="0" style="width:90px" value="'+(v.wholesale_price||0)+'" onchange="editProduct('+v.id+',\'wholesale_price\',this.value)"></div>'
@@ -1591,6 +1592,7 @@ function closeMemo(silent){
 async function loadAdminOrders(){
   var el=document.getElementById("adminOrders"); if(!el) return;
   if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
+  await loadWholesale();
   el.innerHTML="<p>আসছে…</p>";
   var res = await sb.from("orders").select("*").order("created_at", {ascending:false}).limit(50);
   if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
@@ -1611,7 +1613,7 @@ async function loadAdminOrders(){
     var drows=byDay[day];
     var dayTotal=0; drows.forEach(function(o){ dayTotal+=+(o.total||0); });
     var agg={};
-    drows.forEach(function(o){ (o.items||[]).forEach(function(it){ var k=it.name+"|"+(it.unit||""); if(!agg[k]) agg[k]={name:it.name, unit:it.unit||"", qty:0}; agg[k].qty+=(+it.qty||0); }); });
+    drows.forEach(function(o){ (o.items||[]).forEach(function(it){ var nm=normName(it.name); var k=nm+"|"+(it.unit||""); if(!agg[k]) agg[k]={name:nm, unit:it.unit||"", qty:0}; agg[k].qty+=(+it.qty||0); }); });
     var aggLines=Object.keys(agg).map(function(k){ var a=agg[k]; return a.name+' — '+bn(a.qty)+' '+(a.unit||""); }).join("<br>");
     var slotCounts={}; drows.forEach(function(o){ var sk=(o.delivery_slot||"সময় বসানো হয়নি"); slotCounts[sk]=(slotCounts[sk]||0)+1; });
     var slotLine=Object.keys(slotCounts).map(function(sk){ return sk+' — '+bn(slotCounts[sk])+'টি'; }).join(' • ');
@@ -1686,6 +1688,7 @@ function closePlanner(){ var ov=document.getElementById("plannerOverlay"); if(ov
 async function loadProfit(){
   var el=document.getElementById("profitBox"); if(!el) return;
   if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
+  await loadWholesale();
   el.innerHTML="<p>হিসাব করা হচ্ছে…</p>";
   var res = await sb.from("orders").select("total,items,created_at,status").neq("status","Cancelled");
   if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
@@ -1712,6 +1715,7 @@ async function loadProductRatingsAdmin(){
 async function loadAnalytics(){
   var el=document.getElementById("analyticsBox"); if(!el) return;
   if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
+  await loadWholesale();
   el.innerHTML="<p>হিসাব করা হচ্ছে…</p>";
   var res=await sb.from("orders").select("*").order("created_at",{ascending:false}).limit(500);
   if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
@@ -1729,7 +1733,7 @@ async function loadAnalytics(){
   var top=Object.keys(byProd).map(function(k){ return {name:k, qty:byProd[k].qty, total:byProd[k].total}; }).sort(function(a,b){ return b.qty-a.qty; }).slice(0,10);
   var byCat={};
   live.forEach(function(o){ (o.items||[]).forEach(function(it){ var c="—"; DATA.products.forEach(function(p){ if(p.name===normName(it.name)) c=p.category||"—"; }); if(!byCat[c]) byCat[c]=0; byCat[c]+= +it.total||0; }); });
-  var cats=Object.keys(byCat).sort(function(a,b){ return byCat[b]-byCat[a]; });
+  var cats=Object.keys(byCat).filter(function(c){ return !(c==="—"&&!byCat[c]); }).sort(function(a,b){ return byCat[b]-byCat[a]; });
   el.innerHTML='<div class="statgrid"><div class="stat"><b>'+bn(live.length)+'</b>টি অর্ডার</div><div class="stat"><b>৳'+bn(sales)+'</b>মোট বিক্রি</div><div class="stat"><b>৳'+bn(profit)+'</b>মোট লাভ</div><div class="stat"><b>৳'+bn(live.length?Math.round(sales/live.length):0)+'</b>গড় অর্ডার</div><div class="stat"><b>'+bn(del.length)+'</b>টি ডেলিভারি সম্পন্ন</div><div class="stat"><b>'+bn(unpaid.length)+'</b>টি পেমেন্ট বাকি</div></div>'
     +'<h3 style="margin-top:14px">📅 শেষ ১৪ দিন</h3>'+days.map(function(d){ return '<div class="listrow"><div class="n"><b>'+d+'</b> — '+bn(byDay[d].n)+'টি অর্ডার</div><b>৳'+bn(byDay[d].sales)+'</b></div>'; }).join("")
     +'<h3 style="margin-top:14px">🏆 সবচেয়ে বেশি বিক্রি হওয়া পণ্য</h3>'+top.map(function(t){ return '<div class="listrow"><div class="n">'+esc(t.name)+'</div><b>'+bn(t.qty)+' • ৳'+bn(t.total)+'</b></div>'; }).join("")
