@@ -365,7 +365,8 @@ function pickChg(gid,d){ pickQty[gid]=Math.max(1,Math.min(99,(pickQty[gid]||1)+d
 function addPickedByName(gid){ var v=selectedVariantG(gid); if(!v) return; var q=pickQty[gid]||1; cart[v.id]=(cart[v.id]||0)+q; pickQty[gid]=1; saveCart(); renderShop(); renderCart(); }
 function chg(id,d){ cart[id]=(cart[id]||0)+d; if(cart[id]<=0) delete cart[id]; saveCart(); renderShop(); renderCart(); }
 function moveCart(id,d){ var ks=Object.keys(cart); var i=ks.indexOf(String(id)); var j=i+d; if(j<0||j>=ks.length) return; var t=ks[i]; ks[i]=ks[j]; ks[j]=t; var nc={}; ks.forEach(function(k){ nc[k]=cart[k]; }); cart=nc; saveCart(); renderCart(); }
-function pkgTotal(pkg){ var total=0; pkg.items.forEach(function(it){ total += it.line_total_taka||0; }); return total; }
+function pkgActiveItems(pkg){ return (pkg.items||[]).filter(function(it){ return it.active!==false; }); }
+function pkgTotal(pkg){ var total=0; pkgActiveItems(pkg).forEach(function(it){ total += it.line_total_taka||0; }); return total; }
 function recalcPackages(d){
   d.packages.forEach(function(pkg){
     var total=0;
@@ -440,11 +441,11 @@ function renderShop(){
     el.className="";
     el.innerHTML=groups.map(function(gid,i){ return listRowHtml(gid,i); }).join("")||"<p>কোনো পণ্য পাওয়া যায়নি।</p>";
   }
-  document.getElementById("pkgs").innerHTML=DATA.packages.map(function(pkg){ return '<div class="pkg" onclick="openPkgDetail('+pkg.id+')" style="cursor:pointer"><h3>'+pkg.name+'</h3><p>'+(pkg.tagline||"")+'</p><p class="small">'+bn(pkg.items.length)+'টি পণ্য</p><p class="total">'+(canSeePrices()?('আনুমানিক মোট: ৳'+bn(pkgTotal(pkg))):'আনুমানিক মোট: লগইন করলে দেখা যাবে')+'</p><button class="add" onclick="event.stopPropagation();openPkgDetail('+pkg.id+')">📦 প্যাকেজটি খুলুন</button></div>'; }).join("");
+  document.getElementById("pkgs").innerHTML=DATA.packages.map(function(pkg){ return '<div class="pkg" onclick="openPkgDetail('+pkg.id+')" style="cursor:pointer"><h3>'+pkg.name+'</h3><p>'+(pkg.tagline||"")+'</p><p class="small">'+bn(pkgActiveItems(pkg).length)+'টি পণ্য</p><p class="total">'+(canSeePrices()?('আনুমানিক মোট: ৳'+bn(pkgTotal(pkg))):'আনুমানিক মোট: লগইন করলে দেখা যাবে')+'</p><button class="add" onclick="event.stopPropagation();openPkgDetail('+pkg.id+')">📦 প্যাকেজটি খুলুন</button></div>'; }).join("");
 }
 function addPackage(id){
   var pkg=null; DATA.packages.forEach(function(p){ if(p.id===id) pkg=p; }); if(!pkg) return;
-  pkg.items.forEach(function(it){ cart[it.product_id]=(cart[it.product_id]||0)+Math.max(1, Math.round(it.qty_multiplier||1)); });
+  pkgActiveItems(pkg).forEach(function(it){ cart[it.product_id]=(cart[it.product_id]||0)+Math.max(1, Math.round(it.qty_multiplier||1)); });
   saveCart(); renderCart(); showTab("cart");
 }
 /* ---- package detail (tap a package to open it) ---- */
@@ -454,7 +455,7 @@ function openPkgDetail(id){
   detailPkgId=id;
   document.getElementById("pkgCustom").style.display="none";
   document.getElementById("pkgDetailTitle").textContent="📦 "+pkg.name;
-  document.getElementById("pkgDetailItems").innerHTML='<ul>'+pkg.items.map(function(it){ return '<li>'+it.name+' — '+it.qty_label+(canSeePrices()?(' <span style="color:#666">(৳'+bn(it.line_total_taka||0)+')</span>'):"")+'</li>'; }).join("")+'</ul>';
+  document.getElementById("pkgDetailItems").innerHTML='<ul>'+pkgActiveItems(pkg).map(function(it){ return '<li>'+it.name+' — '+it.qty_label+(canSeePrices()?(' <span style="color:#666">(৳'+bn(it.line_total_taka||0)+')</span>'):"")+'</li>'; }).join("")+'</ul>';
   document.getElementById("pkgDetailTotal").textContent=canSeePrices()?("৳"+bn(pkgTotal(pkg))):"লগইন করলে দেখা যাবে";
   document.getElementById("pkgDetail").style.display="block";
   document.getElementById("pkgDetail").scrollIntoView();
@@ -466,7 +467,7 @@ function openPkgCustomFromDetail(){ var id=detailPkgId; if(id===null) return; cl
 var customPkg=null;
 function openPkgCustom(id){
   var pkg=null; DATA.packages.forEach(function(p){ if(p.id===id) pkg=p; }); if(!pkg) return;
-  customPkg=JSON.parse(JSON.stringify(pkg));
+  customPkg=JSON.parse(JSON.stringify(pkg)); customPkg.items=pkgActiveItems(customPkg);
   document.getElementById("pkgCustom").style.display="block";
   document.getElementById("pkgCustomTitle").textContent=pkg.name+" — নিজের মতো সাজান";
   document.getElementById("pkgAddSelect").innerHTML=groupList().map(function(gid){ var v=findProduct(gid); return '<option value="'+v.id+'">'+v.name+(canSeePrices()?(' — ৳'+v.price_taka+'/'+v.unit):"")+'</option>'; }).join("");
@@ -994,11 +995,11 @@ async function aiReply(q){
       var size=parseInt(bnToLatin(pm[1]),10);
       var pkg=null; DATA.packages.forEach(function(p){ if(p.size===size) pkg=p; });
       if(pkg){
-        var items=pkg.items.map(function(it){ return "• "+it.name+" — "+it.qty_label; }).join("\n");
-        return "📦 "+pkg.name+" ("+bn(pkg.items.length)+"টি পণ্য):\n"+items+"\n"+(canSeePrices()?("আনুমানিক মোট: ৳"+bn(pkgTotal(pkg))):"আনুমানিক মোট: লগইন করলে দেখা যাবে।")+"\nপ্যাকেজটি খুলতে উপরে 📦 প্যাকেজ ট্যাবে চাপুন।";
+        var items=pkgActiveItems(pkg).map(function(it){ return "• "+it.name+" — "+it.qty_label; }).join("\n");
+        return "📦 "+pkg.name+" ("+bn(pkgActiveItems(pkg).length)+"টি পণ্য):\n"+items+"\n"+(canSeePrices()?("আনুমানিক মোট: ৳"+bn(pkgTotal(pkg))):"আনুমানিক মোট: লগইন করলে দেখা যাবে।")+"\nপ্যাকেজটি খুলতে উপরে 📦 প্যাকেজ ট্যাবে চাপুন।";
       }
     }
-    var lines=DATA.packages.map(function(p){ return "• "+p.name+" — "+bn(p.items.length)+"টি পণ্য"+(canSeePrices()?(" (আনুমানিক ৳"+bn(pkgTotal(p))+")"):""); });
+    var lines=DATA.packages.map(function(p){ return "• "+p.name+" — "+bn(pkgActiveItems(p).length)+"টি পণ্য"+(canSeePrices()?(" (আনুমানিক ৳"+bn(pkgTotal(p))+")"):""); });
     return "📦 আমাদের ৭টি পরিবার প্যাকেজ আছে (২–৮ জন):\n"+lines.join("\n")+(canSeePrices()?"":"\nদাম দেখতে লগইন করুন — আমার অর্ডার ট্যাবে লগইন করলে দাম দেখা যাবে।")+"\nপ্যাকেজ দেখতে উপরে 📦 প্যাকেজ ট্যাবে চাপুন।";
   }
   /* --- shop contact --- */
