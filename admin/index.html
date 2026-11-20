@@ -514,13 +514,14 @@ function showHome(){
   document.getElementById("masikView").style.display="none";
   renderHome();
 }
-function openMasikAdmin(){
+function openMasikAdmin(silent){
   document.getElementById("homeView").style.display="none";
   document.getElementById("masikView").style.display="block";
   document.getElementById("adminBody").style.display="block";
   renderAdminProducts(); renderAdminPackages(); updateDraftInfo(); updateAdminStats(); refreshAdminOrderCount();
+  if(!silent && !__adInPop) __adPush("masik");
 }
-function goHome(){ showHome(); }
+function goHome(){ showHome(); if(!__adInPop) __adPush("home"); }
 async function renderAdmin(){
   var pe=document.getElementById("pinEntry");
   var sbx=document.getElementById("setupBox");
@@ -540,6 +541,27 @@ async function renderAdmin(){
     if(pe) pe.style.display="block";
   }
 }
+/* ---- back button: আগের পর্দায় যাবে, অ্যাপ থেকে বের হবে না ---- */
+var curAdminTab="products", __adHistInit=false, __adInPop=false, __adTop=null;
+function __adPush(view, tab){
+  try{
+    if(!__adHistInit){ history.replaceState({v:"home"},""); __adHistInit=true; }
+    history.pushState({v:view,tab:tab||curAdminTab},"");
+    __adTop=view;
+  }catch(e){}
+}
+function __adClose(view){ if(__adTop===view && !__adInPop){ __adTop=null; try{ history.back(); }catch(e){} } }
+window.addEventListener("popstate", function(e){
+  __adInPop=true;
+  var st=(e&&e.state)||null; var v=st?st.v:"home";
+  __adTop=null;
+  var mo=document.getElementById("memoOverlay");
+  if(v!=="memo" && mo && mo.style.display==="block") closeMemo(true);
+  if(v!=="pkgDetail" && openPkgId!==null) closeAdminPackage(true);
+  if(v==="masik" || v==="tab"){ openMasikAdmin(true); showAdminTab((st&&st.tab)||"products"); }
+  else { showHome(); }
+  __adInPop=false;
+});
 function showAdminTab(t){
   ["products","packages","settings","publish","orders","profit","supplier","customers","visitors","feedback"].forEach(function(x){
     document.getElementById("admin-"+x).style.display=(x===t)?"block":"none";
@@ -551,6 +573,8 @@ function showAdminTab(t){
   if(t==="customers") loadCustomers();
   if(t==="visitors") loadVisitors();
   if(t==="feedback") loadFeedback();
+  if(t!==curAdminTab && !__adInPop) __adPush("tab", t);
+  curAdminTab=t;
 }
 async function loadFeedback(){
   var el=document.getElementById("feedbackList"); if(!el) return;
@@ -810,8 +834,8 @@ function addProduct(){
   if(inp) inp.focus();
 }
 var openPkgId=null;
-function openAdminPackage(id){ openPkgId=id; pkgPickerId=null; renderAdminPackages(); }
-function closeAdminPackage(){ openPkgId=null; pkgPickerId=null; renderAdminPackages(); }
+function openAdminPackage(id){ openPkgId=id; pkgPickerId=null; renderAdminPackages(); if(__adTop!=="pkgDetail") __adPush("pkgDetail"); }
+function closeAdminPackage(silent){ if(!silent) __adClose("pkgDetail"); openPkgId=null; pkgPickerId=null; renderAdminPackages(); }
 function togglePkgItemActive(pkgId, idx){
   DRAFT.packages.forEach(function(pkg){ if(pkg.id!==pkgId) return; var it=pkg.items[idx]; if(!it) return; it.active = (it.active===false)? true : false; });
   recalcPackages(DRAFT); saveDraft(); renderAdminPackages();
@@ -939,6 +963,7 @@ function openMemo(orderId){
     fee:+o.delivery_fee||0};
   renderMemo(true);
   document.getElementById("memoOverlay").style.display="block";
+  if(__adTop!=="memo") __adPush("memo");
   window.scrollTo(0,0);
 }
 function memoTotals(){
@@ -984,7 +1009,8 @@ function memoDelRow(i){
   memoData.items.splice(i,1);
   renderMemo(true);
 }
-function closeMemo(){
+function closeMemo(silent){
+  if(!silent) __adClose("memo");
   document.getElementById("memoOverlay").style.display="none";
 }
 async function loadAdminOrders(){

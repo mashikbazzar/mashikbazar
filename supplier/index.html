@@ -206,21 +206,42 @@ var singleEdit=-1;
 var catEdit="";
 var nameEdit={};
 var supTab="all", supCat="";
+/* ---- back button: আগের পর্দায় যাবে, অ্যাপ থেকে বের হবে না ---- */
+var __supHistInit=false, __supInPop=false, __supTop=null;
+function supViewStr(){ if(singleEdit!==-1) return "edit:"+singleEdit; if(catEdit) return "catedit:"+catEdit; if(supTab==="cat"&&supCat) return "cat:"+supCat; return supTab; }
+function __supPush(){ try{ if(!__supHistInit){ history.replaceState({v:"root",s:"all"},""); __supHistInit=true; } var s2=supViewStr(); history.pushState({v:"sup",s:s2},""); __supTop=s2; }catch(e){} }
+function __supNav(){ if(!__supInPop){ var s3=supViewStr(); if(s3!==__supTop) __supPush(); } }
+function __supApply(s){
+  if(s.indexOf("edit:")===0){ singleEdit=parseInt(s.slice(5),10); catEdit=""; }
+  else if(s.indexOf("catedit:")===0){ catEdit=s.slice(8); singleEdit=-1; }
+  else if(s.indexOf("cat:")===0){ supTab="cat"; supCat=s.slice(4); singleEdit=-1; catEdit=""; }
+  else if(s==="cat"){ supTab="cat"; supCat=""; singleEdit=-1; catEdit=""; }
+  else { supTab="all"; supCat=""; singleEdit=-1; catEdit=""; }
+  renderProducts();
+}
+window.addEventListener("popstate", function(e){
+  __supInPop=true;
+  var st=(e&&e.state)||null;
+  var s4=(st&&st.s)||"all";
+  __supTop=null;
+  __supApply(s4);
+  __supInPop=false;
+});
 var ROW_COLORS=["#fef9e7","#eafaf1","#eaf2f8","#fdedec","#f4ecf7","#fef5e7","#e8f8f5","#fdf2e9"];
 var SUP_CATS=["চাল ও আটা","তেল ও ঘি","মসলা","ডাল ও চিনি","সাবান ও পরিষ্কারক","ব্যক্তিগত যত্ন","চা ও পানীয়","নাস্তা","ঘরোয়া সামগ্রী","অন্যান্য"];
-function setSupTab(t){ supTab=t; supCat=""; var dm=document.getElementById("catDoneMsg"); if(dm) dm.textContent=""; renderProducts(); }
-function setSupCat(c){ supCat=(supCat===c)?"":c; renderProducts(); }
+function setSupTab(t){ supTab=t; supCat=""; var dm=document.getElementById("catDoneMsg"); if(dm) dm.textContent=""; renderProducts(); __supNav(); }
+function setSupCat(c){ supCat=(supCat===c)?"":c; renderProducts(); __supNav(); }
 function isEditing(gi){ var g=groups[gi]; if(!g) return false; return singleEdit===gi || (catEdit!=="" && g.category===catEdit); }
-function toggleSingleEdit(gi){ singleEdit = (singleEdit===gi)? -1 : gi; renderProducts(); }
-function toggleCatEdit(cat){ catEdit = (catEdit===cat)? "" : cat; if(catEdit) singleEdit=-1; var dm=document.getElementById("catDoneMsg"); if(dm) dm.textContent=""; renderProducts(); }
-function cancelCat(){ catEdit=""; renderProducts(); }
+function toggleSingleEdit(gi){ singleEdit = (singleEdit===gi)? -1 : gi; renderProducts(); __supNav(); }
+function toggleCatEdit(cat){ catEdit = (catEdit===cat)? "" : cat; if(catEdit) singleEdit=-1; var dm=document.getElementById("catDoneMsg"); if(dm) dm.textContent=""; renderProducts(); __supNav(); }
+function cancelCat(){ catEdit=""; renderProducts(); __supNav(); }
 function setNameEdit(gi, val){ nameEdit[gi]=val; }
 function cancelOne(gi){
   delete nameEdit[gi];
   Object.keys(typedPrice).forEach(function(k){ if(k.indexOf(gi+"|")===0) delete typedPrice[k]; });
   Object.keys(typedQty).forEach(function(k){ if(k.indexOf(gi+"|")===0) delete typedQty[k]; });
   if(singleEdit===gi) singleEdit=-1;
-  renderProducts();
+  renderProducts(); __supNav();
 }
 function renderProducts(){
   var q=(document.getElementById("q").value||"").trim();
