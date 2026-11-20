@@ -960,6 +960,8 @@ async function loadSupplierPrices(){
     h+='<div class="small">এখন পাইকারি দাম: <b>৳'+bn(curW)+'</b>'+(curW? ' (এই দামে কেনা হচ্ছে)':' (এখনো বসানো হয়নি)')+'</div>';
     h+=g.prices.map(function(r, idx){
       var d=new Date(r.created_at);
+      var qv=Math.round(((r.qty===undefined||r.qty===null)?1:Number(r.qty))*100)/100; if(qv<=0) qv=1;
+      var tot=Math.round((r.price||0)*qv);
       var badge="";
       if(g.prices.length>1){
         if(idx===0) badge=' <span style="background:#dcfce7;color:#166534;border-radius:999px;padding:2px 8px;font-size:12px">🟢 সবচেয়ে কম</span>';
@@ -967,7 +969,7 @@ async function loadSupplierPrices(){
       }
       var diff="";
       if(curW && r.price!==curW){ diff=' <span class="small">(এখনকার চেয়ে '+(r.price<curW?'৳'+bn(curW-r.price)+' কম':'৳'+bn(r.price-curW)+' বেশি')+')</span>'; }
-      return '<div class="listrow"><div class="n"><b>৳'+bn(r.price)+'</b>'+badge+diff+'<br><span class="small">'+esc(r.supplier_name||"")+' • '+d.toLocaleDateString("bn-BD")+'</span></div>'
+      return '<div class="listrow"><div class="n"><b>৳'+bn(r.price)+'</b>'+badge+diff+'<br><span class="small">'+esc(r.supplier_name||"")+' • '+d.toLocaleDateString("bn-BD")+'</span><br><span class="small">পরিমাণ: '+bn(qv)+' '+(r.unit||"")+' • মোট ৳'+bn(tot)+'</span></div>'
         +'<button class="gold" onclick="applySupplierPrice(\''+r.id+'\','+(r.product_id||'null')+',\''+r.product_name.replace(/'/g,"")+'\',\''+(r.brand||"").replace(/'/g,"")+'\',\''+(r.unit||"").replace(/'/g,"")+'\','+r.price+')">✅ এই দাম বসান</button>'
         +' <button class="danger" onclick="rejectSupplierPrice(\''+r.id+'\')">বাতিল</button></div>';
     }).join("");
