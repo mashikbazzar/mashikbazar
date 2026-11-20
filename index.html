@@ -181,7 +181,7 @@ h1{font-size:26px}
 <p><span id="companyTitle">নীড়</span> &nbsp;•&nbsp; মাসিক বাজারের সবকিছু, এক জায়গায়</p>
 <div class="headbtns"><button onclick="showTab('feedback')">📝 মতামত</button></div>
 </header>
-<div class="hero"><b>মাসের বাজার, এখন আপনার দরজায়</b><br><span id="heroCount">১৩৩টি পণ্য • ৭টি পরিবার প্যাকেজ • WhatsApp-এ অর্ডার</span></div>
+<div class="hero"><b>পুরো মাসের বাজার একসাথে আপনার দরজায়</b><br><span id="heroCount">১৩৩টি পণ্য • ৭টি পরিবার প্যাকেজ • WhatsApp-এ অর্ডার</span></div>
 <div id="installBanner" style="display:none;background:#ffd970;color:#111;padding:14px 16px;text-align:center;border-bottom:3px solid #065f46">
 <b>📲 অ্যাপ হিসেবে হোম স্ক্রিনে যোগ করুন</b><br><span id="installText">এক ট্যাপে ফোনে অ্যাপের মতো রাখুন — পরে আর লিংক খুঁজতে হবে না।</span><br>
 <button class="primary" id="installBtn" style="margin-top:8px" onclick="doInstall()">হোম স্ক্রিনে যোগ করুন</button>
@@ -194,7 +194,7 @@ h1{font-size:26px}
 <div class="steps">
 <div class="step"><b>১</b><span>পণ্য বেছে নিন</span></div>
 <div class="step"><b>২</b><span>কার্টে যোগ করুন</span></div>
-<div class="step"><b>৩</b><span>WhatsApp-এ পাঠান</span></div>
+<div class="step"><b>৩</b><span>WhatsApp-এ অর্ডার করুন</span></div>
 </div>
 <div class="stickybar"><input class="search" id="q" placeholder="পণ্য খুঁজুন… যেমন: চাল, তেল, সাবান" oninput="renderShop()">
 <div id="searchSug" style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0"></div>
@@ -470,7 +470,8 @@ function productBlockHtml(gid, serial){
   var name=groupName(gid);
   var v=selectedVariantG(gid);
   if(!v) return "";
-  var priceHtml=canSeePrices()?'<span class="price">৳'+bn(v.price_taka)+' <span class="unit">/ '+v.unit+'</span></span>':'<span class="small">দাম দেখতে লগইন করুন • প্রতি '+v.unit+'</span>';
+  var q=qtyShownG(gid);
+  var priceHtml=canSeePrices()?'<span><span class="price">৳'+bn(v.price_taka)+' <span class="unit">/ '+v.unit+'</span></span><br><span class="small">মোট: <b>৳'+bn(Math.round(v.price_taka*q))+'</b> ('+bn(fmtQty(q))+' '+v.unit+')</span></span>':'<span class="small">দাম দেখতে লগইন করুন • প্রতি '+v.unit+'</span>';
   return '<div class="pl1">'+(serial?'<span class="psno">'+bn(serial)+'.</span>':"")+'<span class="pname">'+name+'</span>'+nameBrandSelectG(gid)+pickStepperHtml(gid)+'<span class="unit">'+v.unit+'</span></div>'
     +'<div class="pl2">'+priceHtml+'<button class="add" onclick="addPickedByName('+gid+')">যোগ করুন</button></div>'
     +inCartLineG(gid);
