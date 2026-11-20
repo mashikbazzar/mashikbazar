@@ -304,12 +304,13 @@ function recalcPackages(d){
       var p=null; d.products.forEach(function(x){ if(x.id===it.product_id) p=x; });
       if(!p){ it.line_total_taka=0; return; }
       var amt=Math.round(p.price_taka*(it.qty_multiplier||1));
-      it.line_total_taka=amt; total+=amt;
+      it.line_total_taka=amt;
+      if(it.active!==false) total+=amt;
     });
     pkg.estimated_total_taka=total;
   });
 }
-function pkgTotal(pkg){ var total=0; pkg.items.forEach(function(it){ total += it.line_total_taka||0; }); return total; }
+function pkgTotal(pkg){ var total=0; pkg.items.forEach(function(it){ if(it.active!==false) total += it.line_total_taka||0; }); return total; }
 function getOrders(){ try{ return JSON.parse(localStorage.getItem("mb-orders")||"[]"); }catch(e){ return []; } }
 function logVisit(ev, detail){
   if(!sb) return;
@@ -681,10 +682,38 @@ function addProduct(){
   var inp=document.querySelector('#adminProducts input');
   if(inp) inp.focus();
 }
+var openPkgId=null;
+function openAdminPackage(id){ openPkgId=id; pkgPickerId=null; renderAdminPackages(); }
+function closeAdminPackage(){ openPkgId=null; pkgPickerId=null; renderAdminPackages(); }
+function togglePkgItemActive(pkgId, idx){
+  DRAFT.packages.forEach(function(pkg){ if(pkg.id!==pkgId) return; var it=pkg.items[idx]; if(!it) return; it.active = (it.active===false)? true : false; });
+  recalcPackages(DRAFT); saveDraft(); renderAdminPackages();
+}
+function togglePkgItemActiveById(pkgId, prodId){
+  DRAFT.packages.forEach(function(pkg){ if(pkg.id!==pkgId) return; pkg.items.forEach(function(it){ if(it.product_id===prodId) it.active = (it.active===false)? true : false; }); });
+  recalcPackages(DRAFT); saveDraft(); renderAdminPackages();
+}
 function renderAdminPackages(){
-  document.getElementById("adminPackages").innerHTML=DRAFT.packages.map(function(pkg){
-    return '<div class="pkg"><label>প্যাকেজের নাম</label><input value="'+pkg.name.replace(/"/g,"&quot;")+'" onchange="editPackage('+pkg.id+',\'name\',this.value)"><label>ট্যাগলাইন</label><input value="'+(pkg.tagline||"").replace(/"/g,"&quot;")+'" onchange="editPackage('+pkg.id+',\'tagline\',this.value)"><div>'+pkg.items.map(function(it,idx){ return '<div class="listrow"><div class="n"><b>'+it.name+'</b> <span style="color:#666">(৳'+bn(it.line_total_taka||0)+')</span></div><input style="width:90px" value="'+it.qty_label+'" onchange="editPkgItemQty('+pkg.id+','+idx+',this.value)"><button class="danger" onclick="delPkgItem('+pkg.id+','+idx+')">✕</button></div>'; }).join("")+'</div><button class="ghost" onclick="togglePkgPicker('+pkg.id+')">➕ পণ্য যোগ করুন (সব পণ্যের তালিকা)</button><div id="pkgPicker'+pkg.id+'">'+(pkgPickerId===pkg.id?renderPkgPicker(pkg.id):"")+'</div><p class="total">আনুমানিক মোট: ৳'+bn(pkgTotal(pkg))+'</p><button class="danger" onclick="delPackage('+pkg.id+')">'+(pendingDelPkg===pkg.id?'নিশ্চিত? প্যাকেজটি মুছুন':'প্যাকেজটি মুছুন')+'</button></div>';
-  }).join("");
+  var el=document.getElementById("adminPackages");
+  if(openPkgId===null){
+    el.innerHTML=DRAFT.packages.map(function(pkg){
+      var act=pkg.items.filter(function(it){ return it.active!==false; });
+      var inact=pkg.items.length-act.length;
+      return '<div class="pkg" style="cursor:pointer" onclick="openAdminPackage('+pkg.id+')"><h3>'+esc(pkg.name)+'</h3><p>'+(pkg.tagline||"")+'</p><p class="small">'+bn(act.length)+'টি পণ্য'+(inact?(' • '+bn(inact)+'টি নিস্ক্রিয়'):'')+'</p><p class="total">আনুমানিক মোট: ৳'+bn(pkgTotal(pkg))+'</p><button class="add" onclick="event.stopPropagation();openAdminPackage('+pkg.id+')">📦 প্যাকেজটি খুলুন</button></div>';
+    }).join("")+'<button class="gold" style="width:100%" onclick="addPackage()">➕ নতুন প্যাকেজ</button>';
+    return;
+  }
+  var pkg=null; DRAFT.packages.forEach(function(p){ if(p.id===openPkgId) pkg=p; });
+  if(!pkg){ openPkgId=null; renderAdminPackages(); return; }
+  el.innerHTML='<button class="ghost" onclick="closeAdminPackage()">← সব প্যাকেজ</button>'
+    +'<div class="pkg"><label>প্যাকেজের নাম</label><input value="'+pkg.name.replace(/"/g,"&quot;")+'" onchange="editPackage('+pkg.id+',\'name\',this.value)"><label>ট্যাগলাইন</label><input value="'+(pkg.tagline||"").replace(/"/g,"&quot;")+'" onchange="editPackage('+pkg.id+',\'tagline\',this.value)">'
+    +'<div>'+pkg.items.map(function(it,idx){
+        var inactive = it.active===false;
+        return '<div class="listrow"'+(inactive?' style="opacity:.55;background:#f3f4f6"':'')+'><div class="n"><b>'+it.name+'</b> <span style="color:#666">(৳'+bn(it.line_total_taka||0)+')</span>'+(inactive?' <span class="badge rejected">নিস্ক্রিয়</span>':'')+'</div><input style="width:90px" value="'+it.qty_label+'" onchange="editPkgItemQty('+pkg.id+','+idx+',this.value)"><button class="ghost" onclick="togglePkgItemActive('+pkg.id+','+idx+')">'+(inactive?'সক্রিয় করুন':'নিস্ক্রিয়')+'</button><button class="danger" onclick="delPkgItem('+pkg.id+','+idx+')">✕</button></div>';
+      }).join("")+'</div>'
+    +'<button class="ghost" onclick="togglePkgPicker('+pkg.id+')">➕ পণ্য যোগ করুন (সব পণ্যের তালিকা)</button><div id="pkgPicker'+pkg.id+'">'+(pkgPickerId===pkg.id?renderPkgPicker(pkg.id):"")+'</div>'
+    +'<p class="total">আনুমানিক মোট: ৳'+bn(pkgTotal(pkg))+'</p>'
+    +'<button class="danger" onclick="delPackage('+pkg.id+')">'+(pendingDelPkg===pkg.id?'নিশ্চিত? প্যাকেজটি মুছুন':'প্যাকেজটি মুছুন')+'</button></div>';
 }
 function editPackage(id, field, val){ DRAFT.packages.forEach(function(p){ if(p.id===id) p[field]=val; }); saveDraft(); }
 function editPkgItemQty(pkgId, idx, label){
@@ -700,9 +729,9 @@ function togglePkgPicker(pkgId){ pkgPickerId=(pkgPickerId===pkgId)?null:pkgId; r
 function renderPkgPicker(pkgId){
   var pkg=null; DRAFT.packages.forEach(function(p){ if(p.id===pkgId) pkg=p; }); if(!pkg) return "";
   var inPkg={}; pkg.items.forEach(function(it){ inPkg[it.product_id]=it; });
-  return '<p class="small">প্যাকেজে '+bn(pkg.items.length)+'টি পণ্য আছে। ✓ আছে লেখাগুলো আগেই যোগ করা — আবার যোগ হবে না।</p><input placeholder="পণ্য খুঁজুন…" oninput="filterPkgPicker(this)"><div class="picker">'+DRAFT.products.map(function(p){
+  return '<p class="small">প্যাকেজে '+bn(pkg.items.length)+'টি পণ্য আছে। ✓ আছে লেখাগুলো আগেই যোগ করা — আবার যোগ হবে না। নিস্ক্রিয় পণ্য কাস্টমার দেখতে পাবে না, মুছলে প্যাকেজ থেকে চলে যাবে।</p><input placeholder="পণ্য খুঁজুন…" oninput="filterPkgPicker(this)"><div class="picker">'+DRAFT.products.map(function(p){
     var it=inPkg[p.id];
-    return '<div class="listrow"'+(it?' style="background:#f0fdf4"':'')+'><div class="n"><b>'+p.name+'</b> '+(p.brand||"")+' <span style="color:#666">৳'+p.price_taka+'/'+p.unit+'</span></div>'+(it?('<span class="small">✓ আছে ('+it.qty_label+')</span> <button class="danger" onclick="delPkgItemById('+pkg.id+','+p.id+')">মুছুন</button>'):('<button class="ghost" onclick="addPkgItemById('+pkg.id+','+p.id+')">+ যোগ করুন</button>'))+'</div>';
+    return '<div class="listrow"'+(it?' style="background:#f0fdf4"':'')+'><div class="n"><b>'+p.name+'</b> '+(p.brand||"")+' <span style="color:#666">৳'+p.price_taka+'/'+p.unit+'</span></div>'+(it?((it.active===false?'<span class="badge rejected">নিস্ক্রিয়</span> <button class="ghost" onclick="togglePkgItemActiveById('+pkg.id+','+p.id+')">সক্রিয় করুন</button>':'<span class="small">✓ আছে ('+it.qty_label+')</span>')+' <button class="danger" onclick="delPkgItemById('+pkg.id+','+p.id+')">মুছুন</button>'):('<button class="ghost" onclick="addPkgItemById('+pkg.id+','+p.id+')">+ যোগ করুন</button>'))+'</div>';
   }).join("")+'</div>';
 }
 function filterPkgPicker(inp){
@@ -712,7 +741,7 @@ function filterPkgPicker(inp){
 }
 function addPkgItemById(pkgId, prodId){
   var p=null; DRAFT.products.forEach(function(x){ if(x.id===prodId) p=x; }); if(!p) return;
-  DRAFT.packages.forEach(function(pkg){ if(pkg.id===pkgId){ var exists=false; pkg.items.forEach(function(it){ if(it.product_id===prodId) exists=true; }); if(!exists) pkg.items.push({product_id:p.id, name:p.name, brand:p.brand, qty_label:"১ "+p.unit, qty_multiplier:1, line_total_taka:p.price_taka}); } });
+  DRAFT.packages.forEach(function(pkg){ if(pkg.id===pkgId){ var exists=false; pkg.items.forEach(function(it){ if(it.product_id===prodId) exists=true; }); if(!exists) pkg.items.push({product_id:p.id, name:p.name, brand:p.brand, qty_label:"১ "+p.unit, qty_multiplier:1, line_total_taka:p.price_taka, active:true}); } });
   recalcPackages(DRAFT); saveDraft(); renderAdminPackages();
 }
 function delPkgItemById(pkgId, prodId){
@@ -722,7 +751,7 @@ function delPkgItemById(pkgId, prodId){
 function addPkgItem(pkgId){
   var sel=document.getElementById("pkgSel"+pkgId); if(!sel) return;
   var p=null; DRAFT.products.forEach(function(x){ if(String(x.id)===String(sel.value)) p=x; }); if(!p) return;
-  DRAFT.packages.forEach(function(pkg){ if(pkg.id===pkgId){ var exists=false; pkg.items.forEach(function(it){ if(it.product_id===p.id) exists=true; }); if(!exists) pkg.items.push({product_id:p.id, name:p.name, brand:p.brand, qty_label:"১ "+p.unit, qty_multiplier:1, line_total_taka:p.price_taka}); } });
+  DRAFT.packages.forEach(function(pkg){ if(pkg.id===pkgId){ var exists=false; pkg.items.forEach(function(it){ if(it.product_id===p.id) exists=true; }); if(!exists) pkg.items.push({product_id:p.id, name:p.name, brand:p.brand, qty_label:"১ "+p.unit, qty_multiplier:1, line_total_taka:p.price_taka, active:true}); } });
   recalcPackages(DRAFT); saveDraft(); renderAdminPackages();
 }
 var pendingDelPkg=null, pendingDelPkgTimer=null;
