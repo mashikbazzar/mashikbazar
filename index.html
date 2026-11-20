@@ -10,7 +10,15 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:"Noto Sans Bengali","Hind Siliguri",system-ui,sans-serif;background:#f4f6f1;color:#1a1a1a}
+button,a{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+button{transition:transform .08s ease}
+button:active{transform:scale(.97)}
+.add:active{background:#044d38}
+.chip:active{transform:scale(.96)}
+.cartbar:active{filter:brightness(.92)}
+a.wa:active{filter:brightness(.92)}
+.bottomnav button:active{background:#044d38}
+body{margin:0;font-family:"Noto Sans Bengali","Hind Siliguri",system-ui,sans-serif;background:#f4f6f1;color:#1a1a1a;line-height:1.55;-webkit-text-size-adjust:100%}
 header{background:linear-gradient(135deg,#065f46,#0b7a4b);color:#fff;padding:20px 16px 16px;text-align:center;border-radius:0 0 24px 24px;box-shadow:0 4px 16px rgba(6,95,70,.25)}
 .logo{width:64px;height:64px;border-radius:50%;background:#d4a017;color:#065f46;display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 8px;border:3px solid #f5d76e}
 h1{margin:0;font-size:30px;color:#ffd970}
@@ -19,13 +27,17 @@ header p{margin:4px 0;color:#e8f5ee}
 .hero b{color:#ffd970}
 .wrap{max-width:900px;margin:0 auto;padding:12px 12px 200px}
 .search{width:100%;padding:13px 16px;font-size:17px;border:2px solid #065f46;border-radius:999px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.stickybar{position:sticky;top:0;z-index:8;background:#f4f6f1;margin:0 -12px;padding:8px 12px 6px}
+.stickybar .chips{margin:8px 0 2px}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
-.chip{border:1px solid #d1d5db;background:#fff;color:#374151;border-radius:999px;padding:10px 16px;font-size:16px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.chip{border:1px solid #d1d5db;background:#fff;color:#374151;border-radius:999px;padding:11px 16px;font-size:16px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .chip.on{background:#065f46;color:#fff;border-color:#065f46;box-shadow:0 2px 8px rgba(6,95,70,.3)}
 .viewrow{display:flex;gap:8px;margin:6px 0 12px}
-.viewrow button{flex:1;padding:10px;border:1px solid #065f46;background:#fff;color:#065f46;border-radius:10px;font-size:16px;cursor:pointer}
+.viewrow button{flex:1;padding:12px;border:1px solid #065f46;background:#fff;color:#065f46;border-radius:10px;font-size:16px;cursor:pointer}
 .viewrow button.on{background:#065f46;color:#fff}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card,.prow,.listrow{min-width:0}
+.prow,.card{content-visibility:auto;contain-intrinsic-size:auto 110px}
 @media(min-width:640px){.grid{grid-template-columns:1fr 1fr 1fr}}
 .card{background:#fff;border:1px solid #e8e8e8;border-radius:18px;padding:12px;box-shadow:0 3px 10px rgba(0,0,0,.07)}
 .steps{display:flex;gap:8px;margin:12px 0}
@@ -37,7 +49,7 @@ header p{margin:4px 0;color:#e8f5ee}
 .prizebanner b{font-size:18px;color:#111}
 .prizebanner span{font-size:14px;color:#444;display:block;margin-top:4px}
 .headbtns{display:flex;gap:8px;justify-content:center;margin-top:12px}
-.headbtns button{background:rgba(255,255,255,.14);color:#fff;border:1.5px solid rgba(255,255,255,.65);border-radius:999px;padding:8px 18px;font-size:15px;font-weight:700;cursor:pointer}
+.headbtns button{background:rgba(255,255,255,.14);color:#fff;border:1.5px solid rgba(255,255,255,.65);border-radius:999px;padding:11px 18px;font-size:15px;font-weight:700;cursor:pointer;min-height:44px}
 .crow{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:2px 0}
 .ccat{color:#666;font-size:13px;white-space:nowrap}
 .card .brandsel{max-width:100%;width:100%}
@@ -58,12 +70,12 @@ header p{margin:4px 0;color:#e8f5ee}
 .track .st.cur{color:#065f46;font-weight:800}
 .track .st.cur .dot{background:#d4a017;color:#111;box-shadow:0 0 0 3px #f5d76e}
 .chatpanel{position:fixed;left:0;right:0;bottom:0;z-index:20;background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -4px 24px rgba(0,0,0,.3);max-height:82vh;display:flex;flex-direction:column}
-.chatlog{flex:1;overflow:auto;padding:12px}
+.chatlog{flex:1;overflow:auto;padding:12px;overscroll-behavior:contain}
 .chatmsg{margin:6px 0;padding:10px 12px;border-radius:14px;max-width:88%;line-height:1.6;white-space:pre-wrap;word-wrap:break-word}
 .chatmsg.me{background:#065f46;color:#fff;margin-left:auto}
 .chatmsg.bot{background:#f0f0f0;color:#111}
-.chatchip{border:1px solid #065f46;background:#fff;color:#065f46;border-radius:999px;padding:8px 12px;font-size:14px;cursor:pointer}
-.cartbar{position:fixed;left:12px;right:12px;bottom:64px;z-index:11;background:#065f46;color:#fff;border-radius:14px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;font-size:17px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.chatchip{border:1px solid #065f46;background:#fff;color:#065f46;border-radius:999px;padding:11px 14px;font-size:15px;cursor:pointer}
+.cartbar{position:fixed;left:12px;right:12px;bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:11;background:#065f46;color:#fff;border-radius:14px;padding:14px 16px;min-height:52px;display:flex;justify-content:space-between;align-items:center;font-size:17px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25)}
 .card h3{margin:0 0 2px;font-size:17px}
 .card .brand{color:#666;font-size:14px}
 .caticon{width:48px;height:48px;border-radius:14px;background:#e8f5ee;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:6px}
@@ -76,46 +88,50 @@ header p{margin:4px 0;color:#e8f5ee}
 .qty button{width:44px;height:44px;font-size:22px;border-radius:12px;border:1px solid #065f46;background:#fff;color:#065f46;cursor:pointer}
 .listrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#fff;border:1px solid #e8e8e8;border-radius:14px;padding:10px 12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
 .prow{background:#fff;border:1px solid #e8e8e8;border-radius:14px;padding:10px 12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
-.pl1{display:flex;align-items:center;gap:8px}
+.pl1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .pl1 .psno{color:#aaa;font-size:13px;flex:none}
 .pl1 .pname{font-weight:700;font-size:16px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pl1 .brandsel{color:#999;border:1px solid #ddd;background:#fff;font-weight:400;width:auto;max-width:120px;padding:5px 8px;font-size:14px;margin:0;flex:none}
+.pl1 .brandsel{color:#999;border:1px solid #ddd;background:#fff;font-weight:400;width:auto;max-width:120px;padding:5px 8px;font-size:16px;margin:0;flex:none}
 .pl1 .brand{color:#999;font-size:14px;flex:none}
 .qmini{display:flex;gap:4px;align-items:center;flex:none}
-.qmini button{width:30px;height:30px;font-size:17px;border-radius:8px;border:1px solid #065f46;background:#fff;color:#065f46;cursor:pointer}
-.qmini input{width:48px;text-align:center;padding:6px 2px;font-size:15px;border:1px solid #ccc;border-radius:8px}
+.qmini button{width:36px;height:38px;font-size:20px;border-radius:8px;border:1px solid #065f46;background:#fff;color:#065f46;cursor:pointer}
+.qmini input{width:52px;text-align:center;padding:9px 2px;font-size:16px;border:1px solid #ccc;border-radius:8px}
 .pl2{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px}
 .pl2 .price{margin:0}
-.pl2 .add{margin:0;width:auto;padding:10px 20px;font-size:16px}
+.pl2 .add{margin:0;width:auto;padding:12px 22px;font-size:16px}
 .card .pl1 .brandsel{max-width:110px}
-.arow{display:flex;gap:6px;align-items:flex-start;background:#fff;border:1px solid #d8d8d8;border-radius:12px;padding:8px;margin-bottom:8px}
+.arow{display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap;background:#fff;border:1px solid #d8d8d8;border-radius:12px;padding:8px;margin-bottom:8px}
 .arow .n{flex:1;min-width:0}
-.arow input,.arow select{padding:8px;font-size:15px;margin:3px 0}
+.arow input,.arow select{padding:8px;font-size:16px;margin:3px 0}
 .arow .mini{display:flex;gap:6px}
 .arow .mini>div{flex:1;min-width:0}
 .arow .qty{display:flex;flex-direction:column;gap:4px}
-.arow .qty button{padding:6px 9px}
+.arow .qty button{padding:10px 12px;min-width:44px;min-height:44px}
 .picker{max-height:320px;overflow:auto;border:1px solid #d8d8d8;border-radius:10px;padding:6px;margin-top:6px}
 .listrow .n{flex:1;min-width:0}
+.listrow .qty{margin-left:auto}
 .pkg{background:linear-gradient(180deg,#fff8e1,#fffdf5);border:2px solid #d4a017;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 2px 10px rgba(212,160,23,.15)}
 .pkg h3{margin:0;color:#065f46}
 .pkg .total{font-size:20px;font-weight:800;color:#065f46}
-section h2{color:#065f46;margin:14px 0 8px}
+section h2{color:#065f46;margin:14px 0 8px;font-size:20px}
 input,textarea,select{width:100%;padding:11px;font-size:16px;border:1px solid #999;border-radius:10px;margin:6px 0}
 .wa{display:block;text-align:center;background:#25D366;color:#fff;text-decoration:none;font-weight:800;padding:18px;border-radius:14px;margin-top:10px;font-size:20px}
 .pdfbtn{width:100%;background:#d4a017;border:0;border-radius:12px;padding:12px;font-size:17px;font-weight:700;cursor:pointer;margin-top:8px}
 .note{background:#fff;border-left:5px solid #d4a017;padding:12px;border-radius:8px;margin:12px 0}
 .warn{background:#fff3cd;border-left:5px solid #b7791f;padding:12px;border-radius:8px;margin:12px 0}
 .bottomnav{position:fixed;left:0;right:0;bottom:0;background:#065f46;display:flex;z-index:10;padding-bottom:env(safe-area-inset-bottom,0px)}
-.bottomnav button{flex:1;background:none;border:0;color:#fff;padding:14px 2px;font-size:13px;cursor:pointer;min-width:0;white-space:nowrap}
+.bottomnav button{flex:1;background:none;border:0;color:#fff;padding:12px 2px 14px;font-size:14px;cursor:pointer;min-width:0;white-space:nowrap}
 .bottomnav button.on{background:#044d38;font-weight:700}
 .adminbox{background:#fff;border:2px solid #065f46;border-radius:16px;padding:14px;margin-top:12px}
+#customerBox .primary{width:100%;margin-top:8px}
+#pkgDetailItems ul{padding-left:20px;margin:8px 0}
+#pkgDetailItems li{padding:4px 0;line-height:1.6}
 .adminbox h3{color:#065f46;margin:8px 0}
 .small{font-size:14px;color:#555}
 button.primary{background:#065f46;color:#fff;border:0;border-radius:10px;padding:12px 16px;font-size:16px;cursor:pointer}
 button.gold{background:#d4a017;color:#111;border:0;border-radius:10px;padding:12px 16px;font-size:16px;font-weight:700;cursor:pointer}
-button.danger{background:#b91c1c;color:#fff;border:0;border-radius:10px;padding:8px 12px;font-size:15px;cursor:pointer}
-button.ghost{background:#fff;border:1px solid #065f46;color:#065f46;border-radius:10px;padding:8px 12px;font-size:15px;cursor:pointer}
+button.danger{background:#b91c1c;color:#fff;border:0;border-radius:10px;padding:10px 14px;font-size:15px;cursor:pointer}
+button.ghost{background:#fff;border:1px solid #065f46;color:#065f46;border-radius:10px;padding:11px 14px;font-size:15px;cursor:pointer}
 .statgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
 .stat{background:#e8f5ee;border-radius:12px;padding:10px;text-align:center}
 .stat b{font-size:22px;color:#065f46;display:block}
@@ -131,13 +147,23 @@ button.ghost{background:#fff;border:1px solid #065f46;color:#065f46;border-radiu
 .timeline .todo{color:#999}
 .ordercard{background:#fff;border:1px solid #d8d8d8;border-radius:14px;padding:12px;margin-bottom:10px}
 footer{text-align:center;color:#555;padding:16px 16px 140px;font-size:14px}
+@media(max-width:480px){
+header{padding:16px 12px 12px}
+.logo{width:56px;height:56px;font-size:30px}
+h1{font-size:26px}
+.grid{grid-template-columns:1fr}
+.pl1 .brandsel,.card .pl1 .brandsel{max-width:96px}
+.listrow .n{min-width:150px}
+.track .st{min-width:48px;font-size:11px}
+.ordercard .primary,.ordercard .gold,.ordercard .ghost{display:block;width:100%;margin:6px 0 0}
+}
 @media print{.bottomnav,.viewrow,.chips,.search,.add,.qty,.wa,.pdfbtn,#installBanner{display:none!important}}
 #memoOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;overflow:auto;padding:12px;display:none}
 #memoPaper{background:#fff;max-width:640px;margin:0 auto;padding:20px;border-radius:8px;color:#111}
 #memoPaper table{width:100%;border-collapse:collapse;margin:10px 0}
 #memoPaper th,#memoPaper td{border:1px solid #ccc;padding:6px 8px;font-size:15px;text-align:left;vertical-align:top}
 #memoPaper th{background:#e8f5ee;color:#065f46}
-#memoPaper input{padding:6px;font-size:15px;border:1px solid #999;border-radius:6px;margin:0}
+#memoPaper input{padding:6px;font-size:16px;border:1px solid #999;border-radius:6px;margin:0}
 @media print{body *{visibility:hidden} #memoOverlay,#memoOverlay *{visibility:visible} #memoOverlay{position:absolute;left:0;top:0;width:100%;background:#fff;padding:0} .noprint{display:none!important}}
 </style>
 </head>
@@ -152,7 +178,7 @@ footer{text-align:center;color:#555;padding:16px 16px 140px;font-size:14px}
 <div id="installBanner" style="display:none;background:#ffd970;color:#111;padding:14px 16px;text-align:center;border-bottom:3px solid #065f46">
 <b>📲 অ্যাপ হিসেবে হোম স্ক্রিনে যোগ করুন</b><br><span id="installText">এক ট্যাপে ফোনে অ্যাপের মতো রাখুন — পরে আর লিংক খুঁজতে হবে না।</span><br>
 <button class="primary" id="installBtn" style="margin-top:8px" onclick="doInstall()">হোম স্ক্রিনে যোগ করুন</button>
-<button style="background:none;border:0;font-size:18px;cursor:pointer" onclick="document.getElementById('installBanner').style.display='none'">✕</button>
+<button style="background:none;border:0;font-size:18px;cursor:pointer;padding:10px 14px" onclick="document.getElementById('installBanner').style.display='none'">✕</button>
 <div id="installSteps" style="display:none;text-align:left;background:#fff;border-radius:10px;padding:12px;margin-top:10px"></div>
 </div>
 <div class="wrap">
@@ -164,9 +190,9 @@ footer{text-align:center;color:#555;padding:16px 16px 140px;font-size:14px}
 <div class="step"><b>২</b><span>কার্টে যোগ করুন</span></div>
 <div class="step"><b>৩</b><span>WhatsApp-এ পাঠান</span></div>
 </div>
-<input class="search" id="q" placeholder="পণ্য খুঁজুন… যেমন: চাল, তেল, সাবান" oninput="renderShop()">
+<div class="stickybar"><input class="search" id="q" placeholder="পণ্য খুঁজুন… যেমন: চাল, তেল, সাবান" oninput="renderShop()">
 <div id="searchSug" style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0"></div>
-<div class="chips" id="chips"></div>
+<div class="chips" id="chips"></div></div>
 <div class="viewrow">
 <button id="vGrid" onclick="setView('grid')">▦ গ্রিড</button>
 <button id="vList" class="on" onclick="setView('list')">☰ সিরিয়াল লিস্ট</button>
@@ -192,9 +218,9 @@ footer{text-align:center;color:#555;padding:16px 16px 140px;font-size:14px}
 <div id="pkgCustomItems"></div>
 <label>আরেকটি পণ্য যোগ করুন</label>
 <select id="pkgAddSelect"></select>
-<button class="primary" onclick="pkgAddItem()">+ যোগ করুন</button>
+<button class="primary" style="width:100%;margin-top:8px" onclick="pkgAddItem()">+ যোগ করুন</button>
 <p><b>নতুন মোট: <span id="pkgCustomTotal"></span></b></p>
-<button class="gold" onclick="pkgCustomToCart()">✅ এই প্যাকেজটি কার্টে নিন</button>
+<button class="gold" style="width:100%" onclick="pkgCustomToCart()">✅ এই প্যাকেজটি কার্টে নিন</button>
 <button class="ghost" onclick="closePkgCustom()">বাতিল</button>
 </div>
 </div>
@@ -203,7 +229,7 @@ footer{text-align:center;color:#555;padding:16px 16px 140px;font-size:14px}
 <section class="adminbox"><h2>🧾 আপনার অর্ডার</h2>
 <p class="stephead"><b>১.</b> আপনার নাম ও মোবাইল লিখুন</p>
 <label>আপনার নাম</label><input id="cname" placeholder="নাম লিখুন" oninput="renderCart()">
-<label>মোবাইল নম্বর</label><input id="cphone" placeholder="01XXXXXXXXX" oninput="renderCart()">
+<label>মোবাইল নম্বর</label><input id="cphone" placeholder="01XXXXXXXXX" inputmode="tel" autocomplete="tel" oninput="renderCart()">
 <p class="stephead"><b>২.</b> আপনার ঠিকানা লিখুন</p>
 <label>ঠিকানা (বাসা / এলাকা)</label><input id="caddr" placeholder="যেমন: হবিগঞ্জ, শায়েস্তাগঞ্জ" oninput="saveAddr();renderCart()">
 <div id="cart"></div>
@@ -235,7 +261,7 @@ footer{text-align:center;color:#555;padding:16px 16px 140px;font-size:14px}
 <section class="adminbox"><h2>💬 মতামত</h2>
 <p>আপনার অভিযোগ, পরামর্শ বা নতুন আইডিয়া জানান — অ্যাডমিন দেখে সমাধান করবেন। নতুন আইডিয়া দিলে সেরা আইডিয়ার জন্য পুরস্কার আছে!</p>
 <label>আপনার নাম</label><input id="fbName" placeholder="নাম লিখুন">
-<label>মোবাইল নম্বর</label><input id="fbPhone" placeholder="01XXXXXXXXX">
+<label>মোবাইল নম্বর</label><input id="fbPhone" placeholder="01XXXXXXXXX" inputmode="tel" autocomplete="tel">
 <label>ধরন</label>
 <select id="fbType"><option>অভিযোগ</option><option>পরামর্শ</option><option>নতুন আইডিয়া</option></select>
 <label>আপনার বার্তা</label><textarea id="fbMsg" rows="4" placeholder="এখানে লিখুন…"></textarea>
@@ -249,10 +275,10 @@ footer{text-align:center;color:#555;padding:16px 16px 140px;font-size:14px}
 </div>
 <div id="cartBar" class="cartbar" style="display:none" onclick="showTab('cart')"><span id="cartBarText"></span><b>কার্ট দেখুন →</b></div>
 <div id="chatPanel" class="chatpanel" style="display:none">
-<div style="padding:12px 16px;background:#065f46;color:#fff;border-radius:20px 20px 0 0;display:flex;justify-content:space-between;align-items:center"><b>💬 মাসিক বাজার সহকারী</b><button onclick="toggleChat(false)" style="background:none;border:0;color:#fff;font-size:22px;cursor:pointer">✕</button></div>
+<div style="padding:12px 16px;background:#065f46;color:#fff;border-radius:20px 20px 0 0;display:flex;justify-content:space-between;align-items:center"><b>💬 মাসিক বাজার সহকারী</b><button onclick="toggleChat(false)" style="background:none;border:0;color:#fff;font-size:22px;cursor:pointer;padding:8px 12px">✕</button></div>
 <div id="chatLog" class="chatlog"></div>
 <div id="chatChips" style="display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px"></div>
-<div style="display:flex;gap:6px;padding:8px 12px 16px"><input id="chatInput" placeholder="এখানে লিখুন…" style="flex:1;margin:0" onkeydown="if(event.key==='Enter')sendChat()"><button class="primary" onclick="sendChat()">পাঠান</button></div>
+<div style="display:flex;gap:6px;padding:8px 12px calc(16px + env(safe-area-inset-bottom,0px))"><input id="chatInput" placeholder="এখানে লিখুন…" style="flex:1;margin:0" onkeydown="if(event.key==='Enter')sendChat()"><button class="primary" onclick="sendChat()">পাঠান</button></div>
 </div>
 <nav class="bottomnav">
 <button id="nav-shop" class="on" onclick="showTab('shop')">🛒 দোকান</button>
@@ -343,7 +369,7 @@ function brandVariants(name){ return DATA.products.filter(function(x){ return x.
 function brandSelectHtml(p, fnName, arg){
   var vars=brandVariants(p.name);
   if(vars.length<=1) return (p.brand||"");
-  return '<select style="max-width:130px;padding:4px;font-size:14px" onchange="'+fnName+'('+arg+',parseInt(this.value,10))">'+vars.map(function(v){ return '<option value="'+v.id+'"'+(v.id===p.id?' selected':'')+'>'+(v.brand||"ব্র্যান্ড ছাড়া")+'</option>'; }).join("")+'</select>';
+  return '<select style="max-width:130px;padding:6px;font-size:16px" onchange="'+fnName+'('+arg+',parseInt(this.value,10))">'+vars.map(function(v){ return '<option value="'+v.id+'"'+(v.id===p.id?' selected':'')+'>'+(v.brand||"ব্র্যান্ড ছাড়া")+'</option>'; }).join("")+'</select>';
 }
 function chgCartBrand(oldId, newId){ oldId=parseInt(oldId,10); newId=parseInt(newId,10); if(oldId===newId||!cart[oldId]) return; cart[newId]=(cart[newId]||0)+cart[oldId]; delete cart[oldId]; saveCart(); renderCart(); renderShop(); }
 function showTab(t){
@@ -387,7 +413,7 @@ function setPick(gid,val){ var v=selectedVariantG(gid); if(!v) return; var q=Mat
 function addPickedByName(gid){ var v=selectedVariantG(gid); if(!v) return; var q=Math.round((pickQty[gid]||1)*100)/100; if(q<=0) return; cart[v.id]=q; pickQty[gid]=q; saveCart(); renderShop(); renderCart(); }
 function fmtQty(q){ q=Math.round(Number(q||0)*100)/100; return String(q); }
 function unitStep(u){ return (u==="কেজি"||u==="লিটার")?0.5:1; }
-function qtyCtrlHtml(id, q, unit){ var st=unitStep(unit); return '<div class="qty"><button onclick="chg('+id+',-'+st+')">−</button><input type="number" min="0" step="'+st+'" value="'+fmtQty(q)+'" style="width:64px;text-align:center;padding:8px 4px" onchange="setQty('+id+',this.value)"><button onclick="chg('+id+','+st+')">+</button></div>'; }
+function qtyCtrlHtml(id, q, unit){ var st=unitStep(unit); return '<div class="qty"><button onclick="chg('+id+',-'+st+')">−</button><input type="number" min="0" step="'+st+'" value="'+fmtQty(q)+'" style="width:64px;text-align:center;padding:12px 4px" onchange="setQty('+id+',this.value)"><button onclick="chg('+id+','+st+')">+</button></div>'; }
 function setQty(id, val){ var q=Math.round((parseFloat(val)||0)*100)/100; if(q<=0){ delete cart[id]; } else { cart[id]=q; } saveCart(); renderShop(); renderCart(); }
 function chg(id,d){ cart[id]=Math.round(((cart[id]||0)+d)*100)/100; if(cart[id]<=0) delete cart[id]; saveCart(); renderShop(); renderCart(); }
 function moveCart(id,d){ var ks=Object.keys(cart); var i=ks.indexOf(String(id)); var j=i+d; if(j<0||j>=ks.length) return; var t=ks[i]; ks[i]=ks[j]; ks[j]=t; var nc={}; ks.forEach(function(k){ nc[k]=cart[k]; }); cart=nc; saveCart(); renderCart(); }
@@ -554,7 +580,7 @@ function renderCart(){
   Object.keys(cart).forEach(function(id){
     var p=findProduct(id); if(!p) return;
     var amt=Math.round(p.price_taka*cart[id]); total+=amt; n+=cart[id];
-    lines.push('<div class="listrow"><b>'+bn(lines.length+1)+'.</b><div class="n"><b>'+p.name+'</b> '+brandSelectHtml(p,"chgCartBrand",p.id)+(canSeePrices()?('<br>৳'+bn(p.price_taka)+' × '+bn(fmtQty(cart[id]))+' '+p.unit+' = <b>৳'+bn(amt)+'</b>'):('<br>'+bn(fmtQty(cart[id]))+' '+p.unit))+'</div><div class="qty"><button onclick="moveCart('+id+',-1)">↑</button><button onclick="moveCart('+id+',1)">↓</button><button onclick="chg('+id+',-'+unitStep(p.unit)+')">−</button><input type="number" min="0" step="'+unitStep(p.unit)+'" value="'+fmtQty(cart[id])+'" style="width:56px;text-align:center;padding:6px 2px" onchange="setQty('+id+',this.value)"><button onclick="chg('+id+','+unitStep(p.unit)+')">+</button></div></div>');
+    lines.push('<div class="listrow"><b>'+bn(lines.length+1)+'.</b><div class="n"><b>'+p.name+'</b> '+brandSelectHtml(p,"chgCartBrand",p.id)+(canSeePrices()?('<br>৳'+bn(p.price_taka)+' × '+bn(fmtQty(cart[id]))+' '+p.unit+' = <b>৳'+bn(amt)+'</b>'):('<br>'+bn(fmtQty(cart[id]))+' '+p.unit))+'</div><div class="qty"><button onclick="moveCart('+id+',-1)">↑</button><button onclick="moveCart('+id+',1)">↓</button><button onclick="chg('+id+',-'+unitStep(p.unit)+')">−</button><input type="number" min="0" step="'+unitStep(p.unit)+'" value="'+fmtQty(cart[id])+'" style="width:56px;text-align:center;padding:12px 2px" onchange="setQty('+id+',this.value)"><button onclick="chg('+id+','+unitStep(p.unit)+')">+</button></div></div>');
   });
   customCart.forEach(function(c){
     lines.push('<div class="listrow"><b>'+bn(lines.length+1)+'.</b><div class="n"><b>'+c.name+'</b> — '+c.qty+'<br><span class="small">দাম দোকান থেকে জানানো হবে</span></div><button class="danger" onclick="delCustomItem('+c.id+')">✕</button></div>');

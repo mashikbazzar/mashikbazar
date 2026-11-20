@@ -113,9 +113,67 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 #memoPaper input{padding:6px;font-size:15px;border:1px solid #999;border-radius:6px;margin:0}
 @media print{body *{visibility:hidden} #memoOverlay,#memoOverlay *{visibility:visible} #memoOverlay{position:absolute;left:0;top:0;width:100%;background:#fff;padding:0} .noprint{display:none!important}}
 
+/* ---- Neer Admin mobile-first polish (v22) ---- */
+html{-webkit-text-size-adjust:100%}
+button{-webkit-tap-highlight-color:transparent}
+button:active,.chip:active,.pcard:active,.pkg:active{filter:brightness(.93)}
+button.primary,button.gold,button.danger,button.ghost{min-height:44px}
+input:focus,select:focus,textarea:focus{outline:2px solid #8b5cf6;outline-offset:1px;border-color:#6d28d9}
+.wrap{padding-bottom:48px}
+/* purple identity (admin app only: this snapshot feeds the admin build) */
+.adminbox{border-color:#6d28d9;box-shadow:0 2px 10px rgba(109,40,217,.12)}
+.adminbox h3{color:#6d28d9}
+button.primary{background:#6d28d9;box-shadow:0 2px 8px rgba(109,40,217,.3)}
+button.ghost{border-color:#6d28d9;color:#6d28d9}
+.chip{border-color:#6d28d9;color:#6d28d9;min-height:44px;padding:10px 14px}
+.chip.on{background:#6d28d9}
+.admintabs button{border-color:#6d28d9;color:#6d28d9;min-height:44px;padding:12px 8px}
+.admintabs button.on{background:#6d28d9}
+.admintabs button.has-new{background:#fef3c7;border-color:#d4a017;color:#92400e;font-weight:800}
+.stat{background:#f3e8ff}
+.stat b{color:#6d28d9}
+.pcat{background:#f3e8ff;color:#6d28d9}
+.pr{background:#ede9fe;color:#6d28d9}
+.vcard label{color:#6d28d9}
+section h2{color:#6d28d9}
+.handle{color:#6d28d9}
+/* readable inputs: 16px avoids iOS zoom on focus */
+.vrow input,.vrow select,.arow input,.arow select{font-size:16px;padding:10px 8px}
+#memoPaper input{font-size:16px}
+/* touch targets on small action buttons */
+.pacts button,.vacts button{min-height:44px;padding:10px 14px}
+.vrow button,.arow .mini button{min-height:44px;min-width:44px;padding:10px 12px}
+.listrow button{min-height:44px}
+.listrow .danger{min-width:44px}
+/* no horizontal overflow: rows wrap instead of squeezing at 360px */
+.listrow{flex-wrap:wrap}
+.listrow .n{min-width:0;overflow-wrap:anywhere}
+.brandrow{flex-wrap:wrap}
+.bname{min-width:0;overflow-wrap:anywhere}
+.vrow2{flex-wrap:wrap}
+.vrow2>div{flex:1 1 140px}
+/* sticky product search so it stays reachable while scrolling the list */
+#adminQ{position:sticky;top:0;z-index:5;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+@media(max-width:480px){
+  .adminbox{padding:12px}
+  .pcard{padding:12px}
+  #adminProducts .listrow>div{flex:1 1 40%;min-width:0}
+  #adminProducts .listrow>div:first-child{flex:1 1 100%}
+  #adminProducts .listrow input[type=number]{width:100%!important}
+  #supplierPrices .listrow>button{flex:1 1 45%}
+  #memoPaper{overflow-x:auto}
+  #memoPaper th,#memoPaper td{padding:4px 6px;font-size:13px}
+  #memoPaper input{max-width:64px}
+  .admintabs{gap:8px}
+  .admintabs button{flex:1 1 30%;font-size:14px}
+  .statgrid{gap:6px}
+  .stat{padding:8px 4px}
+  .stat b{font-size:19px}
+}
+
 .bizcard{background:#fff;border:2px solid #d4a017;border-radius:16px;padding:16px;margin-bottom:12px}
-.bizcard h3{margin:0;color:#065f46}
-.applink{display:block;text-align:center;background:#065f46;color:#fff;text-decoration:none;font-weight:700;padding:12px;border-radius:10px;margin:6px 0}
+.bizcard h3{margin:0;color:#6d28d9}
+.applink{display:block;text-align:center;background:#6d28d9;color:#fff;text-decoration:none;font-weight:700;padding:12px;border-radius:10px;margin:6px 0}
 </style>
 </head>
 <body>
@@ -379,7 +437,33 @@ function updateAdminStats(){
   document.getElementById("stProducts").textContent=bn(Object.keys(names).length);
   document.getElementById("stPackages").textContent=bn(DRAFT.packages.length);
   document.getElementById("stOrders").textContent=(adminOrderCount===null)?"—":bn(adminOrderCount);
+  refreshAdminBadges();
 }
+
+var _badgeAt=0;
+async function refreshAdminBadges(force){
+  if(!sb) return;
+  var now=Date.now();
+  if(!force && now-_badgeAt<60000) return;
+  _badgeAt=now;
+  try{
+    var o=await sb.from("orders").select("status").eq("status","New Order").limit(200);
+    setTabBadge("orders", (o&&!o.error&&o.data)?o.data.length:0);
+    var sp=await sb.from("supplier_prices").select("id").eq("status","pending").limit(200);
+    setTabBadge("supplier", (sp&&!sp.error&&sp.data)?sp.data.length:0);
+    var f=await sb.from("feedback").select("status").limit(200);
+    var nF=0;
+    if(f&&!f.error&&f.data){ f.data.forEach(function(r){ if(r.status!=="done") nF++; }); }
+    setTabBadge("feedback", nF);
+  }catch(err){}
+}
+function setTabBadge(t,n){
+  var b=document.getElementById("atab-"+t); if(!b) return;
+  if(!b.getAttribute("data-base")) b.setAttribute("data-base", b.textContent);
+  b.textContent=b.getAttribute("data-base")+(n>0?(" \u2022 "+bn(n)+" \u09a8\u09a4\u09c1\u09a8"):"");
+  if(n>0) b.classList.add("has-new"); else b.classList.remove("has-new");
+}
+
 async function refreshAdminOrderCount(){
   if(!sb) return;
   try{
@@ -475,8 +559,9 @@ async function loadFeedback(){
   var res=await sb.from("feedback").select("*").order("created_at",{ascending:false}).limit(100);
   if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
   var rows=res.data||[];
-  if(!rows.length){ el.innerHTML="<p>এখনো কোনো অভিযোগ বা পরামর্শ আসেনি।</p>"; return; }
+  if(!rows.length){ setTabBadge("feedback",0); el.innerHTML="<p>এখনো কোনো অভিযোগ বা পরামর্শ আসেনি।</p>"; return; }
   var nNew=rows.filter(function(r){ return r.status!=="done"; }).length;
+  setTabBadge("feedback", nNew);
   var typeEmoji={ "অভিযোগ":"😠", "পরামর্শ":"💡", "নতুন আইডিয়া":"🏆", "ফোনে কনফার্ম":"📞" };
   el.innerHTML='<div class="statgrid"><div class="stat"><b>'+bn(rows.length)+'</b>টি বার্তা</div><div class="stat"><b>'+bn(nNew)+'</b>টি নতুন</div></div>'+rows.map(function(r){
     var d=new Date(r.created_at);
@@ -912,7 +997,8 @@ async function loadAdminOrders(){
   if(adminOrderCount===null){ adminOrderCount=rows.length; updateAdminStats(); }
   refreshAdminOrderCount();
   adminOrdersById={}; rows.forEach(function(o){ adminOrdersById[o.id]=o; });
-  if(!rows.length){ el.innerHTML="<p>এখনো কোনো অর্ডার আসেনি।</p>"; return; }
+  var nNewOrd=0; rows.forEach(function(o){ if(o.status==="New Order") nNewOrd++; }); setTabBadge("orders", nNewOrd);
+  if(!rows.length){ setTabBadge("orders",0); el.innerHTML="<p>এখনো কোনো অর্ডার আসেনি।</p>"; return; }
   var statuses=["New Order","Contacted","Confirmed","Preparing","Out for Delivery","Delivered","Cancelled"];
   var bnStatus={"New Order":"নতুন অর্ডার","Contacted":"যোগাযোগ হয়েছে","Confirmed":"নিশ্চিত","Preparing":"তৈরি হচ্ছে","Out for Delivery":"ডেলিভারিতে","Delivered":"ডেলিভারি সম্পন্ন","Cancelled":"বাতিল"};
   el.innerHTML=rows.map(function(o){
@@ -943,7 +1029,8 @@ async function loadSupplierPrices(){
   var res = await sb.from("supplier_prices").select("*").eq("status","pending").order("created_at", {ascending:false}).limit(200);
   if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
   var rows=res.data||[];
-  if(!rows.length){ el.innerHTML="<p>কোনো নতুন দাম আসেনি।</p>"; return; }
+  if(!rows.length){ setTabBadge("supplier",0); el.innerHTML="<p>কোনো নতুন দাম আসেনি।</p>"; return; }
+  setTabBadge("supplier", rows.length);
   var groups={}, order=[];
   rows.forEach(function(r){
     var key=(r.product_name||"")+'|'+(r.brand||"");

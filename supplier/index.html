@@ -18,16 +18,20 @@ header p{margin:6px 0;color:#e8f5ee}
 .wrap{max-width:800px;margin:0 auto;padding:14px 14px 60px}
 .card{background:#fff;border:1px solid #e8e8e8;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
 input,select{width:100%;padding:12px;font-size:16px;border:1px solid #999;border-radius:10px;margin:6px 0}
-button.primary{background:#1e40af;color:#fff;border:0;border-radius:12px;padding:12px 16px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(30,64,175,.3)}
-button.gold{background:#d4a017;color:#111;border:0;border-radius:12px;padding:12px 16px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(212,160,23,.3)}
-button.ghost{background:#fff;border:1px solid #1e40af;color:#1e40af;border-radius:10px;padding:8px 12px;font-size:15px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-button.danger{background:#b91c1c;color:#fff;border:0;border-radius:10px;padding:8px 12px;font-size:15px;cursor:pointer;box-shadow:0 1px 4px rgba(185,28,28,.3)}
+button.primary{background:#1e40af;color:#fff;border:0;border-radius:12px;padding:12px 16px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(30,64,175,.3);min-height:44px}
+button.gold{background:#d4a017;color:#111;border:0;border-radius:12px;padding:12px 16px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(212,160,23,.3);min-height:44px}
+button.ghost{background:#fff;border:1px solid #1e40af;color:#1e40af;border-radius:10px;padding:10px 14px;font-size:16px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06);min-height:44px}
+button.danger{background:#b91c1c;color:#fff;border:0;border-radius:10px;padding:10px 14px;font-size:16px;cursor:pointer;box-shadow:0 1px 4px rgba(185,28,28,.3);min-height:44px}
+button{-webkit-tap-highlight-color:transparent}
+button:active{transform:scale(.97);opacity:.88}
+#loginBox button.primary{width:100%;min-height:48px}
+.card>.gold{width:100%}
 .search{width:100%;padding:13px 16px;font-size:17px;border:2px solid #1e40af;border-radius:999px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-.row{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #e8e8e8;border-radius:14px;padding:12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.row{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #e8e8e8;border-radius:14px;padding:12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.05);content-visibility:auto;contain-intrinsic-size:auto 130px}
 .srow{align-items:flex-start;padding:10px}
-.srow input{padding:7px;font-size:15px;margin:2px 0}
+.srow input{padding:12px;font-size:16px;margin:4px 0;min-height:44px}
 input[readonly]{background:#f5f5f5;color:#555}
-.row .n{flex:1}
+.row .n{flex:1;min-width:0}
 .price{color:#1e40af;font-weight:800;font-size:20px}
 .small{font-size:14px;color:#555}
 .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:13px;font-weight:700}
@@ -44,6 +48,17 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 .pname{font-weight:800;font-size:18px;color:#111}
 input.pname{font-weight:800;font-size:18px;color:#111;background:#fffbe6;border:2px solid #d4a017}
 .catedit{background:#eff6ff;border:1px solid #93c5fd;border-radius:14px;padding:14px;margin-bottom:10px}
+.stickybar{position:sticky;top:0;z-index:20;background:#f4f6f1;padding:8px 0 6px}
+@media (max-width:520px){
+ .erow{flex-direction:column;align-items:stretch}
+ .erow select,.erow input{width:100%;min-width:0}
+ .erow .tick,.erow .ghost{width:100%}
+ .qrow{flex-direction:row;align-items:center}
+ .qrow input{flex:1;min-width:0}
+ .brandrow select{min-width:0}
+ .row{padding:12px 10px}
+ .pname{font-size:17px}
+}
 </style>
 </head>
 <body>
@@ -54,7 +69,7 @@ input.pname{font-weight:800;font-size:18px;color:#111;background:#fffbe6;border:
 </header>
 <div id="installBannerTop" style="background:#d4a017;color:#111;text-align:center;padding:12px 14px;font-weight:700">
 📱 অ্যাপ হিসেবে হোম স্ক্রিনে যোগ করুন
-<button id="installBtn" style="background:#1e40af;color:#fff;border:0;border-radius:8px;padding:10px 16px;font-size:16px;margin-left:8px" onclick="installApp()">হোম স্ক্রিনে যোগ করুন</button>
+<button id="installBtn" style="background:#1e40af;color:#fff;border:0;border-radius:8px;padding:10px 16px;font-size:16px;margin-left:8px;min-height:44px" onclick="installApp()">হোম স্ক্রিনে যোগ করুন</button>
 </div>
 <div id="installSteps" style="background:#fff;border-left:5px solid #1e40af;padding:12px 14px;margin:10px 14px 0;border-radius:8px;font-size:16px;line-height:1.9">
 <b>ইন্সটল করার নিয়ম (২ মিনিট):</b><br>
@@ -97,12 +112,15 @@ Chrome-এর ⋮ মেনুতে 'Add to Home screen' না দেখাল
 <p id="newProdMsg" class="small"></p>
 </div>
 
+<div class="stickybar">
 <input class="search" id="q" placeholder="পণ্য খুঁজুন… যেমন: চাল, তেল, সাবান" oninput="renderProducts()">
 <div style="display:flex;gap:8px;margin:10px 0">
 <button id="supTabAll" class="primary" style="flex:1" onclick="setSupTab('all')">📋 সব পণ্য</button>
 <button id="supTabCat" class="ghost" style="flex:1" onclick="setSupTab('cat')">🗂️ ক্যাটাগরি</button>
 </div>
 <div id="catChips" style="display:none;margin-bottom:6px"></div>
+</div>
+<div id="catDoneMsg" class="small" style="margin:6px 0"></div>
 <div id="plist"></div>
 
 <div class="card">
@@ -190,11 +208,11 @@ var nameEdit={};
 var supTab="all", supCat="";
 var ROW_COLORS=["#fef9e7","#eafaf1","#eaf2f8","#fdedec","#f4ecf7","#fef5e7","#e8f8f5","#fdf2e9"];
 var SUP_CATS=["চাল ও আটা","তেল ও ঘি","মসলা","ডাল ও চিনি","সাবান ও পরিষ্কারক","ব্যক্তিগত যত্ন","চা ও পানীয়","নাস্তা","ঘরোয়া সামগ্রী","অন্যান্য"];
-function setSupTab(t){ supTab=t; supCat=""; renderProducts(); }
+function setSupTab(t){ supTab=t; supCat=""; var dm=document.getElementById("catDoneMsg"); if(dm) dm.textContent=""; renderProducts(); }
 function setSupCat(c){ supCat=(supCat===c)?"":c; renderProducts(); }
 function isEditing(gi){ var g=groups[gi]; if(!g) return false; return singleEdit===gi || (catEdit!=="" && g.category===catEdit); }
 function toggleSingleEdit(gi){ singleEdit = (singleEdit===gi)? -1 : gi; renderProducts(); }
-function toggleCatEdit(cat){ catEdit = (catEdit===cat)? "" : cat; if(catEdit) singleEdit=-1; renderProducts(); }
+function toggleCatEdit(cat){ catEdit = (catEdit===cat)? "" : cat; if(catEdit) singleEdit=-1; var dm=document.getElementById("catDoneMsg"); if(dm) dm.textContent=""; renderProducts(); }
 function cancelCat(){ catEdit=""; renderProducts(); }
 function setNameEdit(gi, val){ nameEdit[gi]=val; }
 function cancelOne(gi){
@@ -219,7 +237,7 @@ function renderProducts(){
     chips.style.display="block";
     chips.innerHTML=SUP_CATS.map(function(c){
       var n=0; groups.forEach(function(g){ if(g.category===c) n++; });
-      return '<button class="'+(supCat===c?'primary':'ghost')+'" style="padding:8px 10px;margin:4px 4px 0 0" onclick="setSupCat(\''+c+'\')">'+c+' ('+bn(n)+')</button>';
+      return '<button class="'+(supCat===c?'primary':'ghost')+'" style="padding:10px 14px;margin:4px 4px 0 0;min-height:44px" onclick="setSupCat(\''+c+'\')">'+c+' ('+bn(n)+')</button>';
     }).join("");
   } else { chips.style.display="none"; chips.innerHTML=""; }
   var catBar="";
@@ -270,12 +288,12 @@ function renderProducts(){
     if(editing){
       var nmVal = (nameEdit[gi]!==undefined)? nameEdit[gi] : g.name;
       nameHtml = '<input class="pname" id="nm-'+gi+'" value="'+esc(nmVal)+'" oninput="setNameEdit('+gi+', this.value)">';
-      controlsHtml = '<div class="brandrow"><select onchange="setGroupBrand('+gi+', this.value)">'+opts+'</select>'
+      controlsHtml = '<div class="brandrow erow"><select onchange="setGroupBrand('+gi+', this.value)">'+opts+'</select>'
         +'<input type="number" min="0" id="pr-'+gi+'" style="flex:1;min-width:110px" value="'+priceVal+'" placeholder="পাইকারি দাম ৳" oninput="setTypedPrice('+gi+', this.value)"></div>'
-        +'<div class="brandrow"><input type="number" min="0" step="0.5" id="qt-'+gi+'" style="flex:1;min-width:110px" value="'+qv+'" placeholder="পরিমাণ" oninput="setTypedQty('+gi+', this.value)"><span class="small">'+esc(g.unit||"")+'</span></div>'
+        +'<div class="brandrow erow qrow"><input type="number" min="0" step="0.5" id="qt-'+gi+'" style="flex:1;min-width:110px" value="'+qv+'" placeholder="পরিমাণ" oninput="setTypedQty('+gi+', this.value)"><span class="small">'+esc(g.unit||"")+'</span></div>'
         +'<div class="small" id="qt-tot-'+gi+'">'+totTxt+'</div>'
         +newInput
-        +'<div class="brandrow"><button class="tick" onclick="saveOne('+gi+')">✓ সংরক্ষণ</button><button class="ghost" onclick="cancelOne('+gi+')">✕ বাতিল</button></div>';
+        +'<div class="brandrow erow"><button class="tick" style="flex:1" onclick="saveOne('+gi+')">✓ সংরক্ষণ</button><button class="ghost" style="flex:1" onclick="cancelOne('+gi+')">✕ বাতিল</button></div>';
     } else {
       nameHtml = '<span class="pname">'+esc(g.name)+'</span>';
       controlsHtml = '<div class="brandrow"><select onchange="setGroupBrand('+gi+', this.value)">'+opts+'</select>'
@@ -333,8 +351,8 @@ async function saveOne(gi){
     delete nameEdit[gi];
     if(sel==="__new__"){ newBrandName[g.name]=""; selBrand[g.name]=brand; }
     if(singleEdit===gi) singleEdit=-1;
+    try{ await loadMySubs(); }catch(e){}
     setGroupStatus(gi,"✅ পাঠানো হয়েছে — অ্যাডমিন দেখে বসাবে।");
-    loadMySubs();
   } else {
     setGroupStatus(gi,"পাঠানো যায়নি — আবার চেষ্টা করুন।");
   }
@@ -377,8 +395,11 @@ async function saveCatAll(){
   if(fail) m2 += " "+bn(fail)+"টি পাঠানো যায়নি।";
   if(skipped) m2 += " "+bn(skipped)+"টি বাদ (কিছু বদলানো হয়নি)।";
   if(msg) msg.textContent=m2;
+  try{ await loadMySubs(); }catch(e){}
+  var dm=document.getElementById("catDoneMsg");
+  if(dm) dm.textContent=m2;
   catEdit="";
-  loadMySubs();
+  renderProducts();
 }
 async function submitNewProduct(){
   var name=document.getElementById("newName").value.trim();
@@ -393,10 +414,10 @@ async function submitNewProduct(){
   if(done){
     if(m) m.textContent="✅ পাঠানো হয়েছে। অ্যাডমিন দেখে পণ্যটা তালিকায় যোগ করবে।";
     document.getElementById("newName").value=""; document.getElementById("newBrand").value=""; document.getElementById("newUnit").value=""; document.getElementById("newPrice").value=""; document.getElementById("newQty").value="";
-    refreshMySubs();
+    await refreshMySubs();
   } else { if(m) m.textContent="পাঠানো যায়নি — আবার চেষ্টা করুন।"; }
 }
-function refreshMySubs(){ var hs=document.getElementById("mySubs"); if(hs && hs.textContent.indexOf("এখনো কোনো দাম পাঠাননি")>=0){ hs.innerHTML="<p>পাঠানো দাম আসছে…</p>"; } loadMySubs(); }
+async function refreshMySubs(){ var hs=document.getElementById("mySubs"); if(hs && hs.textContent.indexOf("এখনো কোনো দাম পাঠাননি")>=0){ hs.innerHTML="<p>পাঠানো দাম আসছে…</p>"; } try{ await loadMySubs(); }catch(e){} }
 async function loadMySubs(){
   var res = await sb.from("supplier_prices").select("*").eq("supplier_id", supplier.id).order("created_at", {ascending:false}).limit(500);
   var el=document.getElementById("mySubs");
