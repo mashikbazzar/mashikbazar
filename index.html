@@ -75,6 +75,19 @@ header p{margin:4px 0;color:#e8f5ee}
 .qty{display:flex;gap:6px;align-items:center;justify-content:center}.qty b{min-width:28px;text-align:center}
 .qty button{width:44px;height:44px;font-size:22px;border-radius:12px;border:1px solid #065f46;background:#fff;color:#065f46;cursor:pointer}
 .listrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#fff;border:1px solid #e8e8e8;border-radius:14px;padding:10px 12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.prow{background:#fff;border:1px solid #e8e8e8;border-radius:14px;padding:10px 12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.pl1{display:flex;align-items:center;gap:8px}
+.pl1 .psno{color:#aaa;font-size:13px;flex:none}
+.pl1 .pname{font-weight:700;font-size:16px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pl1 .brandsel{color:#999;border:1px solid #ddd;background:#fff;font-weight:400;width:auto;max-width:120px;padding:5px 8px;font-size:14px;margin:0;flex:none}
+.pl1 .brand{color:#999;font-size:14px;flex:none}
+.qmini{display:flex;gap:4px;align-items:center;flex:none}
+.qmini button{width:30px;height:30px;font-size:17px;border-radius:8px;border:1px solid #065f46;background:#fff;color:#065f46;cursor:pointer}
+.qmini input{width:48px;text-align:center;padding:6px 2px;font-size:15px;border:1px solid #ccc;border-radius:8px}
+.pl2{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px}
+.pl2 .price{margin:0}
+.pl2 .add{margin:0;width:auto;padding:10px 20px;font-size:16px}
+.card .pl1 .brandsel{max-width:110px}
 .arow{display:flex;gap:6px;align-items:flex-start;background:#fff;border:1px solid #d8d8d8;border-radius:12px;padding:8px;margin-bottom:8px}
 .arow .n{flex:1;min-width:0}
 .arow input,.arow select{padding:8px;font-size:15px;margin:3px 0}
@@ -367,8 +380,11 @@ function inCartLineG(gid){
   groupVars(gid).forEach(function(x){ if(v && x.id!==v.id && cart[x.id]) parts.push((x.brand?x.brand+" ×":"৳"+bn(x.price_taka)+" ×")+bn(fmtQty(cart[x.id]))); });
   return parts.length?'<div class="incart">🛒 কার্টে আরও আছে: '+parts.join(", ")+'</div>':"";
 }
-function pickChg(gid,d){ pickQty[gid]=Math.max(1,Math.min(99,(pickQty[gid]||1)+d)); renderShop(); }
-function addPickedByName(gid){ var v=selectedVariantG(gid); if(!v) return; var q=pickQty[gid]||1; cart[v.id]=(cart[v.id]||0)+q; pickQty[gid]=1; saveCart(); renderShop(); renderCart(); }
+function qtyShownG(gid){ var v=selectedVariantG(gid); if(!v) return 1; if(cart[v.id]) return cart[v.id]; return pickQty[gid]||1; }
+function pickStepperHtml(gid){ var v=selectedVariantG(gid); if(!v) return ""; var st=unitStep(v.unit); var q=qtyShownG(gid); return '<span class="qmini"><button onclick="adjPick('+gid+',-'+st+')">−</button><input type="number" min="0" step="'+st+'" value="'+fmtQty(q)+'" onchange="setPick('+gid+',this.value)"><button onclick="adjPick('+gid+','+st+')">+</button></span>'; }
+function adjPick(gid,d){ var v=selectedVariantG(gid); if(!v) return; if(cart[v.id]){ chg(v.id,d); return; } var st=unitStep(v.unit); pickQty[gid]=Math.round(Math.max(st,Math.min(99,(pickQty[gid]||1)+d))*100)/100; renderShop(); }
+function setPick(gid,val){ var v=selectedVariantG(gid); if(!v) return; var q=Math.round((parseFloat(val)||0)*100)/100; if(cart[v.id]){ setQty(v.id,val); return; } if(q>0){ pickQty[gid]=q; } renderShop(); }
+function addPickedByName(gid){ var v=selectedVariantG(gid); if(!v) return; var q=Math.round((pickQty[gid]||1)*100)/100; if(q<=0) return; cart[v.id]=q; pickQty[gid]=q; saveCart(); renderShop(); renderCart(); }
 function fmtQty(q){ q=Math.round(Number(q||0)*100)/100; return String(q); }
 function unitStep(u){ return (u==="কেজি"||u==="লিটার")?0.5:1; }
 function qtyCtrlHtml(id, q, unit){ var st=unitStep(unit); return '<div class="qty"><button onclick="chg('+id+',-'+st+')">−</button><input type="number" min="0" step="'+st+'" value="'+fmtQty(q)+'" style="width:64px;text-align:center;padding:8px 4px" onchange="setQty('+id+',this.value)"><button onclick="chg('+id+','+st+')">+</button></div>'; }
@@ -389,27 +405,20 @@ function recalcPackages(d){
     pkg.estimated_total_taka=total;
   });
 }
-function cardHtml(gid){
+function productBlockHtml(gid, serial){
   var name=groupName(gid);
   var v=selectedVariantG(gid);
   if(!v) return "";
-  var cat0=v.category;
-  var q=cart[v.id]||0;
-  var pq=pickQty[gid]||1;
-  var ctrl;
-  if(q){ ctrl=qtyCtrlHtml(v.id, q, v.unit); }
-    else{ ctrl='<button class="add" onclick="addPickedByName('+gid+')">যোগ করুন</button>'; }
-  return '<div class="card"><div class="caticon">'+(CAT_EMOJI[cat0]||"📦")+'</div><h3>'+name+'</h3><div class="crow">'+nameBrandSelectG(gid)+'<span class="ccat">• '+cat0+'</span></div>'+(canSeePrices()?'<div class="price">৳'+bn(v.price_taka)+' <span class="unit">/ '+v.unit+'</span></div>':'<div class="small">দাম দেখতে লগইন করুন</div>')+inCartLineG(gid)+ctrl+'</div>';
+  var priceHtml=canSeePrices()?'<span class="price">৳'+bn(v.price_taka)+' <span class="unit">/ '+v.unit+'</span></span>':'<span class="small">দাম দেখতে লগইন করুন</span>';
+  return '<div class="pl1">'+(serial?'<span class="psno">'+bn(serial)+'.</span>':"")+'<span class="pname">'+name+'</span>'+nameBrandSelectG(gid)+pickStepperHtml(gid)+'</div>'
+    +'<div class="pl2">'+priceHtml+'<button class="add" onclick="addPickedByName('+gid+')">যোগ করুন</button></div>'
+    +inCartLineG(gid);
+}
+function cardHtml(gid){
+  return '<div class="card">'+productBlockHtml(gid, 0)+'</div>';
 }
 function listRowHtml(gid,i){
-  var name=groupName(gid);
-  var v=selectedVariantG(gid);
-  if(!v) return "";
-  var q=cart[v.id]||0;
-  var ctrl;
-  if(q){ ctrl=qtyCtrlHtml(v.id, q, v.unit); }
-  else{ ctrl='<button class="add" style="width:auto;padding:9px 18px" onclick="addPickedByName('+gid+')">যোগ করুন</button>'; }
-  return '<div class="listrow"><div class="n"><div class="lr-top"><span class="lr-name">'+bn(i+1)+'. '+name+'</span>'+(canSeePrices()?'<span class="price">৳'+bn(v.price_taka)+' <span class="unit">/ '+v.unit+'</span></span>':'<span class="small">দাম দেখতে লগইন করুন</span>')+'</div><div class="lr-sub">'+nameBrandSelectG(gid)+'<span class="lrcat">• '+v.category+'</span></div>'+inCartLineG(gid)+'</div><div class="lr-ctrl">'+ctrl+'</div></div>';
+  return '<div class="prow">'+productBlockHtml(gid, i+1)+'</div>';
 }
 function renderShop(){
   var q=(document.getElementById("q").value||"").trim();
