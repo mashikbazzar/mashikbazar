@@ -1083,7 +1083,8 @@ async function loadSupplierPrices(){
     var h='<div class="agroup"><b>'+esc(g.name)+'</b> '+(g.brand?esc(g.brand):"")+' <span class="pcat">'+esc(g.unit||"")+'</span>';
     h+='<div class="small">এখন পাইকারি দাম: <b>৳'+bn(curW)+'</b>'+(curW? ' (এই দামে কেনা হচ্ছে)':' (এখনো বসানো হয়নি)')+'</div>';
     var mg=(DRAFT&&DRAFT.margin_pct)||10;
-    h+=curW? '<div class="small">🛒 কাস্টমারের দাম হবে: <b>৳'+bn(Math.round(curW*(1+mg/100)))+'</b> ('+bn(mg)+'% লাভে)</div>' : '<div class="small">পাইকারি দাম বসালে এখানে কাস্টমারের দাম দেখা যাবে।</div>';
+    var lowP=g.prices.length? (g.prices[0].price||0) : 0;
+    h+=curW? '<div class="small">🛒 কাস্টমারের দাম হবে: <b>৳'+bn(Math.round(curW*(1+mg/100)))+'</b> ('+bn(mg)+'% লাভে)</div>' : (lowP? '<div class="small">🛒 সবচেয়ে কম দাম ৳'+bn(lowP)+' বসালে কাস্টমারের দাম হবে: <b>৳'+bn(Math.round(lowP*(1+mg/100)))+'</b> ('+bn(mg)+'% লাভে)</div>' : '<div class="small">পাইকারি দাম বসালে এখানে কাস্টমারের দাম দেখা যাবে।</div>');
     h+=g.prices.map(function(r, idx){
       var d=new Date(r.created_at);
       var qv=Math.round(((r.qty===undefined||r.qty===null)?1:Number(r.qty))*100)/100; if(qv<=0) qv=1;
