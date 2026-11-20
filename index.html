@@ -592,6 +592,7 @@ async function saveSubscribe(){
   if(res.error){ msg.textContent="হয়নি: "+res.error.message; return; }
   msg.textContent="✅ সাবস্ক্রিপশন চালু হয়েছে! ডেলিভারির আগে দোকান থেকে জানানো হবে।";
   try{ localStorage.setItem("mb-sub-phone", phone); }catch(e){}
+  window.__subJustStarted=pkg.name+" — "+day;
   setTimeout(function(){ closeSubscribe(true); showTab("orders"); }, 1200);
 }
 async function loadMySubs(){
@@ -603,7 +604,9 @@ async function loadMySubs(){
   var res=await sb.from("subscriptions").select("*").eq("customer_phone",phone).order("created_at",{ascending:false}).limit(20);
   if(res.error || !res.data || !res.data.length){ el.innerHTML=""; return; }
   var stTxt={active:"✅ চালু", paused:"⏸️ থামানো", cancelled:"❌ বাতিল"};
-  el.innerHTML="<h3>📅 আমার মাসিক সাবস্ক্রিপশন</h3>"+res.data.map(function(s){
+  var justStarted="";
+  if(window.__subJustStarted){ justStarted='<div class="note" style="background:#e8f5ee;border-radius:10px;padding:10px;margin-bottom:8px">✅ সাবস্ক্রিপশন চালু হয়েছে — '+window.__subJustStarted+'</div>'; window.__subJustStarted=null; }
+  el.innerHTML=justStarted+"<h3>📅 আমার মাসিক সাবস্ক্রিপশন</h3>"+res.data.map(function(s){
     var btn="";
     if(s.status==="active") btn='<button class="ghost" onclick="setSubStatus(\''+s.id+'\',\'paused\')">⏸️ থামান</button>';
     else if(s.status==="paused") btn='<button class="primary" onclick="setSubStatus(\''+s.id+'\',\'active\')">▶️ আবার চালু করুন</button>';
