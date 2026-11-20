@@ -245,6 +245,7 @@ section h2{color:#6d28d9}
 <button id="atab-settings" onclick="showAdminTab('settings')">⚙️ সেটিংস</button>
 <button id="atab-publish" onclick="showAdminTab('publish')">🚀 প্রকাশ</button>
 <button id="atab-orders" onclick="showAdminTab('orders')">📋 অর্ডার</button>
+<button id="atab-subs" onclick="showAdminTab('subs')">📅 সাবস্ক্রিপশন</button>
 <button id="atab-profit" onclick="showAdminTab('profit')">💰 লাভ-লস</button>
 <button id="atab-supplier" onclick="showAdminTab('supplier')">🏪 পাইকারি দাম</button>
 <button id="atab-customers" onclick="showAdminTab('customers')">👥 কাস্টমার</button>
@@ -310,6 +311,13 @@ section h2{color:#6d28d9}
 <p class="small">কাস্টমার অর্ডার করলেই এখানে চলে আসবে। স্ট্যাটাস বদলাতে পারবেন।</p>
 <button class="primary" onclick="loadAdminOrders()">🔄 রিফ্রেশ করুন</button>
 <div id="adminOrders"></div>
+</div>
+
+<div id="admin-subs" class="adminbox" style="display:none">
+<h3>📅 মাসিক সাবস্ক্রিপশন</h3>
+<p class="small">যে পরিবার যে প্যাকেজে সাবস্ক্রাইব করেছে, তা এখানে দেখা যাবে। ডেলিভারির আগে WhatsApp-এ জানিয়ে নিশ্চিত করুন, তারপর প্যাকিং করুন।</p>
+<button class="primary" onclick="loadSubs()">🔄 রিফ্রেশ করুন</button>
+<div id="subsList"></div>
 </div>
 
 <div id="admin-profit" class="adminbox" style="display:none">
@@ -564,11 +572,12 @@ window.addEventListener("popstate", function(e){
   __adInPop=false;
 });
 function showAdminTab(t){
-  ["products","packages","settings","publish","orders","profit","supplier","customers","visitors","feedback"].forEach(function(x){
+  ["products","packages","settings","publish","orders","subs","profit","supplier","customers","visitors","feedback"].forEach(function(x){
     document.getElementById("admin-"+x).style.display=(x===t)?"block":"none";
     document.getElementById("atab-"+x).classList.toggle("on", x===t);
   });
   if(t==="orders") loadAdminOrders();
+  if(t==="subs") loadSubs();
   if(t==="profit") loadProfit();
   if(t==="supplier"){ loadSupplierPrices(); loadSuppliers(); }
   if(t==="customers") loadCustomers();
@@ -576,6 +585,34 @@ function showAdminTab(t){
   if(t==="feedback") loadFeedback();
   if(t!==curAdminTab && !__adInPop) __adPush("tab", t);
   curAdminTab=t;
+}
+async function loadSubs(){
+  var el=document.getElementById("subsList"); if(!el) return;
+  if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
+  el.innerHTML="<p>আসছে…</p>";
+  var res=await sb.from("subscriptions").select("*").order("created_at",{ascending:false}).limit(100);
+  if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
+  var rows=res.data||[];
+  var nAct=rows.filter(function(r){ return r.status==="active"; }).length;
+  setTabBadge("subs", nAct);
+  if(!rows.length){ el.innerHTML="<p>এখনো কোনো সাবস্ক্রিপশন আসেনি।</p>"; return; }
+  var stTxt={active:"✅ চালু", paused:"⏸️ থামানো", cancelled:"❌ বাতিল"};
+  el.innerHTML='<div class="statgrid"><div class="stat"><b>'+bn(rows.length)+'</b>টি সাবস্ক্রিপশন</div><div class="stat"><b>'+bn(nAct)+'</b>টি চালু</div></div>'+rows.map(function(r){
+    var d=new Date(r.created_at);
+    var ph=(r.customer_phone||"").replace(/[^0-9]/g,"");
+    if(ph.indexOf("88")!==0) ph="88"+ph;
+    var wa="https://wa.me/"+ph+"?text="+encodeURIComponent("আসসালামু আলাইকুম "+(r.customer_name||"")+"! আপনার মাসিক সাবস্ক্রিপশন ("+r.package_name+", "+r.delivery_day+") — এই মাসের ডেলিভারি কি নিশ্চিত করবো?");
+    var btns="";
+    if(r.status==="active") btns='<button class="ghost" onclick="setSubStatusAdmin(\''+r.id+'\',\'paused\')">⏸️ থামান</button>';
+    else if(r.status==="paused") btns='<button class="primary" onclick="setSubStatusAdmin(\''+r.id+'\',\'active\')">▶️ চালু করুন</button>';
+    if(r.status!=="cancelled") btns+=' <button class="danger" onclick="setSubStatusAdmin(\''+r.id+'\',\'cancelled\')">✕ বাতিল</button>';
+    return '<div class="ordercard"><b>'+r.package_name+'</b> — '+r.delivery_day+'<br>'+(r.customer_name||"")+' • '+(r.customer_phone||"")+'<br>'+(stTxt[r.status]||r.status)+' • '+d.toLocaleDateString("bn-BD")+'<br><a class="primary" style="display:inline-block;padding:8px 12px;text-decoration:none" href="'+wa+'" target="_blank">💬 WhatsApp-এ নিশ্চিত করুন</a> '+btns+'</div>';
+  }).join("");
+}
+async function setSubStatusAdmin(id,status){
+  if(!sb) return;
+  await sb.from("subscriptions").update({status:status}).eq("id",id);
+  loadSubs();
 }
 async function loadFeedback(){
   var el=document.getElementById("feedbackList"); if(!el) return;

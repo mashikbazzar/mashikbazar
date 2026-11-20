@@ -216,7 +216,7 @@ h1{font-size:26px}
 <h3 id="pkgDetailTitle"></h3>
 <div id="pkgDetailItems"></div>
 <p><b>আনুমানিক মোট: <span id="pkgDetailTotal"></span></b></p>
-<button class="add" onclick="pkgDetailToCart()">প্যাকেজটি কার্টে নিন</button>
+<button class="add" onclick="pkgDetailToCart()">প্যাকেজটি কার্টে নিন</button> <button class="gold" onclick="openSubscribe(detailPkgId)">📅 প্রতি মাসে নিন</button>
 <button class="ghost" style="width:100%;margin-top:8px" onclick="openPkgCustomFromDetail()">✏️ নিজের মতো সাজান</button>
 <button class="ghost" style="width:100%;margin-top:8px" onclick="closePkgDetail()">বন্ধ করুন</button>
 </div>
@@ -229,6 +229,16 @@ h1{font-size:26px}
 <p><b>নতুন মোট: <span id="pkgCustomTotal"></span></b></p>
 <button class="gold" style="width:100%" onclick="pkgCustomToCart()">✅ এই প্যাকেজটি কার্টে নিন</button>
 <button class="ghost" onclick="closePkgCustom()">বাতিল</button>
+</div>
+<div id="subBox" style="display:none" class="adminbox">
+<h3 id="subTitle">📅 মাসিক সাবস্ক্রিপশন</h3>
+<p class="small">প্রতি মাসে এই প্যাকেজটি নিজে থেকে আসবে — বারবার কার্ট সাজাতে হবে না। ডেলিভারির আগে দোকান থেকে জানানো হবে। যেকোনো সময় থামানো বা বাদ দেওয়া যাবে।</p>
+<label>ডেলিভারির দিন</label>
+<select id="subDay"><option>মাসের ১ তারিখ</option><option>মাসের ৫ তারিখ</option><option>প্রতি শনিবার</option><option>প্রতি শুক্রবার</option></select>
+<label>আপনার নাম</label><input id="subName" placeholder="নাম লিখুন">
+<label>মোবাইল নম্বর</label><input id="subPhone" placeholder="01XXXXXXXXX" inputmode="tel">
+<p><button class="add" onclick="saveSubscribe()">✅ সাবস্ক্রিপশন চালু করুন</button> <button class="ghost" onclick="closeSubscribe()">বাতিল</button></p>
+<p id="subMsg" class="small"></p>
 </div>
 </div>
 
@@ -260,7 +270,7 @@ h1{font-size:26px}
 </div>
 
 <div id="tab-orders" style="display:none">
-<section><h2>📋 আমার অর্ডার</h2><p class="small">লগইন করলে আপনার অর্ডারগুলো সেভ থাকবে — ফোন বদলালেও দেখা যাবে। লগইন ছাড়াও পণ্য দেখা ও অর্ডার করা যাবে।</p><div id="customerBox" class="adminbox"></div><div id="myOrders"></div></section>
+<section><h2>📋 আমার অর্ডার</h2><p class="small">লগইন করলে আপনার অর্ডারগুলো সেভ থাকবে — ফোন বদলালেও দেখা যাবে। লগইন ছাড়াও পণ্য দেখা ও অর্ডার করা যাবে।</p><div id="customerBox" class="adminbox"></div><div id="mySubs"></div><div id="myOrders"></div></section>
 </div>
 
 <div id="tab-feedback" style="display:none">
@@ -400,6 +410,7 @@ window.addEventListener("popstate", function(e){
   if(v!=="chat" && cp && cp.style.display==="flex") toggleChat(false);
   if(v!=="pkgDetail" && detailPkgId!==null) closePkgDetail(true);
   if(v!=="pkgCustom" && customPkg) closePkgCustom(true);
+  if(v!=="subBox" && subPkgId!==null) closeSubscribe(true);
   showTab((st&&st.tab)||"shop");
   __inPop=false;
 });
@@ -528,7 +539,7 @@ function renderShop(){
     el.className="";
     el.innerHTML=(countHtml+nameGroups.map(function(gid,i){ return listRowHtml(gid,i); }).join("")+(catGroups.length?(catNote+catGroups.map(function(gid,i){ return listRowHtml(gid,nameGroups.length+i); }).join("")):""))||"<p>কোনো পণ্য পাওয়া যায়নি।</p>";
   }
-  document.getElementById("pkgs").innerHTML=DATA.packages.map(function(pkg){ return '<div class="pkg" onclick="openPkgDetail('+pkg.id+')" style="cursor:pointer"><h3>'+pkg.name+'</h3><p>'+(pkg.tagline||"")+'</p><p class="small">'+bn(pkgActiveItems(pkg).length)+'টি পণ্য</p><p class="small">'+pkgActiveItems(pkg).slice(0,3).map(function(it){ return it.name; }).join(" • ")+(pkgActiveItems(pkg).length>3?(" • আরও "+bn(pkgActiveItems(pkg).length-3)+"টি"):"")+'</p><p class="total">'+(canSeePrices()?('আনুমানিক মোট: ৳'+bn(pkgTotal(pkg))):'আনুমানিক মোট: লগইন করলে দেখা যাবে')+'</p><button class="add" onclick="event.stopPropagation();openPkgDetail('+pkg.id+')">📦 প্যাকেজটি খুলুন</button></div>'; }).join("");
+  document.getElementById("pkgs").innerHTML=DATA.packages.map(function(pkg){ return '<div class="pkg" onclick="openPkgDetail('+pkg.id+')" style="cursor:pointer"><h3>'+pkg.name+'</h3><p>'+(pkg.tagline||"")+'</p><p class="small">'+bn(pkgActiveItems(pkg).length)+'টি পণ্য</p><p class="small">'+pkgActiveItems(pkg).slice(0,3).map(function(it){ return it.name; }).join(" • ")+(pkgActiveItems(pkg).length>3?(" • আরও "+bn(pkgActiveItems(pkg).length-3)+"টি"):"")+'</p><p class="total">'+(canSeePrices()?('আনুমানিক মোট: ৳'+bn(pkgTotal(pkg))):'আনুমানিক মোট: লগইন করলে দেখা যাবে')+'</p><button class="add" onclick="event.stopPropagation();openPkgDetail('+pkg.id+')">📦 প্যাকেজটি খুলুন</button> <button class="gold" onclick="event.stopPropagation();openSubscribe('+pkg.id+')">📅 প্রতি মাসে নিন</button></div>'; }).join("");
 }
 function addPackage(id){
   var pkg=null; DATA.packages.forEach(function(p){ if(p.id===id) pkg=p; }); if(!pkg) return;
@@ -550,6 +561,61 @@ function openPkgDetail(id){
   if(__topView!=="pkgDetail") __histPush("pkgDetail");
 }
 function closePkgDetail(silent){ if(!silent) __histClose("pkgDetail"); detailPkgId=null; document.getElementById("pkgDetail").style.display="none"; var pl=document.getElementById("pkgs"); if(pl) pl.style.display=""; }
+/* ---- monthly subscription (B1) ---- */
+var subPkgId=null;
+function openSubscribe(id){
+  var pkg=null; DATA.packages.forEach(function(p){ if(p.id===id) pkg=p; }); if(!pkg) return;
+  subPkgId=id;
+  document.getElementById("subTitle").textContent="📅 মাসিক সাবস্ক্রিপশন — "+pkg.name;
+  var c=getCustomer();
+  document.getElementById("subName").value=(c&&c.name)||"";
+  document.getElementById("subPhone").value=(c&&c.phone)||"";
+  document.getElementById("subMsg").textContent="";
+  document.getElementById("subBox").style.display="block";
+  document.getElementById("subBox").scrollIntoView();
+  if(__topView!=="subBox") __histPush("subBox");
+}
+function closeSubscribe(silent){ if(!silent) __histClose("subBox"); subPkgId=null; document.getElementById("subBox").style.display="none"; }
+async function saveSubscribe(){
+  var pkg=null; DATA.packages.forEach(function(p){ if(p.id===subPkgId) pkg=p; }); if(!pkg) return;
+  var name=document.getElementById("subName").value.trim();
+  var phone=document.getElementById("subPhone").value.replace(/[^0-9]/g,"");
+  if(phone.length===13 && phone.indexOf("880")===0) phone=phone.slice(2);
+  var day=document.getElementById("subDay").value;
+  var msg=document.getElementById("subMsg");
+  if(!name || phone.length!==11 || phone.indexOf("01")!==0){ msg.textContent="নাম আর সঠিক মোবাইল নম্বর (01XXXXXXXXX) দিন।"; return; }
+  if(!sb){ msg.textContent="ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি — পরে আবার চেষ্টা করুন।"; return; }
+  msg.textContent="চালু হচ্ছে…";
+  var chk=await sb.from("subscriptions").select("id").eq("customer_phone",phone).eq("package_id",pkg.id).eq("status","active").limit(1);
+  if(chk.data && chk.data.length){ msg.textContent="এই প্যাকেজের সাবস্ক্রিপশন ইতিমধ্যে চালু আছে।"; return; }
+  var res=await sb.from("subscriptions").insert([{customer_phone:phone, customer_name:name, package_id:pkg.id, package_name:pkg.name, delivery_day:day, status:"active"}]);
+  if(res.error){ msg.textContent="হয়নি: "+res.error.message; return; }
+  msg.textContent="✅ সাবস্ক্রিপশন চালু হয়েছে! ডেলিভারির আগে দোকান থেকে জানানো হবে।";
+  try{ localStorage.setItem("mb-sub-phone", phone); }catch(e){}
+  setTimeout(function(){ closeSubscribe(true); showTab("orders"); }, 1200);
+}
+async function loadMySubs(){
+  var el=document.getElementById("mySubs"); if(!el) return;
+  var c=getCustomer();
+  var phone=(c&&c.phone)||"";
+  try{ if(!phone) phone=localStorage.getItem("mb-sub-phone")||""; }catch(e){}
+  if(!phone || !sb){ el.innerHTML=""; return; }
+  var res=await sb.from("subscriptions").select("*").eq("customer_phone",phone).order("created_at",{ascending:false}).limit(20);
+  if(res.error || !res.data || !res.data.length){ el.innerHTML=""; return; }
+  var stTxt={active:"✅ চালু", paused:"⏸️ থামানো", cancelled:"❌ বাতিল"};
+  el.innerHTML="<h3>📅 আমার মাসিক সাবস্ক্রিপশন</h3>"+res.data.map(function(s){
+    var btn="";
+    if(s.status==="active") btn='<button class="ghost" onclick="setSubStatus(\''+s.id+'\',\'paused\')">⏸️ থামান</button>';
+    else if(s.status==="paused") btn='<button class="primary" onclick="setSubStatus(\''+s.id+'\',\'active\')">▶️ আবার চালু করুন</button>';
+    var cancel=s.status!=="cancelled"?'<button class="danger" onclick="setSubStatus(\''+s.id+'\',\'cancelled\')">✕ বাতিল করুন</button>':"";
+    return '<div class="ordercard"><b>'+s.package_name+'</b> — '+s.delivery_day+'<br>'+(stTxt[s.status]||s.status)+'<br>'+btn+" "+cancel+"</div>";
+  }).join("");
+}
+async function setSubStatus(id,status){
+  if(!sb) return;
+  await sb.from("subscriptions").update({status:status}).eq("id",id);
+  loadMySubs();
+}
 function pkgDetailToCart(){ if(detailPkgId===null) return; addPackage(detailPkgId); closePkgDetail(true); }
 function openPkgCustomFromDetail(){ var id=detailPkgId; if(id===null) return; closePkgDetail(true); openPkgCustom(id); }
 /* ---- package customise (customer's own copy only) ---- */
@@ -774,6 +840,7 @@ function trackHtml(st){
 }
 async function renderMyOrders(){
   renderCustomerBox();
+  loadMySubs();
   var el=document.getElementById("myOrders"); if(!el) return;
   var c=getCustomer();
   if(c && sb){
