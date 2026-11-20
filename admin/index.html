@@ -254,6 +254,7 @@ section h2{color:#6d28d9}
 <button id="atab-orders" onclick="showAdminTab('orders')">📋 অর্ডার</button>
 <button id="atab-subs" onclick="showAdminTab('subs')">📅 সাবস্ক্রিপশন</button>
 <button id="atab-profit" onclick="showAdminTab('profit')">💰 লাভ-লস</button>
+<button id="atab-analytics" onclick="showAdminTab('analytics')">📊 হিসাব</button>
 <button id="atab-supplier" onclick="showAdminTab('supplier')">🏪 পাইকারি দাম</button>
 <button id="atab-customers" onclick="showAdminTab('customers')">👥 কাস্টমার</button>
 <button id="atab-visitors" onclick="showAdminTab('visitors')">📊 ভিজিটর</button>
@@ -282,6 +283,7 @@ section h2{color:#6d28d9}
 <button class="gold" onclick="addProduct()">+ নতুন পণ্য যোগ করুন</button>
 <button class="primary" id="priceListBtn" onclick="togglePriceList()">💰 দামের তালিকা</button>
 <div id="adminProducts"></div>
+<div id="prodRatings"></div>
 </div>
 
 <div id="admin-packages" class="adminbox" style="display:none">
@@ -337,6 +339,13 @@ section h2{color:#6d28d9}
 <div id="subsList"></div>
 </div>
 
+<div id="admin-analytics" class="adminbox" style="display:none">
+<h3>📊 হিসাব — বিক্রি ও লাভ</h3>
+<p class="small">সব অর্ডারের হিসাব এক জায়গায় — মোট বিক্রি, লাভ, গড় অর্ডার, কোন পণ্য বেশি বিক্রি হচ্ছে, কোন ক্যাটাগরি কেমন চলছে।</p>
+<button class="primary" onclick="loadAnalytics()">🔄 রিফ্রেশ করুন</button> <button class="gold" onclick="downloadOrdersCsv()">⬇️ অর্ডারের CSV ডাউনলোড</button>
+<div id="analyticsBox"></div>
+</div>
+
 <div id="admin-profit" class="adminbox" style="display:none">
 <h3>💰 লাভ-লস হিসাব</h3>
 <button class="primary" onclick="loadProfit()">🔄 হিসাব দেখুন</button>
@@ -351,6 +360,7 @@ section h2{color:#6d28d9}
 <div class="card" style="background:#eff6ff"><b>⚙️ পাইকারি থেকে খুচরা দাম বসান</b><div style="display:flex;gap:8px;margin-top:8px;align-items:center"><input id="marginPct3" type="number" min="0" placeholder="লাভের হার % (যেমন: ১০)" style="flex:1"><button class="gold" onclick="applyMargin3()">সব খুচরা দাম বসান</button></div><p class="small">খুচরা দাম = পাইকারি × (১০০+লাভ%) ÷ ১০০। যেমন: পাইকারি ৳১০০ আর লাভ ১০% হলে খুচরা ৳১১০। যাদের পাইকারি দাম নেই, তাদের দাম বদলাবে না।</p></div>
 <button class="primary" onclick="loadSupplierPrices()">🔄 রিফ্রেশ করুন</button>
 <div id="supplierPrices"></div>
+<div id="lowStockPO"></div>
 <h3 style="margin-top:18px">🧾 ক্রয় আদেশ</h3>
 <div id="poList"></div>
 <h3 style="margin-top:18px">👥 নিবন্ধিত পাইকারি দোকানদার</h3>
@@ -600,11 +610,13 @@ window.addEventListener("popstate", function(e){
   __adInPop=false;
 });
 function showAdminTab(t){
-  ["products","packages","settings","publish","orders","subs","profit","supplier","customers","visitors","feedback"].forEach(function(x){
+  ["products","packages","settings","publish","orders","subs","profit","supplier","customers","visitors","feedback","analytics"].forEach(function(x){
     document.getElementById("admin-"+x).style.display=(x===t)?"block":"none";
     document.getElementById("atab-"+x).classList.toggle("on", x===t);
   });
   if(t==="settings") loadCoupons();
+  if(t==="products") loadProductRatingsAdmin();
+  if(t==="analytics") loadAnalytics();
   if(t==="orders") loadAdminOrders();
   if(t==="subs") loadSubs();
   if(t==="profit") loadProfit();
@@ -1092,7 +1104,7 @@ var adminOrderCount=null;
 var memoData=null;
 function openMemo(orderId){
   var o=adminOrdersById[orderId]; if(!o) return;
-  memoData={no:o.order_no, date:o.created_at, name:o.customer_name||"", phone:o.phone||"", address:"—",
+  memoData={no:o.order_no, date:o.created_at, name:o.customer_name||"", phone:o.phone||"", address:"—", pay:o.payment_method||"", payStatus:o.payment_status||"unpaid",
     items:(o.items||[]).map(function(it){ return {name:it.name||"", brand:it.brand||"", qty:+it.qty||0, unit:it.unit||"", price:+it.price||0}; }),
     fee:+o.delivery_fee||0};
   renderMemo(true);
@@ -1109,7 +1121,7 @@ function renderMemo(editable){
   var d=new Date(m.date);
   var t=memoTotals();
   var head='<div style="text-align:center;border-bottom:2px solid #065f46;padding-bottom:10px;margin-bottom:12px"><h2 style="margin:0;color:#065f46">মাসিক বাজার</h2><p style="margin:2px 0">নীড় • WhatsApp: 01631421995</p><h3 style="margin:8px 0 0">🧾 ক্যাশ মেমো</h3></div>';
-  var info='<p>অর্ডার নম্বর: <b>'+esc(m.no)+'</b><br>তারিখ: '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br>কাস্টমার: <b>'+esc(m.name||"—")+'</b><br>মোবাইল: '+esc(m.phone||"—")+'<br>ঠিকানা: '+esc(m.address||"—")+'</p>';
+  var info='<p>অর্ডার নম্বর: <b>'+esc(m.no)+'</b><br>তারিখ: '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br>কাস্টমার: <b>'+esc(m.name||"—")+'</b><br>মোবাইল: '+esc(m.phone||"—")+'<br>ঠিকানা: '+esc(m.address||"—")+(m.pay?('<br>পেমেন্ট: '+esc(m.pay)+' ('+(m.payStatus==="paid"?"পাওয়া গেছে":"বাকি")+')'):"")+'</p>';
   var rows=m.items.map(function(it,i){
     var line=(+it.qty||0)*(+it.price||0);
     if(editable){
@@ -1178,12 +1190,61 @@ async function loadAdminOrders(){
   window.__plannerHtml=plannerHtml;
   el.innerHTML=plannerHtml+'<div style="margin-bottom:12px"><button class="gold" onclick="printPlanner()">🖨️ পরিকল্পনা ছাপান</button></div>'+rows.map(function(o){
     var d=new Date(o.created_at);
-    return '<div class="ordercard"><b>'+o.order_no+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br>'+(o.customer_name||"")+' • '+(o.phone||"")+'<br>'+(o.items||[]).map(function(it){ return it.name+' — '+bn(it.qty)+' '+(it.unit||""); }).join("<br>")+'<br><b>মোট: ৳'+bn(o.total)+' • লাভ: ৳'+bn(o.profit||0)+'</b><br><label>স্ট্যাটাস</label><select onchange="setAdminOrderStatus(\''+o.id+'\',this.value)">'+statuses.map(function(s){ return '<option value="'+s+'" '+(s===o.status?'selected':'')+'>'+bnStatus[s]+'</option>'; }).join("")+'</select><br><button class="gold" onclick="openMemo(\''+o.id+'\')">🧾 ক্যাশ মেমো</button></div>';
+    var ph2=(o.phone||"").replace(/[^0-9]/g,""); if(ph2.indexOf("88")!==0) ph2="88"+ph2;
+    var onMyWay="";
+    if(["Confirmed","Preparing","Out for Delivery"].indexOf(o.status)>=0){
+      onMyWay=' <a class="primary" style="display:inline-block;padding:8px 12px;text-decoration:none" href="https://wa.me/'+ph2+'?text='+encodeURIComponent("আসসালামু আলাইকুম "+(o.customer_name||"")+"! আপনার অর্ডার ("+o.order_no+") রওনা হয়েছে, শীঘ্রই পৌঁছাবে। — মাসিক বাজার")+'" target="_blank">🛵 পথে আছি</a>';
+    }
+    var payLine='<br><span class="small">💰 পেমেন্ট: '+esc(o.payment_method||"ক্যাশ অন ডেলিভারি")+' ('+((o.payment_status||"unpaid")==="paid"?"পাওয়া গেছে":"বাকি")+')</span> <button class="ghost" onclick="togglePaymentStatus(\''+o.id+'\')">'+((o.payment_status||"unpaid")==="paid"?"↩️ বাকি করুন":"✅ টাকা পাওয়া গেছে")+'</button>';
+    return '<div class="ordercard"><b>'+o.order_no+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br>'+(o.customer_name||"")+' • '+(o.phone||"")+'<br>'+(o.items||[]).map(function(it){ return it.name+' — '+bn(it.qty)+' '+(it.unit||""); }).join("<br>")+'<br><b>মোট: ৳'+bn(o.total)+' • লাভ: ৳'+bn(o.profit||0)+'</b>'+payLine+'<br><label>স্ট্যাটাস</label><select onchange="setAdminOrderStatus(\''+o.id+'\',this.value)">'+statuses.map(function(s){ return '<option value="'+s+'" '+(s===o.status?'selected':'')+'>'+bnStatus[s]+'</option>'; }).join("")+'</select><br><button class="gold" onclick="openMemo(\''+o.id+'\')">🧾 ক্যাশ মেমো</button>'+onMyWay+'</div>';
   }).join("");
 }
 async function setAdminOrderStatus(id, status){
   if(!sb) return;
-  await sb.from("orders").update({status:status}).eq("id", id);
+  var o=adminOrdersById[id]||null;
+  var old=o?o.status:"";
+  var res=await sb.from("orders").update({status:status}).eq("id", id);
+  if(res.error){ alert("হয়নি: "+res.error.message); return; }
+  if(o) o.status=status;
+  if(o && status==="Confirmed" && old!=="Confirmed" && !o.stock_deducted){
+    deductStockForOrder(o);
+    sb.from("orders").update({stock_deducted:true}).eq("id", id).then(function(){});
+    o.stock_deducted=true;
+  }
+  if(o && status==="Delivered" && old!=="Delivered" && !o.points_awarded){
+    var earned=Math.floor((+o.total||0)/100);
+    if(earned>0 && o.phone){
+      awardPoints(o.phone, earned);
+      sb.from("orders").update({points_awarded:true}).eq("id", id).then(function(){});
+      o.points_awarded=true;
+    }
+  }
+  loadAdminOrders();
+}
+function deductStockForOrder(o){
+  if(!DRAFT) return;
+  var changed=false;
+  (o.items||[]).forEach(function(it){
+    var p=null;
+    DRAFT.products.forEach(function(x){ if(x.name===it.name && (x.brand||"")===(it.brand||"")) p=x; });
+    if(!p) DRAFT.products.forEach(function(x){ if(x.name===it.name) p=x; });
+    if(p && (p.stock_qty||0)>0){ p.stock_qty=Math.max(0, Math.round(((p.stock_qty||0)-(+it.qty||0))*100)/100); changed=true; }
+  });
+  if(changed) saveDraft();
+}
+async function awardPoints(phone, earned){
+  if(!sb || !phone || !earned) return;
+  try{
+    var res=await sb.from("customers").select("id,points").eq("phone", phone).limit(1);
+    if(res.data && res.data[0]){ await sb.from("customers").update({points:(+res.data[0].points||0)+earned}).eq("id", res.data[0].id); }
+  }catch(e){}
+}
+async function togglePaymentStatus(id){
+  if(!sb) return;
+  var o=adminOrdersById[id]; if(!o) return;
+  var next=(o.payment_status==="paid")?"unpaid":"paid";
+  var res=await sb.from("orders").update({payment_status:next}).eq("id", id);
+  if(!res.error){ o.payment_status=next; loadAdminOrders(); }
 }
 var __plannerHtml="";
 function printPlanner(){
@@ -1204,6 +1265,58 @@ async function loadProfit(){
   rows.forEach(function(o){ sales+=o.total||0; profit+=o.profit||0; var day=new Date(o.created_at).toLocaleDateString("bn-BD"); if(!byDay[day]) byDay[day]={sales:0,profit:0,n:0}; byDay[day].sales+=o.total||0; byDay[day].profit+=o.profit||0; byDay[day].n++; });
   var days=Object.keys(byDay).slice(-14).reverse();
   el.innerHTML='<div class="statgrid"><div class="stat"><b>'+bn(rows.length)+'</b>টি অর্ডার</div><div class="stat"><b>৳'+bn(sales)+'</b>মোট বিক্রি</div><div class="stat"><b>৳'+bn(profit)+'</b>মোট লাভ</div></div>'+days.map(function(d){ return '<div class="listrow"><div class="n"><b>'+d+'</b> — '+bn(byDay[d].n)+'টি অর্ডার</div><b>বিক্রি ৳'+bn(byDay[d].sales)+' • লাভ ৳'+bn(byDay[d].profit)+'</b></div>'; }).join("");
+}
+async function loadProductRatingsAdmin(){
+  var el=document.getElementById("prodRatings"); if(!el) return;
+  if(!sb){ el.innerHTML=""; return; }
+  try{
+    var res=await sb.from("product_ratings").select("product_name,stars,comment,customer_phone,created_at").order("created_at",{ascending:false}).limit(100);
+    var rows=res.data||[];
+    if(!rows.length){ el.innerHTML='<h3 style="margin-top:18px">⭐ পণ্যের রেটিং</h3><p class="small">এখনো কোনো রেটিং আসেনি।</p>'; return; }
+    var agg={};
+    rows.forEach(function(r){ var a=agg[r.product_name]||(agg[r.product_name]={sum:0,n:0}); a.sum+=+r.stars||0; a.n++; });
+    var top=Object.keys(agg).map(function(k){ return {name:k, avg:Math.round(agg[k].sum/agg[k].n*10)/10, n:agg[k].n}; }).sort(function(a,b){ return b.n-a.n; }).slice(0,10);
+    el.innerHTML='<h3 style="margin-top:18px">⭐ পণ্যের রেটিং</h3>'+top.map(function(t){ return '<div class="listrow"><div class="n"><b>'+esc(t.name)+'</b></div><b>⭐ '+bn(t.avg)+' ('+bn(t.n)+'টি)</b></div>'; }).join("")
+      +'<h3 style="margin-top:14px">🕒 সাম্প্রতিক রিভিউ</h3>'+rows.slice(0,10).map(function(r){ var d=new Date(r.created_at); return '<div class="listrow"><div class="n"><b>'+esc(r.product_name)+'</b> — ⭐ '+bn(r.stars)+'<br><span class="small">'+esc(r.comment||"")+' • '+(r.customer_phone||"")+' • '+d.toLocaleDateString("bn-BD")+'</span></div></div>'; }).join("");
+  }catch(e){ el.innerHTML=""; }
+}
+async function loadAnalytics(){
+  var el=document.getElementById("analyticsBox"); if(!el) return;
+  if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
+  el.innerHTML="<p>হিসাব করা হচ্ছে…</p>";
+  var res=await sb.from("orders").select("*").order("created_at",{ascending:false}).limit(500);
+  if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
+  var rows=res.data||[];
+  window.__analyticsRows=rows;
+  var live=rows.filter(function(o){ return o.status!=="Cancelled"; });
+  var del=live.filter(function(o){ return o.status==="Delivered"; });
+  var unpaid=live.filter(function(o){ return (o.payment_status||"unpaid")!=="paid"; });
+  var sales=0, profit=0; live.forEach(function(o){ sales+=+o.total||0; profit+=+o.profit||0; });
+  var byDay={};
+  live.forEach(function(o){ var d=new Date(o.created_at).toLocaleDateString("bn-BD"); if(!byDay[d]) byDay[d]={n:0,sales:0}; byDay[d].n++; byDay[d].sales+=+o.total||0; });
+  var days=Object.keys(byDay).slice(-14).reverse();
+  var byProd={};
+  live.forEach(function(o){ (o.items||[]).forEach(function(it){ var k=it.name+((it.brand)?(" ("+it.brand+")"):""); if(!byProd[k]) byProd[k]={qty:0,total:0}; byProd[k].qty+=+it.qty||0; byProd[k].total+=+it.total||0; }); });
+  var top=Object.keys(byProd).map(function(k){ return {name:k, qty:byProd[k].qty, total:byProd[k].total}; }).sort(function(a,b){ return b.qty-a.qty; }).slice(0,10);
+  var byCat={};
+  live.forEach(function(o){ (o.items||[]).forEach(function(it){ var c="—"; DATA.products.forEach(function(p){ if(p.name===it.name) c=p.category||"—"; }); if(!byCat[c]) byCat[c]=0; byCat[c]+= +it.total||0; }); });
+  var cats=Object.keys(byCat).sort(function(a,b){ return byCat[b]-byCat[a]; });
+  el.innerHTML='<div class="statgrid"><div class="stat"><b>'+bn(live.length)+'</b>টি অর্ডার</div><div class="stat"><b>৳'+bn(sales)+'</b>মোট বিক্রি</div><div class="stat"><b>৳'+bn(profit)+'</b>মোট লাভ</div><div class="stat"><b>৳'+bn(live.length?Math.round(sales/live.length):0)+'</b>গড় অর্ডার</div><div class="stat"><b>'+bn(del.length)+'</b>টি ডেলিভারি সম্পন্ন</div><div class="stat"><b>'+bn(unpaid.length)+'</b>টি পেমেন্ট বাকি</div></div>'
+    +'<h3 style="margin-top:14px">📅 শেষ ১৪ দিন</h3>'+days.map(function(d){ return '<div class="listrow"><div class="n"><b>'+d+'</b> — '+bn(byDay[d].n)+'টি অর্ডার</div><b>৳'+bn(byDay[d].sales)+'</b></div>'; }).join("")
+    +'<h3 style="margin-top:14px">🏆 সবচেয়ে বেশি বিক্রি হওয়া পণ্য</h3>'+top.map(function(t){ return '<div class="listrow"><div class="n">'+esc(t.name)+'</div><b>'+bn(t.qty)+' • ৳'+bn(t.total)+'</b></div>'; }).join("")
+    +'<h3 style="margin-top:14px">📂 ক্যাটাগরি অনুযায়ী বিক্রি</h3>'+cats.map(function(c){ return '<div class="listrow"><div class="n">'+esc(c)+'</div><b>৳'+bn(byCat[c])+'</b></div>'; }).join("");
+}
+function downloadOrdersCsv(){
+  var rows=window.__analyticsRows||[];
+  if(!rows.length){ alert("এখনো কোনো অর্ডার নেই।"); return; }
+  function q(v){ return '"'+String(v==null?"":v).replace(/"/g,'""')+'"'; }
+  var lines=[["তারিখ","অর্ডার নম্বর","কাস্টমার","মোবাইল","পণ্য","মোট","পেমেন্ট","পেমেন্ট স্ট্যাটাস","স্ট্যাটাস"].map(q).join(",")];
+  rows.forEach(function(o){
+    var items=(o.items||[]).map(function(it){ return it.name+" "+(it.qty||"")+" "+(it.unit||""); }).join(" | ");
+    lines.push([new Date(o.created_at).toLocaleDateString("bn-BD"), o.order_no||"", o.customer_name||"", o.phone||"", items, o.total||0, o.payment_method||"", o.payment_status||"", o.status||""].map(q).join(","));
+  });
+  var blob=new Blob(["\uFEFF"+lines.join("\n")], {type:"text/csv;charset=utf-8"});
+  var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="masik-bazar-orders.csv"; a.click();
 }
 async function loadSupplierPrices(){
   var el=document.getElementById("supplierPrices"); if(!el) return;
@@ -1275,6 +1388,22 @@ async function loadSupplierPrices(){
     window.__spRows=window.__spRows||{}; arows.forEach(function(r){ window.__spRows[r.id]=r; });
     if(arows.length){
       el.innerHTML+='<h3 style="margin-top:18px">✅ বসানো হয়েছে — সাম্প্রতিক দাম</h3><p class="small">আগে কোন দোকান কোন পণ্যের কত দাম দিয়েছিল, আর সেটা বসানো হয়েছে — তার তালিকা।</p>'+arows.map(function(r){ var d=new Date(r.created_at); return '<div class="listrow"><div class="n"><b>'+esc(r.product_name||"")+'</b> '+(r.brand?esc(r.brand):"")+' — <b>৳'+bn(r.price||0)+'</b><br><span class="small">'+esc(r.supplier_name||"")+' • '+d.toLocaleDateString("bn-BD")+'</span></div><button class="primary" onclick="createPO(\''+r.id+'\')">🧾 ক্রয় আদেশ</button></div>'; }).join("");
+    }
+  }catch(e){}
+  try{
+    var lowBox=document.getElementById("lowStockPO");
+    if(lowBox && DRAFT){
+      var low=DRAFT.products.filter(function(p){ return (p.stock_qty||0)>0 && (p.stock_qty||0)<=5; });
+      if(!low.length){ lowBox.innerHTML=""; }
+      else{
+        lowBox.innerHTML='<h3 style="margin-top:18px">📦 স্টক কম — অর্ডার দেওয়ার পরামর্শ</h3><p class="small">এই পণ্যগুলোর স্টক ৫ বা তার কম — দোকানদারের দাম থেকে ক্রয় আদেশ বানাতে পারেন।</p>'+low.map(function(p){
+          var best=null;
+          rows.forEach(function(r){ if(r.product_name===p.name && (r.brand||"")===(p.brand||"")){ if(!best || (r.price||0)<(best.price||0)) best=r; } });
+          if(!best) rows.forEach(function(r){ if(r.product_name===p.name){ if(!best || (r.price||0)<(best.price||0)) best=r; } });
+          var bHtml=best?('<br><span class="small">সবচেয়ে কম দাম: ৳'+bn(best.price||0)+' ('+esc(best.supplier_name||"")+')</span> <button class="primary" onclick="createPO(\''+best.id+'\')">🧾 ক্রয় আদেশ</button>'):'<br><span class="small">কোনো দাম আসেনি — দোকানদারকে জানান।</span>';
+          return '<div class="listrow"><div class="n"><b>'+esc(p.name)+'</b> '+(p.brand?esc(p.brand):"")+'<br><span class="small">স্টক: <b>'+bn(p.stock_qty)+'</b> '+(p.unit||"")+'</span>'+bHtml+'</div></div>';
+        }).join("");
+      }
     }
   }catch(e){}
   loadPOs();
@@ -1410,13 +1539,15 @@ async function openCustomerCard(phone, name){
   el.innerHTML="<p>আসছে…</p>";
   var ores=await sb.from("orders").select("*").eq("phone", phone).order("created_at",{ascending:false}).limit(50);
   var sres=await sb.from("subscriptions").select("*").eq("customer_phone", phone).eq("status","active").limit(5);
+  var cres=await sb.from("customers").select("points").eq("phone", phone).limit(1);
+  var pts=(cres.data&&cres.data[0])? (+cres.data[0].points||0) : 0;
   var ords=ores.data||[];
   var total=0; ords.forEach(function(o){ total+=+(o.total||0); });
   var subs=sres.data||[];
   var ph=(phone||"").replace(/[^0-9]/g,""); if(ph.indexOf("88")!==0) ph="88"+ph;
   var wa="https://wa.me/"+ph+"?text="+encodeURIComponent("আসসালামু আলাইকুম "+(name||"")+"! মাসিক বাজার থেকে জানাচ্ছি।");
   el.innerHTML='<button class="ghost" onclick="loadCustomers()">← কাস্টমারের তালিকা</button>'
-    +'<div class="ordercard"><h3 style="margin:0">📇 '+esc(name||"কাস্টমার")+'</h3>📱 <a href="tel:'+phone+'">'+phone+'</a><br>মোট অর্ডার: <b>'+bn(ords.length)+'</b>টি • মোট খরচ: <b>৳'+bn(total)+'</b><br>শেষ অর্ডার: '+(ords[0]?new Date(ords[0].created_at).toLocaleDateString("bn-BD"):"—")
+    +'<div class="ordercard"><h3 style="margin:0">📇 '+esc(name||"কাস্টমার")+'</h3>📱 <a href="tel:'+phone+'">'+phone+'</a><br>মোট অর্ডার: <b>'+bn(ords.length)+'</b>টি • মোট খরচ: <b>৳'+bn(total)+'</b> • ⭐ পয়েন্ট: <b>'+bn(pts)+'</b><br>শেষ অর্ডার: '+(ords[0]?new Date(ords[0].created_at).toLocaleDateString("bn-BD"):"—")
     +(subs.length?('<br>📅 সাবস্ক্রিপশন: <b>'+subs.map(function(s){ return s.package_name+" ("+s.delivery_day+")"; }).join(", ")+'</b>'):"<br>📅 সাবস্ক্রিপশন নেই")
     +'<br><a class="primary" style="display:inline-block;padding:8px 12px;text-decoration:none" href="'+wa+'" target="_blank">💬 WhatsApp</a></div>'
     +(ords.length?('<h3 style="margin-top:14px">📋 অর্ডারের তালিকা</h3>'+ords.map(function(o){ var d=new Date(o.created_at); return '<div class="ordercard"><b>'+o.order_no+'</b> — '+d.toLocaleDateString("bn-BD")+'<br>'+(o.items||[]).map(function(it){ return it.name+' — '+bn(it.qty)+' '+(it.unit||""); }).join("<br>")+'<br><b>মোট: ৳'+bn(o.total)+'</b> • '+(o.status||"")+'</div>'; }).join("")):"<p>এখনো কোনো অর্ডার করেননি।</p>");
