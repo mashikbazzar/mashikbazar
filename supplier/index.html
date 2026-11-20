@@ -132,6 +132,12 @@ Chrome-এর ⋮ মেনুতে 'Add to Home screen' না দেখাল
 <h3>📋 আমার পাঠানো দাম</h3>
 <div id="mySubs"></div>
 </div>
+
+<div class="card">
+<h3>📦 বাল্ক অর্ডার (বিয়ে / বড় অর্ডার)</h3>
+<p class="small">দোকান থেকে বড় অর্ডার পাঠালে এখানে আসবে। প্রতিটা পণ্যের <b>পাইকারি দাম (খুচরা দামের চেয়ে কম)</b> লিখে পাঠান।</p>
+<div id="bulkOrders"></div>
+</div>
 </div>
 
 <div class="note">এই অ্যাপ শুধু দাম পাঠানোর জন্য। কাস্টমারের অর্ডার বা দোকানের অন্য কিছু এখানে দেখা যায় না — সেগুলো শুধু মাসিক বাজারের অ্যাডমিন দেখতে পারে।</div>
@@ -200,7 +206,7 @@ async function showApp(){
     if(!g){ g={name:p.name, category:p.category, unit:p.unit, variants:[]}; gmap[p.name]=g; groups.push(g); }
     g.variants.push(p);
   });
-  renderProducts(); loadMySubs(); loadMyRating();
+  renderProducts(); loadMySubs(); loadMyRating(); loadBulkOrders();
 }
 async function loadMyRating(){
   var el=document.getElementById("myRating"); if(!el||!sb||!supplier) return;
@@ -477,6 +483,39 @@ async function submitNewProduct(){
   } else { if(m) m.textContent="পাঠানো যায়নি — আবার চেষ্টা করুন।"; }
 }
 async function refreshMySubs(){ var hs=document.getElementById("mySubs"); if(hs && hs.textContent.indexOf("এখনো কোনো দাম পাঠাননি")>=0){ hs.innerHTML="<p>পাঠানো দাম আসছে…</p>"; } try{ await loadMySubs(); }catch(e){} }
+async function loadBulkOrders(){
+  var el=document.getElementById("bulkOrders"); if(!el||!sb||!supplier) return;
+  var res=await sb.from("purchase_orders").select("*").eq("supplier_id",supplier.id).in("status",["sent","priced"]).order("created_at",{ascending:false}).limit(10);
+  if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
+  var rows=res.data||[];
+  if(!rows.length){ el.innerHTML="<p>এখনো কোনো বাল্ক অর্ডার আসেনি।</p>"; return; }
+  window.__bulkPOs={}; rows.forEach(function(po){ window.__bulkPOs[po.id]=po; });
+  el.innerHTML=rows.map(function(po){
+    var d=new Date(po.created_at);
+    var items=(po.items||[]).map(function(it,idx){
+      var sp=(it.supplier_price!=null?it.supplier_price:"");
+      return '<div class="listrow"><div class="n"><b>'+it.product_name+'</b> '+(it.brand||"")+'<br>'+it.qty+' '+(it.unit||"")+' • খুচরা ৳'+bn(it.price)+'</div><input id="bp-'+po.id+'-'+idx+'" type="number" min="0" step="any" placeholder="পাইকারি দাম" value="'+sp+'" style="width:110px"></div>';
+    }).join("");
+    var st=po.status==="priced"?"💰 দাম পাঠানো হয়েছে — অ্যাডমিনের উত্তরের অপেক্ষায়":"📤 নতুন — দাম লিখে পাঠান";
+    return '<div class="ordercard"><b>'+po.po_no+'</b> — অর্ডার '+(po.order_no||"")+'<br><span class="small">'+d.toLocaleDateString("bn-BD")+' • '+st+' • খুচরা মোট ৳'+bn(po.total)+'</span>'+items+'<button class="gold" style="width:100%;margin-top:8px" onclick="submitBulkPrices(\''+po.id+'\')">💰 দাম পাঠান</button><p id="bpMsg-'+po.id+'" class="small"></p></div>';
+  }).join("");
+}
+async function submitBulkPrices(poId){
+  var po=(window.__bulkPOs||{})[poId]; if(!po||!sb) return;
+  var msg=document.getElementById("bpMsg-"+poId);
+  var items=[]; var bad=null;
+  (po.items||[]).forEach(function(it,idx){
+    var v=parseFloat((document.getElementById("bp-"+poId+"-"+idx)||{}).value);
+    if(isNaN(v)||v<=0){ bad="সব পণ্যের পাইকারি দাম লিখুন।"; return; }
+    if(v>=+it.price){ bad="পাইকারি দাম খুচরা দামের (৳"+it.price+") চেয়ে কম হতে হবে — "+it.product_name+"-এর দাম ঠিক করুন।"; return; }
+    items.push({product_name:it.product_name, brand:it.brand||"", unit:it.unit||"", price:+it.price||0, qty:+it.qty||0, supplier_price:v});
+  });
+  if(bad){ msg.textContent=bad; return; }
+  var res=await sb.from("purchase_orders").update({items:items, status:"priced"}).eq("id",poId);
+  if(res.error){ msg.textContent="হয়নি: "+res.error.message; return; }
+  msg.textContent="✅ দাম পাঠানো হয়েছে — অ্যাডমিন যাচাই করে জানাবে।";
+  loadBulkOrders();
+}
 async function loadMySubs(){
   var res = await sb.from("supplier_prices").select("*").eq("supplier_id", supplier.id).order("created_at", {ascending:false}).limit(500);
   var el=document.getElementById("mySubs");

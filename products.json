@@ -14,7 +14,8 @@
       "unit": "কেজি",
       "price_taka": 65,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 2,
@@ -24,7 +25,8 @@
       "unit": "কেজি",
       "price_taka": 55,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 16,
@@ -34,7 +36,8 @@
       "unit": "কেজি",
       "price_taka": 110,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 17,
@@ -44,7 +47,8 @@
       "unit": "কেজি",
       "price_taka": 60,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 31,
@@ -54,7 +58,8 @@
       "unit": "কেজি",
       "price_taka": 180,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 32,
@@ -64,7 +69,8 @@
       "unit": "কেজি",
       "price_taka": 95,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 33,
@@ -74,7 +80,8 @@
       "unit": "কেজি",
       "price_taka": 78,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 34,
@@ -84,7 +91,8 @@
       "unit": "কেজি",
       "price_taka": 62,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 35,
@@ -94,7 +102,8 @@
       "unit": "কেজি",
       "price_taka": 64,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 36,
@@ -104,7 +113,8 @@
       "unit": "কেজি",
       "price_taka": 62,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 37,
@@ -114,7 +124,8 @@
       "unit": "কেজি",
       "price_taka": 58,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 38,
@@ -124,7 +135,8 @@
       "unit": "৫০০ গ্রাম",
       "price_taka": 55,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 39,
@@ -134,7 +146,8 @@
       "unit": "কেজি",
       "price_taka": 80,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 40,
@@ -144,7 +157,8 @@
       "unit": "৫০০ গ্রাম",
       "price_taka": 45,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 134,
@@ -154,7 +168,8 @@
       "unit": "কেজি",
       "price_taka": 70,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 135,
@@ -164,7 +179,8 @@
       "unit": "কেজি",
       "price_taka": 90,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 136,
@@ -174,7 +190,8 @@
       "unit": "৫০০ গ্রাম",
       "price_taka": 60,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 3,
@@ -184,7 +201,8 @@
       "unit": "লিটার",
       "price_taka": 190,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 18,
@@ -194,7 +212,8 @@
       "unit": "লিটার",
       "price_taka": 320,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 19,
@@ -204,7 +223,8 @@
       "unit": "৫০০ গ্রাম",
       "price_taka": 550,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 41,
@@ -214,7 +234,8 @@
       "unit": "লিটার",
       "price_taka": 185,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 42,
@@ -224,7 +245,8 @@
       "unit": "লিটার",
       "price_taka": 195,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 43,
@@ -234,7 +256,8 @@
       "unit": "লিটার",
       "price_taka": 182,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 44,
@@ -244,7 +267,8 @@
       "unit": "লিটার",
       "price_taka": 188,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 45,
@@ -254,7 +278,8 @@
       "unit": "লিটার",
       "price_taka": 310,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 46,
@@ -264,7 +289,8 @@
       "unit": "লিটার",
       "price_taka": 300,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 47,
@@ -274,7 +300,8 @@
       "unit": "৫০০ গ্রাম",
       "price_taka": 680,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 48,
@@ -284,7 +311,8 @@
       "unit": "২০০ মিলি",
       "price_taka": 175,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 4,
@@ -294,7 +322,8 @@
       "unit": "কেজি",
       "price_taka": 130,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 5,
@@ -304,7 +333,8 @@
       "unit": "কেজি",
       "price_taka": 125,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 6,
@@ -314,7 +344,8 @@
       "unit": "কেজি",
       "price_taka": 42,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 20,
@@ -324,7 +355,8 @@
       "unit": "কেজি",
       "price_taka": 170,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 21,
@@ -334,7 +366,8 @@
       "unit": "কেজি",
       "price_taka": 95,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 49,
@@ -344,7 +377,8 @@
       "unit": "কেজি",
       "price_taka": 120,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 50,
@@ -354,7 +388,8 @@
       "unit": "কেজি",
       "price_taka": 105,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 51,
@@ -364,7 +399,8 @@
       "unit": "কেজি",
       "price_taka": 150,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 52,
@@ -374,7 +410,8 @@
       "unit": "কেজি",
       "price_taka": 128,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 53,
@@ -384,7 +421,8 @@
       "unit": "কেজি",
       "price_taka": 38,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 54,
@@ -394,7 +432,8 @@
       "unit": "কেজি",
       "price_taka": 40,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 55,
@@ -404,7 +443,8 @@
       "unit": "কেজি",
       "price_taka": 170,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 137,
@@ -414,7 +454,8 @@
       "unit": "কেজি",
       "price_taka": 95,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 138,
@@ -424,7 +465,8 @@
       "unit": "৫০০ গ্রাম",
       "price_taka": 70,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 139,
@@ -434,7 +476,8 @@
       "unit": "কেজি",
       "price_taka": 260,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 7,
@@ -444,7 +487,8 @@
       "unit": "১০০ গ্রাম",
       "price_taka": 45,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 8,
@@ -454,7 +498,8 @@
       "unit": "১০০ গ্রাম",
       "price_taka": 55,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 9,
@@ -464,7 +509,8 @@
       "unit": "১০০ গ্রাম",
       "price_taka": 40,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 22,
@@ -474,7 +520,8 @@
       "unit": "১০০ গ্রাম",
       "price_taka": 90,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 23,
@@ -484,7 +531,8 @@
       "unit": "১০০ গ্রাম",
       "price_taka": 120,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 56,
@@ -494,7 +542,8 @@
       "unit": "১০০ গ্রাম",
       "price_taka": 60,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 57,
@@ -504,7 +553,8 @@
       "unit": "১০০ গ্রাম",
       "price_taka": 70,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 58,
@@ -514,7 +564,8 @@
       "unit": "১০০ গ্রাম",
       "price_taka": 55,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 59,
@@ -524,7 +575,8 @@
       "unit": "১০০ গ্রাম",
       "price_taka": 110,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 60,
@@ -534,7 +586,8 @@
       "unit": "১০০ গ্রাম",
       "price_taka": 60,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 61,
@@ -544,7 +597,8 @@
       "unit": "১০০ গ্রাম",
       "price_taka": 80,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 62,
@@ -554,7 +608,8 @@
       "unit": "৫০ গ্রাম",
       "price_taka": 350,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 63,
@@ -564,7 +619,8 @@
       "unit": "১০০ গ্রাম",
       "price_taka": 120,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 64,
@@ -574,7 +630,8 @@
       "unit": "৫০ গ্রাম",
       "price_taka": 200,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 65,
@@ -584,7 +641,8 @@
       "unit": "প্যাকেট",
       "price_taka": 30,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 66,
@@ -594,7 +652,8 @@
       "unit": "২৫০ গ্রাম",
       "price_taka": 110,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 67,
@@ -604,7 +663,8 @@
       "unit": "প্যাকেট",
       "price_taka": 70,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 68,
@@ -614,7 +674,8 @@
       "unit": "প্যাকেট",
       "price_taka": 65,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 69,
@@ -624,7 +685,8 @@
       "unit": "প্যাকেট",
       "price_taka": 50,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 140,
@@ -634,7 +696,8 @@
       "unit": "৫০ গ্রাম",
       "price_taka": 110,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 141,
@@ -644,7 +707,8 @@
       "unit": "২৫০ গ্রাম",
       "price_taka": 90,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 142,
@@ -654,7 +718,8 @@
       "unit": "১০০ গ্রাম",
       "price_taka": 60,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 143,
@@ -664,7 +729,8 @@
       "unit": "পিস",
       "price_taka": 40,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 10,
@@ -674,7 +740,8 @@
       "unit": "পিস",
       "price_taka": 35,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 11,
@@ -684,7 +751,8 @@
       "unit": "পিস",
       "price_taka": 55,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 13,
@@ -694,7 +762,8 @@
       "unit": "পিস",
       "price_taka": 180,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 12,
@@ -704,7 +773,8 @@
       "unit": "৫০০ গ্রাম",
       "price_taka": 110,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 29,
@@ -714,7 +784,8 @@
       "unit": "পিস",
       "price_taka": 110,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 30,
@@ -724,7 +795,8 @@
       "unit": "পিস",
       "price_taka": 160,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 95,
@@ -734,7 +806,8 @@
       "unit": "পিস",
       "price_taka": 30,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 96,
@@ -744,7 +817,8 @@
       "unit": "পিস",
       "price_taka": 48,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 97,
@@ -754,7 +828,8 @@
       "unit": "পিস",
       "price_taka": 62,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 98,
@@ -764,7 +839,8 @@
       "unit": "পিস",
       "price_taka": 58,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 99,
@@ -774,7 +850,8 @@
       "unit": "৫০০ গ্রাম",
       "price_taka": 85,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 100,
@@ -784,7 +861,8 @@
       "unit": "৫০০ গ্রাম",
       "price_taka": 95,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 101,
@@ -794,7 +872,8 @@
       "unit": "৫০০ গ্রাম",
       "price_taka": 75,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 102,
@@ -804,7 +883,8 @@
       "unit": "পিস",
       "price_taka": 195,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 103,
@@ -814,7 +894,8 @@
       "unit": "পিস",
       "price_taka": 215,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 104,
@@ -824,7 +905,8 @@
       "unit": "পিস",
       "price_taka": 240,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 105,
@@ -834,7 +916,8 @@
       "unit": "পিস",
       "price_taka": 38,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 106,
@@ -844,7 +927,8 @@
       "unit": "পিস",
       "price_taka": 150,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 107,
@@ -854,7 +938,8 @@
       "unit": "৫০০ মিলি",
       "price_taka": 185,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 108,
@@ -864,7 +949,8 @@
       "unit": "পিস",
       "price_taka": 135,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 155,
@@ -874,7 +960,8 @@
       "unit": "১ লিটার",
       "price_taka": 120,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 156,
@@ -884,7 +971,8 @@
       "unit": "৫০০ গ্রাম",
       "price_taka": 60,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 157,
@@ -894,7 +982,8 @@
       "unit": "প্যাকেট",
       "price_taka": 50,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 158,
@@ -904,7 +993,8 @@
       "unit": "কেজি",
       "price_taka": 55,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 159,
@@ -914,7 +1004,8 @@
       "unit": "পিস",
       "price_taka": 25,
       "wholesale_price": 0,
-      "daily": true
+      "daily": true,
+      "special": false
     },
     {
       "id": 27,
@@ -924,7 +1015,8 @@
       "unit": "পিস",
       "price_taka": 120,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 28,
@@ -934,7 +1026,8 @@
       "unit": "পিস",
       "price_taka": 90,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 109,
@@ -944,7 +1037,8 @@
       "unit": "পিস",
       "price_taka": 135,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 110,
@@ -954,7 +1048,8 @@
       "unit": "পিস",
       "price_taka": 115,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 111,
@@ -964,7 +1059,8 @@
       "unit": "পিস",
       "price_taka": 190,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 112,
@@ -974,7 +1070,8 @@
       "unit": "পিস",
       "price_taka": 70,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 113,
@@ -984,7 +1081,8 @@
       "unit": "পিস",
       "price_taka": 105,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 114,
@@ -994,7 +1092,8 @@
       "unit": "পিস",
       "price_taka": 95,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 115,
@@ -1004,7 +1103,8 @@
       "unit": "পিস",
       "price_taka": 95,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 116,
@@ -1014,7 +1114,8 @@
       "unit": "২০০ মিলি",
       "price_taka": 320,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 117,
@@ -1024,7 +1125,8 @@
       "unit": "পিস",
       "price_taka": 175,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 118,
@@ -1034,7 +1136,8 @@
       "unit": "প্যাকেট",
       "price_taka": 140,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 119,
@@ -1044,7 +1147,8 @@
       "unit": "প্যাকেট",
       "price_taka": 120,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 120,
@@ -1054,7 +1158,8 @@
       "unit": "প্যাকেট",
       "price_taka": 650,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 121,
@@ -1064,7 +1169,8 @@
       "unit": "প্যাকেট",
       "price_taka": 690,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 165,
@@ -1074,7 +1180,8 @@
       "unit": "পিস",
       "price_taka": 140,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 166,
@@ -1084,7 +1191,8 @@
       "unit": "প্যাকেট",
       "price_taka": 60,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 167,
@@ -1094,7 +1202,8 @@
       "unit": "২০০ মিলি",
       "price_taka": 180,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 24,
@@ -1104,7 +1213,8 @@
       "unit": "২০০ গ্রাম",
       "price_taka": 130,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 25,
@@ -1114,7 +1224,8 @@
       "unit": "৫০০ গ্রাম",
       "price_taka": 420,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 70,
@@ -1124,7 +1235,8 @@
       "unit": "২০০ গ্রাম",
       "price_taka": 125,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 71,
@@ -1134,7 +1246,8 @@
       "unit": "প্যাকেট",
       "price_taka": 320,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 72,
@@ -1144,7 +1257,8 @@
       "unit": "৪০০ গ্রাম",
       "price_taka": 480,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 73,
@@ -1154,7 +1268,8 @@
       "unit": "৫০০ গ্রাম",
       "price_taka": 400,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 74,
@@ -1164,7 +1279,8 @@
       "unit": "৫০০ গ্রাম",
       "price_taka": 410,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 75,
@@ -1174,7 +1290,8 @@
       "unit": "৫০ গ্রাম",
       "price_taka": 210,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 76,
@@ -1184,7 +1301,8 @@
       "unit": "৫০০ গ্রাম",
       "price_taka": 430,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 77,
@@ -1194,7 +1312,8 @@
       "unit": "৭৫০ গ্রাম",
       "price_taka": 520,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 144,
@@ -1204,7 +1323,8 @@
       "unit": "৩৯৭ গ্রাম",
       "price_taka": 140,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 145,
@@ -1214,7 +1334,8 @@
       "unit": "প্যাকেট",
       "price_taka": 180,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 146,
@@ -1224,7 +1345,8 @@
       "unit": "২ লিটার",
       "price_taka": 150,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 147,
@@ -1234,7 +1356,8 @@
       "unit": "৪০০ গ্রাম",
       "price_taka": 420,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 148,
@@ -1244,7 +1367,19 @@
       "unit": "প্যাকেট",
       "price_taka": 25,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
+    },
+    {
+      "id": 169,
+      "name": "ফ্রেশ কাটি গরুর দুধ",
+      "brand": "",
+      "category": "চা ও পানীয়",
+      "unit": "লিটার",
+      "price_taka": 90,
+      "wholesale_price": 0,
+      "daily": false,
+      "special": true
     },
     {
       "id": 26,
@@ -1254,7 +1389,8 @@
       "unit": "প্যাকেট",
       "price_taka": 100,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 78,
@@ -1264,7 +1400,8 @@
       "unit": "প্যাকেট",
       "price_taka": 85,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 79,
@@ -1274,7 +1411,8 @@
       "unit": "প্যাকেট",
       "price_taka": 75,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 80,
@@ -1284,7 +1422,8 @@
       "unit": "প্যাকেট",
       "price_taka": 70,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 81,
@@ -1294,7 +1433,8 @@
       "unit": "প্যাকেট",
       "price_taka": 60,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 82,
@@ -1304,7 +1444,8 @@
       "unit": "প্যাকেট",
       "price_taka": 55,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 83,
@@ -1314,7 +1455,8 @@
       "unit": "প্যাকেট",
       "price_taka": 50,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 84,
@@ -1324,7 +1466,8 @@
       "unit": "৩০০ গ্রাম",
       "price_taka": 90,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 85,
@@ -1334,7 +1477,8 @@
       "unit": "৩০০ গ্রাম",
       "price_taka": 85,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 86,
@@ -1344,7 +1488,8 @@
       "unit": "২০০ গ্রাম",
       "price_taka": 45,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 87,
@@ -1354,7 +1499,8 @@
       "unit": "২০০ গ্রাম",
       "price_taka": 60,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 88,
@@ -1364,7 +1510,8 @@
       "unit": "৫০০ গ্রাম",
       "price_taka": 130,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 89,
@@ -1374,7 +1521,8 @@
       "unit": "৫০০ গ্রাম",
       "price_taka": 330,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 90,
@@ -1384,7 +1532,8 @@
       "unit": "৪০০ গ্রাম",
       "price_taka": 140,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 91,
@@ -1394,7 +1543,8 @@
       "unit": "৩৪০ গ্রাম",
       "price_taka": 85,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 92,
@@ -1404,7 +1554,8 @@
       "unit": "৪০০ গ্রাম",
       "price_taka": 150,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 93,
@@ -1414,7 +1565,8 @@
       "unit": "২৫০ গ্রাম",
       "price_taka": 280,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 94,
@@ -1424,7 +1576,8 @@
       "unit": "২৫০ গ্রাম",
       "price_taka": 320,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 149,
@@ -1434,7 +1587,8 @@
       "unit": "৫০০ গ্রাম",
       "price_taka": 110,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 150,
@@ -1444,7 +1598,8 @@
       "unit": "৪০০ গ্রাম",
       "price_taka": 160,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 151,
@@ -1454,7 +1609,8 @@
       "unit": "৫০০ মিলি",
       "price_taka": 80,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 152,
@@ -1464,7 +1620,8 @@
       "unit": "৫০০ মিলি",
       "price_taka": 130,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 153,
@@ -1474,7 +1631,8 @@
       "unit": "১০০ গ্রাম",
       "price_taka": 70,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 154,
@@ -1484,7 +1642,8 @@
       "unit": "২০০ গ্রাম",
       "price_taka": 60,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 122,
@@ -1494,7 +1653,8 @@
       "unit": "প্যাকেট",
       "price_taka": 65,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 123,
@@ -1504,7 +1664,8 @@
       "unit": "প্যাকেট",
       "price_taka": 90,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 124,
@@ -1514,7 +1675,8 @@
       "unit": "প্যাকেট",
       "price_taka": 75,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 125,
@@ -1524,7 +1686,8 @@
       "unit": "পিস",
       "price_taka": 290,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 126,
@@ -1534,7 +1697,8 @@
       "unit": "প্যাকেট",
       "price_taka": 60,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 127,
@@ -1544,7 +1708,8 @@
       "unit": "জোড়া",
       "price_taka": 70,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 128,
@@ -1554,7 +1719,8 @@
       "unit": "প্যাকেট",
       "price_taka": 20,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 160,
@@ -1564,7 +1730,8 @@
       "unit": "প্যাকেট",
       "price_taka": 40,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 161,
@@ -1574,7 +1741,8 @@
       "unit": "পিস",
       "price_taka": 120,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 162,
@@ -1584,7 +1752,8 @@
       "unit": "পিস",
       "price_taka": 350,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 163,
@@ -1594,7 +1763,8 @@
       "unit": "প্যাকেট",
       "price_taka": 45,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 164,
@@ -1604,7 +1774,8 @@
       "unit": "পিস",
       "price_taka": 60,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 14,
@@ -1614,7 +1785,8 @@
       "unit": "কেজি",
       "price_taka": 60,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 15,
@@ -1624,7 +1796,8 @@
       "unit": "কেজি",
       "price_taka": 160,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 129,
@@ -1634,7 +1807,8 @@
       "unit": "কেজি",
       "price_taka": 150,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 130,
@@ -1644,7 +1818,8 @@
       "unit": "ডজন",
       "price_taka": 155,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 131,
@@ -1654,7 +1829,8 @@
       "unit": "২৫০ গ্রাম",
       "price_taka": 130,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 132,
@@ -1664,7 +1840,8 @@
       "unit": "২৫০ গ্রাম",
       "price_taka": 320,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 133,
@@ -1674,7 +1851,8 @@
       "unit": "৫০০ গ্রাম",
       "price_taka": 280,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     },
     {
       "id": 168,
@@ -1684,13 +1862,22 @@
       "unit": "কেজি",
       "price_taka": 45,
       "wholesale_price": 0,
-      "daily": false
+      "daily": false,
+      "special": false
     }
   ],
   "packages": [
     {
       "id": 1,
       "size": 2,
+      "kind": "family",
+      "scale": {
+        "base": 2,
+        "min": 2,
+        "max": 12,
+        "step": 1,
+        "unit": "সদস্য"
+      },
       "name": "২ জনের পরিবার প্যাকেজ",
       "tagline": "২ জনের পরিবারের মাসিক বাজার",
       "estimated_total_taka": 1870,
@@ -1764,6 +1951,14 @@
     {
       "id": 2,
       "size": 3,
+      "kind": "family",
+      "scale": {
+        "base": 3,
+        "min": 2,
+        "max": 12,
+        "step": 1,
+        "unit": "সদস্য"
+      },
       "name": "৩ জনের পরিবার প্যাকেজ",
       "tagline": "৩ জনের পরিবারের মাসিক বাজার",
       "estimated_total_taka": 2504,
@@ -1837,9 +2032,17 @@
     {
       "id": 3,
       "size": 4,
+      "kind": "family",
+      "scale": {
+        "base": 4,
+        "min": 2,
+        "max": 12,
+        "step": 1,
+        "unit": "সদস্য"
+      },
       "name": "৪ জনের পরিবার প্যাকেজ",
       "tagline": "৪ জনের পরিবারের মাসিক বাজার",
-      "estimated_total_taka": 3895,
+      "estimated_total_taka": 3884,
       "items": [
         {
           "product_id": 1,
@@ -1933,9 +2136,9 @@
           "product_id": 12,
           "name": "ডিটারজেন্ট পাউডার",
           "brand": "সার্ফ এক্সেল",
-          "qty_label": "৫০০ গ্রাম",
-          "qty_multiplier": 1.0,
-          "line_total_taka": 110
+          "qty_label": "৪৫০ গ্রাম",
+          "qty_multiplier": 0.9,
+          "line_total_taka": 99
         },
         {
           "product_id": 13,
@@ -1958,9 +2161,17 @@
     {
       "id": 4,
       "size": 5,
+      "kind": "family",
+      "scale": {
+        "base": 5,
+        "min": 2,
+        "max": 12,
+        "step": 1,
+        "unit": "সদস্য"
+      },
       "name": "৫ জনের পরিবার প্যাকেজ",
       "tagline": "৫ জনের পরিবারের মাসিক বাজার",
-      "estimated_total_taka": 4529,
+      "estimated_total_taka": 4540,
       "items": [
         {
           "product_id": 1,
@@ -2054,9 +2265,9 @@
           "product_id": 12,
           "name": "ডিটারজেন্ট পাউডার",
           "brand": "সার্ফ এক্সেল",
-          "qty_label": "৫০০ গ্রাম",
-          "qty_multiplier": 1.0,
-          "line_total_taka": 110
+          "qty_label": "৫৫০ গ্রাম",
+          "qty_multiplier": 1.1,
+          "line_total_taka": 121
         },
         {
           "product_id": 13,
@@ -2079,9 +2290,17 @@
     {
       "id": 5,
       "size": 6,
+      "kind": "family",
+      "scale": {
+        "base": 6,
+        "min": 2,
+        "max": 12,
+        "step": 1,
+        "unit": "সদস্য"
+      },
       "name": "৬ জনের পরিবার প্যাকেজ",
       "tagline": "৬ জনের পরিবারের মাসিক বাজার",
-      "estimated_total_taka": 5677,
+      "estimated_total_taka": 5607,
       "items": [
         {
           "product_id": 1,
@@ -2135,25 +2354,25 @@
           "product_id": 7,
           "name": "হলুদ গুঁড়া",
           "brand": "",
-          "qty_label": "২০০ গ্রাম",
-          "qty_multiplier": 2.0,
-          "line_total_taka": 90
+          "qty_label": "১৫০ গ্রাম",
+          "qty_multiplier": 1.5,
+          "line_total_taka": 68
         },
         {
           "product_id": 8,
           "name": "মরিচ গুঁড়া",
           "brand": "",
-          "qty_label": "২০০ গ্রাম",
-          "qty_multiplier": 2.0,
-          "line_total_taka": 110
+          "qty_label": "১৫০ গ্রাম",
+          "qty_multiplier": 1.5,
+          "line_total_taka": 82
         },
         {
           "product_id": 9,
           "name": "ধনিয়া গুঁড়া",
           "brand": "",
-          "qty_label": "২০০ গ্রাম",
-          "qty_multiplier": 2.0,
-          "line_total_taka": 80
+          "qty_label": "১৫০ গ্রাম",
+          "qty_multiplier": 1.5,
+          "line_total_taka": 60
         },
         {
           "product_id": 10,
@@ -2192,6 +2411,14 @@
     {
       "id": 6,
       "size": 7,
+      "kind": "family",
+      "scale": {
+        "base": 7,
+        "min": 2,
+        "max": 12,
+        "step": 1,
+        "unit": "সদস্য"
+      },
       "name": "৭ জনের পরিবার প্যাকেজ",
       "tagline": "৭ জনের পরিবারের মাসিক বাজার",
       "estimated_total_taka": 6519,
@@ -2305,9 +2532,17 @@
     {
       "id": 7,
       "size": 8,
+      "kind": "family",
+      "scale": {
+        "base": 8,
+        "min": 2,
+        "max": 12,
+        "step": 1,
+        "unit": "সদস্য"
+      },
       "name": "৮ জনের পরিবার প্যাকেজ",
       "tagline": "৮ জনের পরিবারের মাসিক বাজার",
-      "estimated_total_taka": 7361,
+      "estimated_total_taka": 7431,
       "items": [
         {
           "product_id": 1,
@@ -2361,25 +2596,25 @@
           "product_id": 7,
           "name": "হলুদ গুঁড়া",
           "brand": "",
-          "qty_label": "২০০ গ্রাম",
-          "qty_multiplier": 2.0,
-          "line_total_taka": 90
+          "qty_label": "২৫০ গ্রাম",
+          "qty_multiplier": 2.5,
+          "line_total_taka": 112
         },
         {
           "product_id": 8,
           "name": "মরিচ গুঁড়া",
           "brand": "",
-          "qty_label": "২০০ গ্রাম",
-          "qty_multiplier": 2.0,
-          "line_total_taka": 110
+          "qty_label": "২৫০ গ্রাম",
+          "qty_multiplier": 2.5,
+          "line_total_taka": 138
         },
         {
           "product_id": 9,
           "name": "ধনিয়া গুঁড়া",
           "brand": "",
-          "qty_label": "২০০ গ্রাম",
-          "qty_multiplier": 2.0,
-          "line_total_taka": 80
+          "qty_label": "২৫০ গ্রাম",
+          "qty_multiplier": 2.5,
+          "line_total_taka": 100
         },
         {
           "product_id": 10,
@@ -2412,6 +2647,564 @@
           "qty_label": "১ পিস",
           "qty_multiplier": 1.0,
           "line_total_taka": 180
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "size": 100,
+      "kind": "occasion",
+      "note": "মাছ-মাংস ও কাঁচা সবজি এই প্যাকেজে নেই — সেগুলো আলাদা ব্যবস্থা করতে হবে।",
+      "scale": {
+        "base": 100,
+        "min": 100,
+        "max": 600,
+        "step": 50,
+        "unit": "অতিথি"
+      },
+      "name": "বিয়ের বাজার",
+      "tagline": "১০০ অতিথির বিয়ের রান্নার বাজার",
+      "estimated_total_taka": 15004,
+      "items": [
+        {
+          "product_id": 16,
+          "name": "পোলাও চাল (চিনিগুঁড়া)",
+          "brand": "",
+          "qty_label": "১৫ কেজি",
+          "qty_multiplier": 15.0,
+          "line_total_taka": 1650
+        },
+        {
+          "product_id": 33,
+          "name": "মিনিকেট চাল",
+          "brand": "",
+          "qty_label": "৫ কেজি",
+          "qty_multiplier": 5.0,
+          "line_total_taka": 390
+        },
+        {
+          "product_id": 3,
+          "name": "সয়াবিন তেল",
+          "brand": "তীর",
+          "qty_label": "৫ লিটার",
+          "qty_multiplier": 5.0,
+          "line_total_taka": 950
+        },
+        {
+          "product_id": 14,
+          "name": "পেঁয়াজ",
+          "brand": "",
+          "qty_label": "১০ কেজি",
+          "qty_multiplier": 10.0,
+          "line_total_taka": 600
+        },
+        {
+          "product_id": 15,
+          "name": "রসুন",
+          "brand": "",
+          "qty_label": "২ কেজি",
+          "qty_multiplier": 2.0,
+          "line_total_taka": 320
+        },
+        {
+          "product_id": 129,
+          "name": "আদা",
+          "brand": "",
+          "qty_label": "১ কেজি",
+          "qty_multiplier": 1.0,
+          "line_total_taka": 150
+        },
+        {
+          "product_id": 7,
+          "name": "হলুদ গুঁড়া",
+          "brand": "",
+          "qty_label": "১০০০ গ্রাম",
+          "qty_multiplier": 10.0,
+          "line_total_taka": 450
+        },
+        {
+          "product_id": 8,
+          "name": "মরিচ গুঁড়া",
+          "brand": "",
+          "qty_label": "৮০০ গ্রাম",
+          "qty_multiplier": 8.0,
+          "line_total_taka": 440
+        },
+        {
+          "product_id": 9,
+          "name": "ধনিয়া গুঁড়া",
+          "brand": "",
+          "qty_label": "৮০০ গ্রাম",
+          "qty_multiplier": 8.0,
+          "line_total_taka": 320
+        },
+        {
+          "product_id": 22,
+          "name": "জিরা",
+          "brand": "",
+          "qty_label": "৫০০ গ্রাম",
+          "qty_multiplier": 5.0,
+          "line_total_taka": 450
+        },
+        {
+          "product_id": 23,
+          "name": "গরম মসলা",
+          "brand": "রাধুনী",
+          "qty_label": "৩০০ গ্রাম",
+          "qty_multiplier": 3.0,
+          "line_total_taka": 360
+        },
+        {
+          "product_id": 63,
+          "name": "দারুচিনি",
+          "brand": "",
+          "qty_label": "২০০ গ্রাম",
+          "qty_multiplier": 2.0,
+          "line_total_taka": 240
+        },
+        {
+          "product_id": 5,
+          "name": "চিনি",
+          "brand": "",
+          "qty_label": "৫ কেজি",
+          "qty_multiplier": 5.0,
+          "line_total_taka": 625
+        },
+        {
+          "product_id": 6,
+          "name": "লবণ",
+          "brand": "এসিআই",
+          "qty_label": "২ কেজি",
+          "qty_multiplier": 2.0,
+          "line_total_taka": 84
+        },
+        {
+          "product_id": 19,
+          "name": "ঘি",
+          "brand": "",
+          "qty_label": "২০০০ গ্রাম",
+          "qty_multiplier": 4.0,
+          "line_total_taka": 2200
+        },
+        {
+          "product_id": 25,
+          "name": "গুঁড়া দুধ",
+          "brand": "ডানো",
+          "qty_label": "২০০০ গ্রাম",
+          "qty_multiplier": 4.0,
+          "line_total_taka": 1680
+        },
+        {
+          "product_id": 130,
+          "name": "ডিম",
+          "brand": "",
+          "qty_label": "৮ ডজন",
+          "qty_multiplier": 8.0,
+          "line_total_taka": 1240
+        },
+        {
+          "product_id": 38,
+          "name": "সুজি",
+          "brand": "",
+          "qty_label": "৩০০০ গ্রাম",
+          "qty_multiplier": 6.0,
+          "line_total_taka": 330
+        },
+        {
+          "product_id": 4,
+          "name": "মসুর ডাল",
+          "brand": "",
+          "qty_label": "৫ কেজি",
+          "qty_multiplier": 5.0,
+          "line_total_taka": 650
+        },
+        {
+          "product_id": 24,
+          "name": "চা পাতা",
+          "brand": "ইস্পাহানি মির্জাপুর",
+          "qty_label": "৬০০ গ্রাম",
+          "qty_multiplier": 3.0,
+          "line_total_taka": 390
+        },
+        {
+          "product_id": 122,
+          "name": "টিস্যু পেপার",
+          "brand": "বসুন্ধরা",
+          "qty_label": "৫ প্যাকেট",
+          "qty_multiplier": 5.0,
+          "line_total_taka": 325
+        },
+        {
+          "product_id": 131,
+          "name": "কিসমিস",
+          "brand": "",
+          "qty_label": "১০০০ গ্রাম",
+          "qty_multiplier": 4.0,
+          "line_total_taka": 520
+        },
+        {
+          "product_id": 132,
+          "name": "কাঠবাদাম",
+          "brand": "",
+          "qty_label": "৫০০ গ্রাম",
+          "qty_multiplier": 2.0,
+          "line_total_taka": 640
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "size": 100,
+      "kind": "occasion",
+      "note": "মাছ-মাংস ও কাঁচা সবজি এই প্যাকেজে নেই — সেগুলো আলাদা ব্যবস্থা করতে হবে।",
+      "scale": {
+        "base": 100,
+        "min": 100,
+        "max": 600,
+        "step": 50,
+        "unit": "অতিথি"
+      },
+      "name": "সিন্নির বাজার",
+      "tagline": "১০০ অতিথির সিন্নি / মিলাদের বাজার",
+      "estimated_total_taka": 11442,
+      "items": [
+        {
+          "product_id": 134,
+          "name": "আতপ চাল (পাইজাম)",
+          "brand": "",
+          "qty_label": "১২ কেজি",
+          "qty_multiplier": 12.0,
+          "line_total_taka": 840
+        },
+        {
+          "product_id": 4,
+          "name": "মসুর ডাল",
+          "brand": "",
+          "qty_label": "৪ কেজি",
+          "qty_multiplier": 4.0,
+          "line_total_taka": 520
+        },
+        {
+          "product_id": 3,
+          "name": "সয়াবিন তেল",
+          "brand": "তীর",
+          "qty_label": "৩ লিটার",
+          "qty_multiplier": 3.0,
+          "line_total_taka": 570
+        },
+        {
+          "product_id": 14,
+          "name": "পেঁয়াজ",
+          "brand": "",
+          "qty_label": "৫ কেজি",
+          "qty_multiplier": 5.0,
+          "line_total_taka": 300
+        },
+        {
+          "product_id": 15,
+          "name": "রসুন",
+          "brand": "",
+          "qty_label": "১ কেজি",
+          "qty_multiplier": 1.0,
+          "line_total_taka": 160
+        },
+        {
+          "product_id": 129,
+          "name": "আদা",
+          "brand": "",
+          "qty_label": "৫০০ গ্রাম",
+          "qty_multiplier": 0.5,
+          "line_total_taka": 75
+        },
+        {
+          "product_id": 7,
+          "name": "হলুদ গুঁড়া",
+          "brand": "",
+          "qty_label": "৫০০ গ্রাম",
+          "qty_multiplier": 5.0,
+          "line_total_taka": 225
+        },
+        {
+          "product_id": 8,
+          "name": "মরিচ গুঁড়া",
+          "brand": "",
+          "qty_label": "৪০০ গ্রাম",
+          "qty_multiplier": 4.0,
+          "line_total_taka": 220
+        },
+        {
+          "product_id": 9,
+          "name": "ধনিয়া গুঁড়া",
+          "brand": "",
+          "qty_label": "৪০০ গ্রাম",
+          "qty_multiplier": 4.0,
+          "line_total_taka": 160
+        },
+        {
+          "product_id": 22,
+          "name": "জিরা",
+          "brand": "",
+          "qty_label": "৩০০ গ্রাম",
+          "qty_multiplier": 3.0,
+          "line_total_taka": 270
+        },
+        {
+          "product_id": 23,
+          "name": "গরম মসলা",
+          "brand": "রাধুনী",
+          "qty_label": "২০০ গ্রাম",
+          "qty_multiplier": 2.0,
+          "line_total_taka": 240
+        },
+        {
+          "product_id": 5,
+          "name": "চিনি",
+          "brand": "",
+          "qty_label": "৮ কেজি",
+          "qty_multiplier": 8.0,
+          "line_total_taka": 1000
+        },
+        {
+          "product_id": 6,
+          "name": "লবণ",
+          "brand": "এসিআই",
+          "qty_label": "১ কেজি",
+          "qty_multiplier": 1.0,
+          "line_total_taka": 42
+        },
+        {
+          "product_id": 38,
+          "name": "সুজি",
+          "brand": "",
+          "qty_label": "৩০০০ গ্রাম",
+          "qty_multiplier": 6.0,
+          "line_total_taka": 330
+        },
+        {
+          "product_id": 19,
+          "name": "ঘি",
+          "brand": "",
+          "qty_label": "১৫০০ গ্রাম",
+          "qty_multiplier": 3.0,
+          "line_total_taka": 1650
+        },
+        {
+          "product_id": 25,
+          "name": "গুঁড়া দুধ",
+          "brand": "ডানো",
+          "qty_label": "১৫০০ গ্রাম",
+          "qty_multiplier": 3.0,
+          "line_total_taka": 1260
+        },
+        {
+          "product_id": 133,
+          "name": "খেজুর",
+          "brand": "",
+          "qty_label": "২৫০০ গ্রাম",
+          "qty_multiplier": 5.0,
+          "line_total_taka": 1400
+        },
+        {
+          "product_id": 131,
+          "name": "কিসমিস",
+          "brand": "",
+          "qty_label": "৫০০ গ্রাম",
+          "qty_multiplier": 2.0,
+          "line_total_taka": 260
+        },
+        {
+          "product_id": 136,
+          "name": "সাগু দানা",
+          "brand": "",
+          "qty_label": "১৫০০ গ্রাম",
+          "qty_multiplier": 3.0,
+          "line_total_taka": 180
+        },
+        {
+          "product_id": 40,
+          "name": "মুড়ি",
+          "brand": "",
+          "qty_label": "২০০০ গ্রাম",
+          "qty_multiplier": 4.0,
+          "line_total_taka": 180
+        },
+        {
+          "product_id": 39,
+          "name": "চিড়া",
+          "brand": "",
+          "qty_label": "২ কেজি",
+          "qty_multiplier": 2.0,
+          "line_total_taka": 160
+        },
+        {
+          "product_id": 139,
+          "name": "খেজুরের গুড়",
+          "brand": "",
+          "qty_label": "২ কেজি",
+          "qty_multiplier": 2.0,
+          "line_total_taka": 520
+        },
+        {
+          "product_id": 24,
+          "name": "চা পাতা",
+          "brand": "ইস্পাহানি মির্জাপুর",
+          "qty_label": "৪০০ গ্রাম",
+          "qty_multiplier": 2.0,
+          "line_total_taka": 260
+        },
+        {
+          "product_id": 130,
+          "name": "ডিম",
+          "brand": "",
+          "qty_label": "৪ ডজন",
+          "qty_multiplier": 4.0,
+          "line_total_taka": 620
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "size": 4,
+      "kind": "expat",
+      "note": "",
+      "scale": {
+        "base": 4,
+        "min": 2,
+        "max": 12,
+        "step": 1,
+        "unit": "সদস্য"
+      },
+      "name": "প্রবাসী পরিবার",
+      "tagline": "প্রবাসে থেকে পরিবারের মাসিক বাজার",
+      "estimated_total_taka": 4697,
+      "items": [
+        {
+          "product_id": 1,
+          "name": "চাল (খোলা চাল) বি-২৯",
+          "brand": "নৌকা",
+          "qty_label": "২০ কেজি",
+          "qty_multiplier": 20.0,
+          "line_total_taka": 1300
+        },
+        {
+          "product_id": 3,
+          "name": "সয়াবিন তেল",
+          "brand": "তীর",
+          "qty_label": "৪ লিটার",
+          "qty_multiplier": 4.0,
+          "line_total_taka": 760
+        },
+        {
+          "product_id": 4,
+          "name": "মসুর ডাল",
+          "brand": "",
+          "qty_label": "২ কেজি",
+          "qty_multiplier": 2.0,
+          "line_total_taka": 260
+        },
+        {
+          "product_id": 5,
+          "name": "চিনি",
+          "brand": "",
+          "qty_label": "২ কেজি",
+          "qty_multiplier": 2.0,
+          "line_total_taka": 250
+        },
+        {
+          "product_id": 6,
+          "name": "লবণ",
+          "brand": "এসিআই",
+          "qty_label": "১ কেজি",
+          "qty_multiplier": 1.0,
+          "line_total_taka": 42
+        },
+        {
+          "product_id": 2,
+          "name": "আটা",
+          "brand": "",
+          "qty_label": "৪ কেজি",
+          "qty_multiplier": 4.0,
+          "line_total_taka": 220
+        },
+        {
+          "product_id": 7,
+          "name": "হলুদ গুঁড়া",
+          "brand": "",
+          "qty_label": "১০০ গ্রাম",
+          "qty_multiplier": 1.0,
+          "line_total_taka": 45
+        },
+        {
+          "product_id": 8,
+          "name": "মরিচ গুঁড়া",
+          "brand": "",
+          "qty_label": "১০০ গ্রাম",
+          "qty_multiplier": 1.0,
+          "line_total_taka": 55
+        },
+        {
+          "product_id": 9,
+          "name": "ধনিয়া গুঁড়া",
+          "brand": "",
+          "qty_label": "১০০ গ্রাম",
+          "qty_multiplier": 1.0,
+          "line_total_taka": 40
+        },
+        {
+          "product_id": 10,
+          "name": "কাপড় কাচার সাবান",
+          "brand": "",
+          "qty_label": "৩ পিস",
+          "qty_multiplier": 3.0,
+          "line_total_taka": 105
+        },
+        {
+          "product_id": 11,
+          "name": "গায়ে মাখার সাবান",
+          "brand": "লাক্স",
+          "qty_label": "২ পিস",
+          "qty_multiplier": 2.0,
+          "line_total_taka": 110
+        },
+        {
+          "product_id": 24,
+          "name": "চা পাতা",
+          "brand": "ইস্পাহানি মির্জাপুর",
+          "qty_label": "২০০ গ্রাম",
+          "qty_multiplier": 1.0,
+          "line_total_taka": 130
+        },
+        {
+          "product_id": 25,
+          "name": "গুঁড়া দুধ",
+          "brand": "ডানো",
+          "qty_label": "৫০০ গ্রাম",
+          "qty_multiplier": 1.0,
+          "line_total_taka": 420
+        },
+        {
+          "product_id": 133,
+          "name": "খেজুর",
+          "brand": "",
+          "qty_label": "৫০০ গ্রাম",
+          "qty_multiplier": 1.0,
+          "line_total_taka": 280
+        },
+        {
+          "product_id": 131,
+          "name": "কিসমিস",
+          "brand": "",
+          "qty_label": "২৫০ গ্রাম",
+          "qty_multiplier": 1.0,
+          "line_total_taka": 130
+        },
+        {
+          "product_id": 19,
+          "name": "ঘি",
+          "brand": "",
+          "qty_label": "৫০০ গ্রাম",
+          "qty_multiplier": 1.0,
+          "line_total_taka": 550
         }
       ]
     }

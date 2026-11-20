@@ -109,6 +109,7 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 #plannerOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;overflow:auto;padding:12px;display:none}
 #plannerPaper{background:#fff;max-width:640px;margin:0 auto;padding:20px;border-radius:8px;color:#111}
 #poOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;overflow:auto;padding:12px;display:none}
+#bulkOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;overflow:auto;padding:12px;display:none}
 #poPaper{background:#fff;max-width:640px;margin:0 auto;padding:20px;border-radius:8px;color:#111}
 #poPaper table{width:100%;border-collapse:collapse;margin:10px 0}
 #poPaper th,#poPaper td{border:1px solid #ccc;padding:6px 8px;font-size:15px;text-align:left;vertical-align:top}
@@ -118,7 +119,7 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 #memoPaper th,#memoPaper td{border:1px solid #ccc;padding:6px 8px;font-size:15px;text-align:left;vertical-align:top}
 #memoPaper th{background:#e8f5ee;color:#065f46}
 #memoPaper input{padding:6px;font-size:15px;border:1px solid #999;border-radius:6px;margin:0}
-@media print{body *{visibility:hidden} #memoOverlay,#memoOverlay *{visibility:visible} #memoOverlay{position:absolute;left:0;top:0;width:100%;background:#fff;padding:0} #plannerOverlay,#plannerOverlay *{visibility:visible} #plannerOverlay{position:absolute;left:0;top:0;width:100%;background:#fff;padding:0} #poOverlay,#poOverlay *{visibility:visible} #poOverlay{position:absolute;left:0;top:0;width:100%;background:#fff;padding:0} .noprint{display:none!important}}
+@media print{body *{visibility:hidden} #memoOverlay,#memoOverlay *{visibility:visible} #memoOverlay{position:absolute;left:0;top:0;width:100%;background:#fff;padding:0} #plannerOverlay,#plannerOverlay *{visibility:visible} #plannerOverlay{position:absolute;left:0;top:0;width:100%;background:#fff;padding:0} #poOverlay,#poOverlay *{visibility:visible} #poOverlay{position:absolute;left:0;top:0;width:100%;background:#fff;padding:0} #bulkOverlay,#bulkOverlay *{visibility:visible} #bulkOverlay{position:absolute;left:0;top:0;width:100%;background:#fff;padding:0} .noprint{display:none!important}}
 
 /* ---- Neer Admin mobile-first polish (v22) ---- */
 html{-webkit-text-size-adjust:100%}
@@ -168,6 +169,11 @@ section h2{color:#6d28d9}
   #adminProducts .listrow>div:first-child{flex:1 1 100%}
   #adminProducts .listrow input[type=number]{width:100%!important}
   #supplierPrices .listrow>button{flex:1 1 45%}
+  /* supplier price rows: text block takes its own full-width line on a phone,
+     otherwise the 4 action buttons squeeze it to one letter per line */
+  #supplierPrices .listrow .n{flex:1 1 100%}
+  #supplierPrices .listrow>button.gold{flex:1 1 100%}
+  #supplierPrices .listrow>a{flex:1 1 45%}
   #memoPaper{overflow-x:auto}
   #memoPaper th,#memoPaper td{padding:4px 6px;font-size:13px}
   #memoPaper input{max-width:64px}
@@ -303,13 +309,22 @@ section h2{color:#6d28d9}
 <h3 style="margin-top:18px">🎟️ কুপন কোড</h3>
 <p class="small">কাস্টমার কার্টে এই কোড লিখলে ছাড় পাবে। কোড বন্ধ করতে চাইলে "বন্ধ করুন" চাপুন — মুছে ফেলার দরকার নেই।</p>
 <label>কোড (বড় অক্ষরে লিখুন)</label><input id="cpCode" placeholder="যেমন: MASIK10">
-<label>ছাড়ের ধরন</label><select id="cpType"><option value="percent">শতাংশ (%)</option><option value="fixed">নির্দিষ্ট টাকা (৳)</option></select>
+<label>ছাড়ের ধরন</label><select id="cpType"><option value="percent">শতাংশ (%)</option><option value="fixed">নির্দিষ্ট টাকা (৳)</option><option value="free_delivery">ফ্রি ডেলিভারি</option></select>
 <label>ছাড়ের পরিমাণ</label><input id="cpValue" type="number" min="0" placeholder="যেমন: ১০">
 <label>ন্যূনতম অর্ডার (৳) — ০ মানে কোনো সীমা নেই</label><input id="cpMin" type="number" min="0" value="0">
 <label>মেয়াদ শেষ (না বসালে মেয়াদ নেই)</label><input id="cpExp" type="date">
 <button class="gold" onclick="addCoupon()">➕ কুপন যোগ করুন</button>
 <p id="cpMsg" class="small"></p>
 <div id="couponList"></div>
+<h3 style="margin-top:18px">🎟️ বড় অর্ডারে ছাড়ের কুপন (অটো)</h3>
+<p class="small">কাস্টমার যত বড় অর্ডার দেবে, তত ছাড়ের কুপন পাবে — পরের অর্ডারে ব্যবহার করবে। নিয়ম এখানে বসান; অর্ডার পাঠালেই কুপন নিজে থেকে তৈরি হবে।</p>
+<label>ন্যূনতম অর্ডার (৳) — এই টাকার অর্ডার হলে কুপন পাবে</label><input id="btMin" type="number" min="0" placeholder="যেমন: ৫০০০">
+<label>ছাড়ের ধরন</label><select id="btType"><option value="fixed">নির্দিষ্ট টাকা (৳)</option><option value="percent">শতাংশ (%)</option><option value="free_delivery">ফ্রি ডেলিভারি</option></select>
+<label>ছাড়ের পরিমাণ (টাকা বা % — ফ্রি ডেলিভারি হলে ০)</label><input id="btValue" type="number" min="0" placeholder="যেমন: ৫০">
+<button class="gold" onclick="addBulkTier()">➕ নিয়ম যোগ করুন</button>
+<p id="btMsg" class="small"></p>
+<p id="btMargin" class="small"></p>
+<div id="bulkTierList"></div>
 </div>
 
 <div id="admin-publish" class="adminbox" style="display:none">
@@ -363,6 +378,9 @@ section h2{color:#6d28d9}
 <div id="lowStockPO"></div>
 <h3 style="margin-top:18px">🧾 ক্রয় আদেশ</h3>
 <div id="poList"></div>
+<h3 style="margin-top:18px">📦 বাল্ক অর্ডার (বিয়ে / বড় অর্ডার)</h3>
+<p class="small">কাস্টমারের বড় অর্ডার (বিয়ের বাজার ইত্যাদি) পাইকারিকে পাঠালে এখানে আসবে। দোকানদার দাম দিলে যাচাই করে নিশ্চিত করুন — তখন অর্ডারের লাভ হিসাব হবে বাল্ক দাম দিয়ে।</p>
+<div id="bulkList"></div>
 <h3 style="margin-top:18px">👥 নিবন্ধিত পাইকারি দোকানদার</h3>
 <p class="small">যে দোকানদাররা নিজের কোড বসিয়ে নিবন্ধন করেছে, তাদের তালিকা। কাউকে বন্ধ করতে চাইলে <b>বন্ধ করুন</b> চাপুন — সে আর ঢুকতে পারবে না।</p>
 <button class="primary" onclick="loadSuppliers()">🔄 তালিকা দেখুন</button>
@@ -397,7 +415,302 @@ section h2{color:#6d28d9}
 <script>var SB_URL="https://iucgavgdpbvjnxmnuqce.supabase.co";
 var SB_KEY="sb_publishable_seDgIW1BHnvbNjuJnyxqvw_dK2AKNug";
 var sb = (window.supabase) ? window.supabase.createClient(SB_URL, SB_KEY) : null;
-var FALLBACK = {"shop": "মাসিক বাজার", "company": "নীড়", "whatsapp": "01631421995", "delivery_fee_taka": 0, "show_prices": true, "margin_pct": 0, "products": [{"id": 1, "name": "চাল (খোলা চাল) বি-২৯", "brand": "নৌকা", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 65, "wholesale_price": 0, "daily": true}, {"id": 2, "name": "আটা", "brand": "", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 55, "wholesale_price": 0, "daily": true}, {"id": 16, "name": "পোলাও চাল (চিনিগুঁড়া)", "brand": "", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 110, "wholesale_price": 0, "daily": true}, {"id": 17, "name": "ময়দা", "brand": "ফ্রেশ", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 60, "wholesale_price": 0, "daily": true}, {"id": 31, "name": "বাসমতী চাল", "brand": "", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 180, "wholesale_price": 0, "daily": true}, {"id": 32, "name": "নাজিরশাইল চাল", "brand": "", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 95, "wholesale_price": 0, "daily": true}, {"id": 33, "name": "মিনিকেট চাল", "brand": "", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 78, "wholesale_price": 0, "daily": true}, {"id": 34, "name": "আটা", "brand": "তীর", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 62, "wholesale_price": 0, "daily": true}, {"id": 35, "name": "আটা", "brand": "ফ্রেশ", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 64, "wholesale_price": 0, "daily": true}, {"id": 36, "name": "ময়দা", "brand": "তীর", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 62, "wholesale_price": 0, "daily": true}, {"id": 37, "name": "ময়দা", "brand": "", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 58, "wholesale_price": 0, "daily": true}, {"id": 38, "name": "সুজি", "brand": "", "category": "চাল ও আটা", "unit": "৫০০ গ্রাম", "price_taka": 55, "wholesale_price": 0, "daily": true}, {"id": 39, "name": "চিড়া", "brand": "", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 80, "wholesale_price": 0, "daily": true}, {"id": 40, "name": "মুড়ি", "brand": "", "category": "চাল ও আটা", "unit": "৫০০ গ্রাম", "price_taka": 45, "wholesale_price": 0, "daily": true}, {"id": 134, "name": "আতপ চাল (পাইজাম)", "brand": "", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 70, "wholesale_price": 0, "daily": true}, {"id": 135, "name": "চালের গুঁড়া", "brand": "", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 90, "wholesale_price": 0, "daily": true}, {"id": 136, "name": "সাগু দানা", "brand": "", "category": "চাল ও আটা", "unit": "৫০০ গ্রাম", "price_taka": 60, "wholesale_price": 0, "daily": true}, {"id": 3, "name": "সয়াবিন তেল", "brand": "তীর", "category": "তেল ও ঘি", "unit": "লিটার", "price_taka": 190, "wholesale_price": 0, "daily": true}, {"id": 18, "name": "সরিষার তেল", "brand": "রাধুনী", "category": "তেল ও ঘি", "unit": "লিটার", "price_taka": 320, "wholesale_price": 0, "daily": true}, {"id": 19, "name": "ঘি", "brand": "", "category": "তেল ও ঘি", "unit": "৫০০ গ্রাম", "price_taka": 550, "wholesale_price": 0, "daily": true}, {"id": 41, "name": "সয়াবিন তেল", "brand": "ফ্রেশ", "category": "তেল ও ঘি", "unit": "লিটার", "price_taka": 185, "wholesale_price": 0, "daily": true}, {"id": 42, "name": "সয়াবিন তেল", "brand": "রূপচাঁদা", "category": "তেল ও ঘি", "unit": "লিটার", "price_taka": 195, "wholesale_price": 0, "daily": true}, {"id": 43, "name": "সয়াবিন তেল", "brand": "পুষ্টি", "category": "তেল ও ঘি", "unit": "লিটার", "price_taka": 182, "wholesale_price": 0, "daily": true}, {"id": 44, "name": "সয়াবিন তেল", "brand": "বসুন্ধরা", "category": "তেল ও ঘি", "unit": "লিটার", "price_taka": 188, "wholesale_price": 0, "daily": true}, {"id": 45, "name": "সরিষার তেল", "brand": "প্রাণ", "category": "তেল ও ঘি", "unit": "লিটার", "price_taka": 310, "wholesale_price": 0, "daily": true}, {"id": 46, "name": "সরিষার তেল", "brand": "", "category": "তেল ও ঘি", "unit": "লিটার", "price_taka": 300, "wholesale_price": 0, "daily": true}, {"id": 47, "name": "ঘি", "brand": "আড়ং ডেইরি", "category": "তেল ও ঘি", "unit": "৫০০ গ্রাম", "price_taka": 680, "wholesale_price": 0, "daily": true}, {"id": 48, "name": "নারকেল তেল", "brand": "প্যারাশুট", "category": "তেল ও ঘি", "unit": "২০০ মিলি", "price_taka": 175, "wholesale_price": 0, "daily": true}, {"id": 4, "name": "মসুর ডাল", "brand": "", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 130, "wholesale_price": 0, "daily": true}, {"id": 5, "name": "চিনি", "brand": "", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 125, "wholesale_price": 0, "daily": true}, {"id": 6, "name": "লবণ", "brand": "এসিআই", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 42, "wholesale_price": 0, "daily": true}, {"id": 20, "name": "মুগ ডাল", "brand": "", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 170, "wholesale_price": 0, "daily": true}, {"id": 21, "name": "ছোলা", "brand": "", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 95, "wholesale_price": 0, "daily": true}, {"id": 49, "name": "বুটের ডাল", "brand": "", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 120, "wholesale_price": 0, "daily": true}, {"id": 50, "name": "মটর ডাল", "brand": "", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 105, "wholesale_price": 0, "daily": true}, {"id": 51, "name": "মাষকলাই ডাল", "brand": "", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 150, "wholesale_price": 0, "daily": true}, {"id": 52, "name": "চিনি", "brand": "ফ্রেশ", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 128, "wholesale_price": 0, "daily": true}, {"id": 53, "name": "লবণ", "brand": "মোল্লা সল্ট", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 38, "wholesale_price": 0, "daily": true}, {"id": 54, "name": "লবণ", "brand": "ফ্রেশ", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 40, "wholesale_price": 0, "daily": true}, {"id": 55, "name": "আখের গুড়", "brand": "", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 170, "wholesale_price": 0, "daily": true}, {"id": 137, "name": "খেসারি ডাল", "brand": "", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 95, "wholesale_price": 0, "daily": true}, {"id": 138, "name": "বেসন", "brand": "", "category": "ডাল ও চিনি", "unit": "৫০০ গ্রাম", "price_taka": 70, "wholesale_price": 0, "daily": true}, {"id": 139, "name": "খেজুরের গুড়", "brand": "", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 260, "wholesale_price": 0, "daily": true}, {"id": 7, "name": "হলুদ গুঁড়া", "brand": "", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 45, "wholesale_price": 0, "daily": true}, {"id": 8, "name": "মরিচ গুঁড়া", "brand": "", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 55, "wholesale_price": 0, "daily": true}, {"id": 9, "name": "ধনিয়া গুঁড়া", "brand": "", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 40, "wholesale_price": 0, "daily": true}, {"id": 22, "name": "জিরা", "brand": "", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 90, "wholesale_price": 0, "daily": true}, {"id": 23, "name": "গরম মসলা", "brand": "রাধুনী", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 120, "wholesale_price": 0, "daily": true}, {"id": 56, "name": "হলুদ গুঁড়া", "brand": "রাধুনী", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 60, "wholesale_price": 0, "daily": true}, {"id": 57, "name": "মরিচ গুঁড়া", "brand": "রাধুনী", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 70, "wholesale_price": 0, "daily": true}, {"id": 58, "name": "ধনিয়া গুঁড়া", "brand": "রাধুনী", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 55, "wholesale_price": 0, "daily": true}, {"id": 59, "name": "জিরা গুঁড়া", "brand": "রাধুনী", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 110, "wholesale_price": 0, "daily": true}, {"id": 60, "name": "পাঁচফোড়ন", "brand": "", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 60, "wholesale_price": 0, "daily": true}, {"id": 61, "name": "কালোজিরা", "brand": "", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 80, "wholesale_price": 0, "daily": true}, {"id": 62, "name": "এলাচ", "brand": "", "category": "মসলা", "unit": "৫০ গ্রাম", "price_taka": 350, "wholesale_price": 0, "daily": true}, {"id": 63, "name": "দারুচিনি", "brand": "", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 120, "wholesale_price": 0, "daily": true}, {"id": 64, "name": "লবঙ্গ", "brand": "", "category": "মসলা", "unit": "৫০ গ্রাম", "price_taka": 200, "wholesale_price": 0, "daily": true}, {"id": 65, "name": "তেজপাতা", "brand": "", "category": "মসলা", "unit": "প্যাকেট", "price_taka": 30, "wholesale_price": 0, "daily": true}, {"id": 66, "name": "শুকনা মরিচ", "brand": "", "category": "মসলা", "unit": "২৫০ গ্রাম", "price_taka": 110, "wholesale_price": 0, "daily": true}, {"id": 67, "name": "বিরিয়ানি মসলা", "brand": "রাধুনী", "category": "মসলা", "unit": "প্যাকেট", "price_taka": 70, "wholesale_price": 0, "daily": true}, {"id": 68, "name": "মাংসের মসলা", "brand": "রাধুনী", "category": "মসলা", "unit": "প্যাকেট", "price_taka": 65, "wholesale_price": 0, "daily": true}, {"id": 69, "name": "চাট মসলা", "brand": "প্রাণ", "category": "মসলা", "unit": "প্যাকেট", "price_taka": 50, "wholesale_price": 0, "daily": true}, {"id": 140, "name": "গোলমরিচ গুঁড়া", "brand": "", "category": "মসলা", "unit": "৫০ গ্রাম", "price_taka": 110, "wholesale_price": 0, "daily": true}, {"id": 141, "name": "সরিষা দানা", "brand": "", "category": "মসলা", "unit": "২৫০ গ্রাম", "price_taka": 90, "wholesale_price": 0, "daily": true}, {"id": 142, "name": "মেথি", "brand": "", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 60, "wholesale_price": 0, "daily": true}, {"id": 143, "name": "জায়ফল", "brand": "", "category": "মসলা", "unit": "পিস", "price_taka": 40, "wholesale_price": 0, "daily": true}, {"id": 10, "name": "কাপড় কাচার সাবান", "brand": "", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 35, "wholesale_price": 0, "daily": true}, {"id": 11, "name": "গায়ে মাখার সাবান", "brand": "লাক্স", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 55, "wholesale_price": 0, "daily": true}, {"id": 13, "name": "শ্যাম্পু", "brand": "সানসিল্ক", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 180, "wholesale_price": 0, "daily": true}, {"id": 12, "name": "ডিটারজেন্ট পাউডার", "brand": "সার্ফ এক্সেল", "category": "সাবান ও পরিষ্কারক", "unit": "৫০০ গ্রাম", "price_taka": 110, "wholesale_price": 0, "daily": true}, {"id": 29, "name": "বাসন মাজার লিকুইড", "brand": "ভিম", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 110, "wholesale_price": 0, "daily": true}, {"id": 30, "name": "টয়লেট ক্লিনার", "brand": "হারপিক", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 160, "wholesale_price": 0, "daily": true}, {"id": 95, "name": "কাপড় কাচার সাবান", "brand": "হুইল", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 30, "wholesale_price": 0, "daily": true}, {"id": 96, "name": "গায়ে মাখার সাবান", "brand": "লাইফবয়", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 48, "wholesale_price": 0, "daily": true}, {"id": 97, "name": "গায়ে মাখার সাবান", "brand": "ডেটল", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 62, "wholesale_price": 0, "daily": true}, {"id": 98, "name": "গায়ে মাখার সাবান", "brand": "স্যাভলন", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 58, "wholesale_price": 0, "daily": true}, {"id": 99, "name": "ডিটারজেন্ট পাউডার", "brand": "হুইল", "category": "সাবান ও পরিষ্কারক", "unit": "৫০০ গ্রাম", "price_taka": 85, "wholesale_price": 0, "daily": true}, {"id": 100, "name": "ডিটারজেন্ট পাউডার", "brand": "রিন", "category": "সাবান ও পরিষ্কারক", "unit": "৫০০ গ্রাম", "price_taka": 95, "wholesale_price": 0, "daily": true}, {"id": 101, "name": "ডিটারজেন্ট পাউডার", "brand": "ঘড়ি", "category": "সাবান ও পরিষ্কারক", "unit": "৫০০ গ্রাম", "price_taka": 75, "wholesale_price": 0, "daily": true}, {"id": 102, "name": "শ্যাম্পু", "brand": "ক্লিয়ার", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 195, "wholesale_price": 0, "daily": true}, {"id": 103, "name": "শ্যাম্পু", "brand": "প্যান্টিন", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 215, "wholesale_price": 0, "daily": true}, {"id": 104, "name": "শ্যাম্পু", "brand": "ডাভ", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 240, "wholesale_price": 0, "daily": true}, {"id": 105, "name": "বাসন মাজার বার", "brand": "ভিম", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 38, "wholesale_price": 0, "daily": true}, {"id": 106, "name": "টয়লেট ক্লিনার", "brand": "ডোমেক্স", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 150, "wholesale_price": 0, "daily": true}, {"id": 107, "name": "ফ্লোর ক্লিনার", "brand": "লাইজল", "category": "সাবান ও পরিষ্কারক", "unit": "৫০০ মিলি", "price_taka": 185, "wholesale_price": 0, "daily": true}, {"id": 108, "name": "গ্লাস ক্লিনার", "brand": "কলিন", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 135, "wholesale_price": 0, "daily": true}, {"id": 155, "name": "ফিনাইল", "brand": "", "category": "সাবান ও পরিষ্কারক", "unit": "১ লিটার", "price_taka": 120, "wholesale_price": 0, "daily": true}, {"id": 156, "name": "ব্লিচিং পাউডার", "brand": "", "category": "সাবান ও পরিষ্কারক", "unit": "৫০০ গ্রাম", "price_taka": 60, "wholesale_price": 0, "daily": true}, {"id": 157, "name": "ন্যাপথলিন", "brand": "", "category": "সাবান ও পরিষ্কারক", "unit": "প্যাকেট", "price_taka": 50, "wholesale_price": 0, "daily": true}, {"id": 158, "name": "কাপড় কাচা সোডা", "brand": "", "category": "সাবান ও পরিষ্কারক", "unit": "কেজি", "price_taka": 55, "wholesale_price": 0, "daily": true}, {"id": 159, "name": "বাসন মাজার স্পঞ্জ", "brand": "", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 25, "wholesale_price": 0, "daily": true}, {"id": 27, "name": "টুথপেস্ট", "brand": "ক্লোজআপ", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 120, "wholesale_price": 0, "daily": false}, {"id": 28, "name": "হ্যান্ডওয়াশ", "brand": "লাইফবয়", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 90, "wholesale_price": 0, "daily": false}, {"id": 109, "name": "টুথপেস্ট", "brand": "কোলগেট", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 135, "wholesale_price": 0, "daily": false}, {"id": 110, "name": "টুথপেস্ট", "brand": "পেপসোডেন্ট", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 115, "wholesale_price": 0, "daily": false}, {"id": 111, "name": "টুথপেস্ট", "brand": "সেনসোডাইন", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 190, "wholesale_price": 0, "daily": false}, {"id": 112, "name": "টুথব্রাশ", "brand": "ওরাল-বি", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 70, "wholesale_price": 0, "daily": false}, {"id": 113, "name": "হ্যান্ডওয়াশ", "brand": "ডেটল", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 105, "wholesale_price": 0, "daily": false}, {"id": 114, "name": "হ্যান্ডওয়াশ", "brand": "স্যাভলন", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 95, "wholesale_price": 0, "daily": false}, {"id": 115, "name": "পেট্রোলিয়াম জেলি", "brand": "ভ্যাসলিন", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 95, "wholesale_price": 0, "daily": false}, {"id": 116, "name": "বডি লোশন", "brand": "নিভিয়া", "category": "ব্যক্তিগত যত্ন", "unit": "২০০ মিলি", "price_taka": 320, "wholesale_price": 0, "daily": false}, {"id": 117, "name": "ফেসওয়াশ", "brand": "পন্ডস", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 175, "wholesale_price": 0, "daily": false}, {"id": 118, "name": "স্যানিটারি ন্যাপকিন", "brand": "হুইসপার", "category": "ব্যক্তিগত যত্ন", "unit": "প্যাকেট", "price_taka": 140, "wholesale_price": 0, "daily": false}, {"id": 119, "name": "স্যানিটারি ন্যাপকিন", "brand": "সেনোরা", "category": "ব্যক্তিগত যত্ন", "unit": "প্যাকেট", "price_taka": 120, "wholesale_price": 0, "daily": false}, {"id": 120, "name": "বেবি ডায়াপার", "brand": "মামিপোকো", "category": "ব্যক্তিগত যত্ন", "unit": "প্যাকেট", "price_taka": 650, "wholesale_price": 0, "daily": false}, {"id": 121, "name": "বেবি ডায়াপার", "brand": "হাগিস", "category": "ব্যক্তিগত যত্ন", "unit": "প্যাকেট", "price_taka": 690, "wholesale_price": 0, "daily": false}, {"id": 165, "name": "শেভিং ক্রিম", "brand": "", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 140, "wholesale_price": 0, "daily": false}, {"id": 166, "name": "রেজার ব্লেড", "brand": "", "category": "ব্যক্তিগত যত্ন", "unit": "প্যাকেট", "price_taka": 60, "wholesale_price": 0, "daily": false}, {"id": 167, "name": "চুলের তেল", "brand": "আমলা", "category": "ব্যক্তিগত যত্ন", "unit": "২০০ মিলি", "price_taka": 180, "wholesale_price": 0, "daily": false}, {"id": 24, "name": "চা পাতা", "brand": "ইস্পাহানি মির্জাপুর", "category": "চা ও পানীয়", "unit": "২০০ গ্রাম", "price_taka": 130, "wholesale_price": 0, "daily": false}, {"id": 25, "name": "গুঁড়া দুধ", "brand": "ডানো", "category": "চা ও পানীয়", "unit": "৫০০ গ্রাম", "price_taka": 420, "wholesale_price": 0, "daily": false}, {"id": 70, "name": "চা পাতা", "brand": "সিলন", "category": "চা ও পানীয়", "unit": "২০০ গ্রাম", "price_taka": 125, "wholesale_price": 0, "daily": false}, {"id": 71, "name": "চা পাতা (টি-ব্যাগ)", "brand": "টেটলি", "category": "চা ও পানীয়", "unit": "প্যাকেট", "price_taka": 320, "wholesale_price": 0, "daily": false}, {"id": 72, "name": "গুঁড়া দুধ", "brand": "নেসলে নিডো", "category": "চা ও পানীয়", "unit": "৪০০ গ্রাম", "price_taka": 480, "wholesale_price": 0, "daily": false}, {"id": 73, "name": "গুঁড়া দুধ", "brand": "ডিপ্লোমা", "category": "চা ও পানীয়", "unit": "৫০০ গ্রাম", "price_taka": 400, "wholesale_price": 0, "daily": false}, {"id": 74, "name": "গুঁড়া দুধ", "brand": "মার্কস", "category": "চা ও পানীয়", "unit": "৫০০ গ্রাম", "price_taka": 410, "wholesale_price": 0, "daily": false}, {"id": 75, "name": "কফি", "brand": "নেসক্যাফে", "category": "চা ও পানীয়", "unit": "৫০ গ্রাম", "price_taka": 210, "wholesale_price": 0, "daily": false}, {"id": 76, "name": "হরলিক্স", "brand": "", "category": "চা ও পানীয়", "unit": "৫০০ গ্রাম", "price_taka": 430, "wholesale_price": 0, "daily": false}, {"id": 77, "name": "ট্যাং", "brand": "", "category": "চা ও পানীয়", "unit": "৭৫০ গ্রাম", "price_taka": 520, "wholesale_price": 0, "daily": false}, {"id": 144, "name": "কনডেন্সড মিল্ক", "brand": "ডানো", "category": "চা ও পানীয়", "unit": "৩৯৭ গ্রাম", "price_taka": 140, "wholesale_price": 0, "daily": false}, {"id": 145, "name": "গ্রিন টি", "brand": "", "category": "চা ও পানীয়", "unit": "প্যাকেট", "price_taka": 180, "wholesale_price": 0, "daily": false}, {"id": 146, "name": "কোমল পানীয়", "brand": "", "category": "চা ও পানীয়", "unit": "২ লিটার", "price_taka": 150, "wholesale_price": 0, "daily": false}, {"id": 147, "name": "সেরেলাক (শিশু খাদ্য)", "brand": "", "category": "চা ও পানীয়", "unit": "৪০০ গ্রাম", "price_taka": 420, "wholesale_price": 0, "daily": false}, {"id": 148, "name": "ওরস্যালাইন", "brand": "", "category": "চা ও পানীয়", "unit": "প্যাকেট", "price_taka": 25, "wholesale_price": 0, "daily": false}, {"id": 26, "name": "নুডুলস", "brand": "ম্যাগি", "category": "নাস্তা", "unit": "প্যাকেট", "price_taka": 100, "wholesale_price": 0, "daily": false}, {"id": 78, "name": "নুডুলস", "brand": "কোকোলা", "category": "নাস্তা", "unit": "প্যাকেট", "price_taka": 85, "wholesale_price": 0, "daily": false}, {"id": 79, "name": "নুডুলস", "brand": "মামা", "category": "নাস্তা", "unit": "প্যাকেট", "price_taka": 75, "wholesale_price": 0, "daily": false}, {"id": 80, "name": "নুডুলস", "brand": "ডুডলস", "category": "নাস্তা", "unit": "প্যাকেট", "price_taka": 70, "wholesale_price": 0, "daily": false}, {"id": 81, "name": "বিস্কুট", "brand": "অলিম্পিক", "category": "নাস্তা", "unit": "প্যাকেট", "price_taka": 60, "wholesale_price": 0, "daily": false}, {"id": 82, "name": "বিস্কুট", "brand": "প্রাণ", "category": "নাস্তা", "unit": "প্যাকেট", "price_taka": 55, "wholesale_price": 0, "daily": false}, {"id": 83, "name": "বিস্কুট", "brand": "লেক্সাস", "category": "নাস্তা", "unit": "প্যাকেট", "price_taka": 50, "wholesale_price": 0, "daily": false}, {"id": 84, "name": "চানাচুর", "brand": "বোম্বে সুইটস", "category": "নাস্তা", "unit": "৩০০ গ্রাম", "price_taka": 90, "wholesale_price": 0, "daily": false}, {"id": 85, "name": "চানাচুর", "brand": "প্রাণ", "category": "নাস্তা", "unit": "৩০০ গ্রাম", "price_taka": 85, "wholesale_price": 0, "daily": false}, {"id": 86, "name": "সেমাই", "brand": "প্রাণ", "category": "নাস্তা", "unit": "২০০ গ্রাম", "price_taka": 45, "wholesale_price": 0, "daily": false}, {"id": 87, "name": "লাচ্ছা সেমাই", "brand": "", "category": "নাস্তা", "unit": "২০০ গ্রাম", "price_taka": 60, "wholesale_price": 0, "daily": false}, {"id": 88, "name": "পাস্তা", "brand": "", "category": "নাস্তা", "unit": "৫০০ গ্রাম", "price_taka": 130, "wholesale_price": 0, "daily": false}, {"id": 89, "name": "ওটস", "brand": "কোয়েকার", "category": "নাস্তা", "unit": "৫০০ গ্রাম", "price_taka": 330, "wholesale_price": 0, "daily": false}, {"id": 90, "name": "জ্যাম", "brand": "প্রাণ", "category": "নাস্তা", "unit": "৪০০ গ্রাম", "price_taka": 140, "wholesale_price": 0, "daily": false}, {"id": 91, "name": "টমেটো সস", "brand": "প্রাণ", "category": "নাস্তা", "unit": "৩৪০ গ্রাম", "price_taka": 85, "wholesale_price": 0, "daily": false}, {"id": 92, "name": "আমের আচার", "brand": "প্রাণ", "category": "নাস্তা", "unit": "৪০০ গ্রাম", "price_taka": 150, "wholesale_price": 0, "daily": false}, {"id": 93, "name": "মধু", "brand": "", "category": "নাস্তা", "unit": "২৫০ গ্রাম", "price_taka": 280, "wholesale_price": 0, "daily": false}, {"id": 94, "name": "মধু", "brand": "ডাবর", "category": "নাস্তা", "unit": "২৫০ গ্রাম", "price_taka": 320, "wholesale_price": 0, "daily": false}, {"id": 149, "name": "চিনাবাদাম", "brand": "", "category": "নাস্তা", "unit": "৫০০ গ্রাম", "price_taka": 110, "wholesale_price": 0, "daily": false}, {"id": 150, "name": "জলপাইয়ের আচার", "brand": "প্রাণ", "category": "নাস্তা", "unit": "৪০০ গ্রাম", "price_taka": 160, "wholesale_price": 0, "daily": false}, {"id": 151, "name": "ভিনেগার", "brand": "", "category": "নাস্তা", "unit": "৫০০ মিলি", "price_taka": 80, "wholesale_price": 0, "daily": false}, {"id": 152, "name": "সয়া সস", "brand": "", "category": "নাস্তা", "unit": "৫০০ মিলি", "price_taka": 130, "wholesale_price": 0, "daily": false}, {"id": 153, "name": "বেকিং পাউডার", "brand": "", "category": "নাস্তা", "unit": "১০০ গ্রাম", "price_taka": 70, "wholesale_price": 0, "daily": false}, {"id": 154, "name": "কর্নফ্লাওয়ার", "brand": "", "category": "নাস্তা", "unit": "২০০ গ্রাম", "price_taka": 60, "wholesale_price": 0, "daily": false}, {"id": 122, "name": "টিস্যু পেপার", "brand": "বসুন্ধরা", "category": "ঘরোয়া সামগ্রী", "unit": "প্যাকেট", "price_taka": 65, "wholesale_price": 0, "daily": false}, {"id": 123, "name": "টয়লেট টিস্যু", "brand": "বসুন্ধরা", "category": "ঘরোয়া সামগ্রী", "unit": "প্যাকেট", "price_taka": 90, "wholesale_price": 0, "daily": false}, {"id": 124, "name": "মশার কয়েল", "brand": "মর্টিন", "category": "ঘরোয়া সামগ্রী", "unit": "প্যাকেট", "price_taka": 75, "wholesale_price": 0, "daily": false}, {"id": 125, "name": "মশা মারার স্প্রে", "brand": "মর্টিন", "category": "ঘরোয়া সামগ্রী", "unit": "পিস", "price_taka": 290, "wholesale_price": 0, "daily": false}, {"id": 126, "name": "মোমবাতি", "brand": "", "category": "ঘরোয়া সামগ্রী", "unit": "প্যাকেট", "price_taka": 60, "wholesale_price": 0, "daily": false}, {"id": 127, "name": "পেন্সিল ব্যাটারি", "brand": "", "category": "ঘরোয়া সামগ্রী", "unit": "জোড়া", "price_taka": 70, "wholesale_price": 0, "daily": false}, {"id": 128, "name": "দিয়াশলাই", "brand": "", "category": "ঘরোয়া সামগ্রী", "unit": "প্যাকেট", "price_taka": 20, "wholesale_price": 0, "daily": false}, {"id": 160, "name": "পলিথিন ব্যাগ", "brand": "", "category": "ঘরোয়া সামগ্রী", "unit": "প্যাকেট", "price_taka": 40, "wholesale_price": 0, "daily": false}, {"id": 161, "name": "অ্যালুমিনিয়াম ফয়েল", "brand": "", "category": "ঘরোয়া সামগ্রী", "unit": "পিস", "price_taka": 120, "wholesale_price": 0, "daily": false}, {"id": 162, "name": "মশা মারার ব্যাট", "brand": "", "category": "ঘরোয়া সামগ্রী", "unit": "পিস", "price_taka": 350, "wholesale_price": 0, "daily": false}, {"id": 163, "name": "আগরবাতি", "brand": "", "category": "ঘরোয়া সামগ্রী", "unit": "প্যাকেট", "price_taka": 45, "wholesale_price": 0, "daily": false}, {"id": 164, "name": "গ্যাস লাইটার", "brand": "", "category": "ঘরোয়া সামগ্রী", "unit": "পিস", "price_taka": 60, "wholesale_price": 0, "daily": false}, {"id": 14, "name": "পেঁয়াজ", "brand": "", "category": "অন্যান্য", "unit": "কেজি", "price_taka": 60, "wholesale_price": 0, "daily": false}, {"id": 15, "name": "রসুন", "brand": "", "category": "অন্যান্য", "unit": "কেজি", "price_taka": 160, "wholesale_price": 0, "daily": false}, {"id": 129, "name": "আদা", "brand": "", "category": "অন্যান্য", "unit": "কেজি", "price_taka": 150, "wholesale_price": 0, "daily": false}, {"id": 130, "name": "ডিম", "brand": "", "category": "অন্যান্য", "unit": "ডজন", "price_taka": 155, "wholesale_price": 0, "daily": false}, {"id": 131, "name": "কিসমিস", "brand": "", "category": "অন্যান্য", "unit": "২৫০ গ্রাম", "price_taka": 130, "wholesale_price": 0, "daily": false}, {"id": 132, "name": "কাঠবাদাম", "brand": "", "category": "অন্যান্য", "unit": "২৫০ গ্রাম", "price_taka": 320, "wholesale_price": 0, "daily": false}, {"id": 133, "name": "খেজুর", "brand": "", "category": "অন্যান্য", "unit": "৫০০ গ্রাম", "price_taka": 280, "wholesale_price": 0, "daily": false}, {"id": 168, "name": "আলু", "brand": "", "category": "অন্যান্য", "unit": "কেজি", "price_taka": 45, "wholesale_price": 0, "daily": false}], "packages": [{"id": 1, "size": 2, "name": "২ জনের পরিবার প্যাকেজ", "tagline": "২ জনের পরিবারের মাসিক বাজার", "estimated_total_taka": 1870, "items": [{"product_id": 1, "name": "চাল (কোলা চাল)", "brand": "", "qty_label": "১২ কেজি", "qty_multiplier": 12.0, "line_total_taka": 780}, {"product_id": 3, "name": "সয়াবিন তেল", "brand": "তীর", "qty_label": "২.৫ লিটার", "qty_multiplier": 2.5, "line_total_taka": 475}, {"product_id": 4, "name": "মসুর ডাল", "brand": "", "qty_label": "১ কেজি", "qty_multiplier": 1.0, "line_total_taka": 130}, {"product_id": 5, "name": "চিনি", "brand": "", "qty_label": "১ কেজি", "qty_multiplier": 1.0, "line_total_taka": 125}, {"product_id": 6, "name": "লবণ", "brand": "এসিআই", "qty_label": "১ কেজি", "qty_multiplier": 1.0, "line_total_taka": 42}, {"product_id": 2, "name": "আটা", "brand": "", "qty_label": "২.৫ কেজি", "qty_multiplier": 2.5, "line_total_taka": 138}, {"product_id": 10, "name": "কাপড় কাচার সাবান", "brand": "", "qty_label": "২ পিস", "qty_multiplier": 2.0, "line_total_taka": 70}, {"product_id": 11, "name": "গায়ে মাখার সাবান", "brand": "লাক্স", "qty_label": "২ পিস", "qty_multiplier": 2.0, "line_total_taka": 110}]}, {"id": 2, "size": 3, "name": "৩ জনের পরিবার প্যাকেজ", "tagline": "৩ জনের পরিবারের মাসিক বাজার", "estimated_total_taka": 2504, "items": [{"product_id": 1, "name": "চাল (কোলা চাল)", "brand": "", "qty_label": "১৮ কেজি", "qty_multiplier": 18.0, "line_total_taka": 1170}, {"product_id": 3, "name": "সয়াবিন তেল", "brand": "তীর", "qty_label": "৩.৫ লিটার", "qty_multiplier": 3.5, "line_total_taka": 665}, {"product_id": 4, "name": "মসুর ডাল", "brand": "", "qty_label": "১ কেজি", "qty_multiplier": 1.0, "line_total_taka": 130}, {"product_id": 5, "name": "চিনি", "brand": "", "qty_label": "১ কেজি", "qty_multiplier": 1.0, "line_total_taka": 125}, {"product_id": 6, "name": "লবণ", "brand": "এসিআই", "qty_label": "১ কেজি", "qty_multiplier": 1.0, "line_total_taka": 42}, {"product_id": 2, "name": "আটা", "brand": "", "qty_label": "৩.৫ কেজি", "qty_multiplier": 3.5, "line_total_taka": 192}, {"product_id": 10, "name": "কাপড় কাচার সাবান", "brand": "", "qty_label": "২ পিস", "qty_multiplier": 2.0, "line_total_taka": 70}, {"product_id": 11, "name": "গায়ে মাখার সাবান", "brand": "লাক্স", "qty_label": "২ পিস", "qty_multiplier": 2.0, "line_total_taka": 110}]}, {"id": 3, "size": 4, "name": "৪ জনের পরিবার প্যাকেজ", "tagline": "৪ জনের পরিবারের মাসিক বাজার", "estimated_total_taka": 3895, "items": [{"product_id": 1, "name": "চাল (কোলা চাল)", "brand": "", "qty_label": "২২ কেজি", "qty_multiplier": 22.0, "line_total_taka": 1430}, {"product_id": 3, "name": "সয়াবিন তেল", "brand": "তীর", "qty_label": "৪.৫ লিটার", "qty_multiplier": 4.5, "line_total_taka": 855}, {"product_id": 4, "name": "মসুর ডাল", "brand": "", "qty_label": "২ কেজি", "qty_multiplier": 2.0, "line_total_taka": 260}, {"product_id": 5, "name": "চিনি", "brand": "", "qty_label": "২ কেজি", "qty_multiplier": 2.0, "line_total_taka": 250}, {"product_id": 6, "name": "লবণ", "brand": "এসিআই", "qty_label": "১ কেজি", "qty_multiplier": 1.0, "line_total_taka": 42}, {"product_id": 2, "name": "আটা", "brand": "", "qty_label": "৪.৫ কেজি", "qty_multiplier": 4.5, "line_total_taka": 248}, {"product_id": 7, "name": "হলুদ গুঁড়া", "brand": "", "qty_label": "১০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 45}, {"product_id": 8, "name": "মরিচ গুঁড়া", "brand": "", "qty_label": "১০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 55}, {"product_id": 9, "name": "ধনিয়া গুঁড়া", "brand": "", "qty_label": "১০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 40}, {"product_id": 10, "name": "কাপড় কাচার সাবান", "brand": "", "qty_label": "৪ পিস", "qty_multiplier": 4.0, "line_total_taka": 140}, {"product_id": 11, "name": "গায়ে মাখার সাবান", "brand": "লাক্স", "qty_label": "২ পিস", "qty_multiplier": 2.0, "line_total_taka": 110}, {"product_id": 12, "name": "ডিটারজেন্ট পাউডার", "brand": "সার্ফ এক্সেল", "qty_label": "৫০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 110}, {"product_id": 13, "name": "শ্যাম্পু", "brand": "সানসিল্ক", "qty_label": "১ পিস", "qty_multiplier": 1.0, "line_total_taka": 180}, {"product_id": 24, "name": "চা পাতা", "brand": "ইস্পাহানি মির্জাপুর", "qty_label": "২০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 130}]}, {"id": 4, "size": 5, "name": "৫ জনের পরিবার প্যাকেজ", "tagline": "৫ জনের পরিবারের মাসিক বাজার", "estimated_total_taka": 4529, "items": [{"product_id": 1, "name": "চাল (কোলা চাল)", "brand": "", "qty_label": "২৮ কেজি", "qty_multiplier": 28.0, "line_total_taka": 1820}, {"product_id": 3, "name": "সয়াবিন তেল", "brand": "তীর", "qty_label": "৫.৫ লিটার", "qty_multiplier": 5.5, "line_total_taka": 1045}, {"product_id": 4, "name": "মসুর ডাল", "brand": "", "qty_label": "২ কেজি", "qty_multiplier": 2.0, "line_total_taka": 260}, {"product_id": 5, "name": "চিনি", "brand": "", "qty_label": "২ কেজি", "qty_multiplier": 2.0, "line_total_taka": 250}, {"product_id": 6, "name": "লবণ", "brand": "এসিআই", "qty_label": "১ কেজি", "qty_multiplier": 1.0, "line_total_taka": 42}, {"product_id": 2, "name": "আটা", "brand": "", "qty_label": "৫.৫ কেজি", "qty_multiplier": 5.5, "line_total_taka": 302}, {"product_id": 7, "name": "হলুদ গুঁড়া", "brand": "", "qty_label": "১০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 45}, {"product_id": 8, "name": "মরিচ গুঁড়া", "brand": "", "qty_label": "১০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 55}, {"product_id": 9, "name": "ধনিয়া গুঁড়া", "brand": "", "qty_label": "১০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 40}, {"product_id": 10, "name": "কাপড় কাচার সাবান", "brand": "", "qty_label": "৪ পিস", "qty_multiplier": 4.0, "line_total_taka": 140}, {"product_id": 11, "name": "গায়ে মাখার সাবান", "brand": "লাক্স", "qty_label": "২ পিস", "qty_multiplier": 2.0, "line_total_taka": 110}, {"product_id": 12, "name": "ডিটারজেন্ট পাউডার", "brand": "সার্ফ এক্সেল", "qty_label": "৫০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 110}, {"product_id": 13, "name": "শ্যাম্পু", "brand": "সানসিল্ক", "qty_label": "১ পিস", "qty_multiplier": 1.0, "line_total_taka": 180}, {"product_id": 24, "name": "চা পাতা", "brand": "ইস্পাহানি মির্জাপুর", "qty_label": "২০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 130}]}, {"id": 5, "size": 6, "name": "৬ জনের পরিবার প্যাকেজ", "tagline": "৬ জনের পরিবারের মাসিক বাজার", "estimated_total_taka": 5677, "items": [{"product_id": 1, "name": "চাল (কোলা চাল)", "brand": "", "qty_label": "৩৪.৫ কেজি", "qty_multiplier": 34.5, "line_total_taka": 2242}, {"product_id": 3, "name": "সয়াবিন তেল", "brand": "তীর", "qty_label": "৭ লিটার", "qty_multiplier": 7.0, "line_total_taka": 1330}, {"product_id": 4, "name": "মসুর ডাল", "brand": "", "qty_label": "২.৫ কেজি", "qty_multiplier": 2.5, "line_total_taka": 325}, {"product_id": 5, "name": "চিনি", "brand": "", "qty_label": "২.৫ কেজি", "qty_multiplier": 2.5, "line_total_taka": 312}, {"product_id": 6, "name": "লবণ", "brand": "এসিআই", "qty_label": "১.৫ কেজি", "qty_multiplier": 1.5, "line_total_taka": 63}, {"product_id": 2, "name": "আটা", "brand": "", "qty_label": "৭ কেজি", "qty_multiplier": 7.0, "line_total_taka": 385}, {"product_id": 7, "name": "হলুদ গুঁড়া", "brand": "", "qty_label": "২০০ গ্রাম", "qty_multiplier": 2.0, "line_total_taka": 90}, {"product_id": 8, "name": "মরিচ গুঁড়া", "brand": "", "qty_label": "২০০ গ্রাম", "qty_multiplier": 2.0, "line_total_taka": 110}, {"product_id": 9, "name": "ধনিয়া গুঁড়া", "brand": "", "qty_label": "২০০ গ্রাম", "qty_multiplier": 2.0, "line_total_taka": 80}, {"product_id": 10, "name": "কাপড় কাচার সাবান", "brand": "", "qty_label": "৫ পিস", "qty_multiplier": 5.0, "line_total_taka": 175}, {"product_id": 11, "name": "গায়ে মাখার সাবান", "brand": "লাক্স", "qty_label": "৩ পিস", "qty_multiplier": 3.0, "line_total_taka": 165}, {"product_id": 12, "name": "ডিটারজেন্ট পাউডার", "brand": "সার্ফ এক্সেল", "qty_label": "১ কেজি", "qty_multiplier": 2.0, "line_total_taka": 220}, {"product_id": 13, "name": "শ্যাম্পু", "brand": "সানসিল্ক", "qty_label": "১ পিস", "qty_multiplier": 1.0, "line_total_taka": 180}]}, {"id": 6, "size": 7, "name": "৭ জনের পরিবার প্যাকেজ", "tagline": "৭ জনের পরিবারের মাসিক বাজার", "estimated_total_taka": 6519, "items": [{"product_id": 1, "name": "চাল (কোলা চাল)", "brand": "", "qty_label": "৪০ কেজি", "qty_multiplier": 40.0, "line_total_taka": 2600}, {"product_id": 3, "name": "সয়াবিন তেল", "brand": "তীর", "qty_label": "৮ লিটার", "qty_multiplier": 8.0, "line_total_taka": 1520}, {"product_id": 4, "name": "মসুর ডাল", "brand": "", "qty_label": "৩ কেজি", "qty_multiplier": 3.0, "line_total_taka": 390}, {"product_id": 5, "name": "চিনি", "brand": "", "qty_label": "৩ কেজি", "qty_multiplier": 3.0, "line_total_taka": 375}, {"product_id": 6, "name": "লবণ", "brand": "এসিআই", "qty_label": "২ কেজি", "qty_multiplier": 2.0, "line_total_taka": 84}, {"product_id": 2, "name": "আটা", "brand": "", "qty_label": "৮ কেজি", "qty_multiplier": 8.0, "line_total_taka": 440}, {"product_id": 7, "name": "হলুদ গুঁড়া", "brand": "", "qty_label": "২০০ গ্রাম", "qty_multiplier": 2.0, "line_total_taka": 90}, {"product_id": 8, "name": "মরিচ গুঁড়া", "brand": "", "qty_label": "২০০ গ্রাম", "qty_multiplier": 2.0, "line_total_taka": 110}, {"product_id": 9, "name": "ধনিয়া গুঁড়া", "brand": "", "qty_label": "২০০ গ্রাম", "qty_multiplier": 2.0, "line_total_taka": 80}, {"product_id": 10, "name": "কাপড় কাচার সাবান", "brand": "", "qty_label": "৬ পিস", "qty_multiplier": 6.0, "line_total_taka": 210}, {"product_id": 11, "name": "গায়ে মাখার সাবান", "brand": "লাক্স", "qty_label": "৪ পিস", "qty_multiplier": 4.0, "line_total_taka": 220}, {"product_id": 12, "name": "ডিটারজেন্ট পাউডার", "brand": "সার্ফ এক্সেল", "qty_label": "১ কেজি", "qty_multiplier": 2.0, "line_total_taka": 220}, {"product_id": 13, "name": "শ্যাম্পু", "brand": "সানসিল্ক", "qty_label": "১ পিস", "qty_multiplier": 1.0, "line_total_taka": 180}]}, {"id": 7, "size": 8, "name": "৮ জনের পরিবার প্যাকেজ", "tagline": "৮ জনের পরিবারের মাসিক বাজার", "estimated_total_taka": 7361, "items": [{"product_id": 1, "name": "চাল (কোলা চাল)", "brand": "", "qty_label": "৪৫.৫ কেজি", "qty_multiplier": 45.5, "line_total_taka": 2958}, {"product_id": 3, "name": "সয়াবিন তেল", "brand": "তীর", "qty_label": "৯ লিটার", "qty_multiplier": 9.0, "line_total_taka": 1710}, {"product_id": 4, "name": "মসুর ডাল", "brand": "", "qty_label": "৩.৫ কেজি", "qty_multiplier": 3.5, "line_total_taka": 455}, {"product_id": 5, "name": "চিনি", "brand": "", "qty_label": "৩.৫ কেজি", "qty_multiplier": 3.5, "line_total_taka": 438}, {"product_id": 6, "name": "লবণ", "brand": "এসিআই", "qty_label": "২.৫ কেজি", "qty_multiplier": 2.5, "line_total_taka": 105}, {"product_id": 2, "name": "আটা", "brand": "", "qty_label": "৯ কেজি", "qty_multiplier": 9.0, "line_total_taka": 495}, {"product_id": 7, "name": "হলুদ গুঁড়া", "brand": "", "qty_label": "২০০ গ্রাম", "qty_multiplier": 2.0, "line_total_taka": 90}, {"product_id": 8, "name": "মরিচ গুঁড়া", "brand": "", "qty_label": "২০০ গ্রাম", "qty_multiplier": 2.0, "line_total_taka": 110}, {"product_id": 9, "name": "ধনিয়া গুঁড়া", "brand": "", "qty_label": "২০০ গ্রাম", "qty_multiplier": 2.0, "line_total_taka": 80}, {"product_id": 10, "name": "কাপড় কাচার সাবান", "brand": "", "qty_label": "৭ পিস", "qty_multiplier": 7.0, "line_total_taka": 245}, {"product_id": 11, "name": "গায়ে মাখার সাবান", "brand": "লাক্স", "qty_label": "৫ পিস", "qty_multiplier": 5.0, "line_total_taka": 275}, {"product_id": 12, "name": "ডিটারজেন্ট পাউডার", "brand": "সার্ফ এক্সেল", "qty_label": "১ কেজি", "qty_multiplier": 2.0, "line_total_taka": 220}, {"product_id": 13, "name": "শ্যাম্পু", "brand": "সানসিল্ক", "qty_label": "১ পিস", "qty_multiplier": 1.0, "line_total_taka": 180}]}]};
+var FALLBACK = {"shop": "মাসিক বাজার", "company": "নীড়", "whatsapp": "01631421995", "delivery_fee_taka": 0, "show_prices": true, "margin_pct": 0, "products": [{"id": 1, "name": "চাল (খোলা চাল) বি-২৯", "brand": "নৌকা", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 65, "wholesale_price": 0, "daily": true}, {"id": 2, "name": "আটা", "brand": "", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 55, "wholesale_price": 0, "daily": true}, {"id": 16, "name": "পোলাও চাল (চিনিগুঁড়া)", "brand": "", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 110, "wholesale_price": 0, "daily": true}, {"id": 17, "name": "ময়দা", "brand": "ফ্রেশ", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 60, "wholesale_price": 0, "daily": true}, {"id": 31, "name": "বাসমতী চাল", "brand": "", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 180, "wholesale_price": 0, "daily": true}, {"id": 32, "name": "নাজিরশাইল চাল", "brand": "", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 95, "wholesale_price": 0, "daily": true}, {"id": 33, "name": "মিনিকেট চাল", "brand": "", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 78, "wholesale_price": 0, "daily": true}, {"id": 34, "name": "আটা", "brand": "তীর", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 62, "wholesale_price": 0, "daily": true}, {"id": 35, "name": "আটা", "brand": "ফ্রেশ", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 64, "wholesale_price": 0, "daily": true}, {"id": 36, "name": "ময়দা", "brand": "তীর", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 62, "wholesale_price": 0, "daily": true}, {"id": 37, "name": "ময়দা", "brand": "", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 58, "wholesale_price": 0, "daily": true}, {"id": 38, "name": "সুজি", "brand": "", "category": "চাল ও আটা", "unit": "৫০০ গ্রাম", "price_taka": 55, "wholesale_price": 0, "daily": true}, {"id": 39, "name": "চিড়া", "brand": "", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 80, "wholesale_price": 0, "daily": true}, {"id": 40, "name": "মুড়ি", "brand": "", "category": "চাল ও আটা", "unit": "৫০০ গ্রাম", "price_taka": 45, "wholesale_price": 0, "daily": true}, {"id": 134, "name": "আতপ চাল (পাইজাম)", "brand": "", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 70, "wholesale_price": 0, "daily": true}, {"id": 135, "name": "চালের গুঁড়া", "brand": "", "category": "চাল ও আটা", "unit": "কেজি", "price_taka": 90, "wholesale_price": 0, "daily": true}, {"id": 136, "name": "সাগু দানা", "brand": "", "category": "চাল ও আটা", "unit": "৫০০ গ্রাম", "price_taka": 60, "wholesale_price": 0, "daily": true}, {"id": 3, "name": "সয়াবিন তেল", "brand": "তীর", "category": "তেল ও ঘি", "unit": "লিটার", "price_taka": 190, "wholesale_price": 0, "daily": true}, {"id": 18, "name": "সরিষার তেল", "brand": "রাধুনী", "category": "তেল ও ঘি", "unit": "লিটার", "price_taka": 320, "wholesale_price": 0, "daily": true}, {"id": 19, "name": "ঘি", "brand": "", "category": "তেল ও ঘি", "unit": "৫০০ গ্রাম", "price_taka": 550, "wholesale_price": 0, "daily": true}, {"id": 41, "name": "সয়াবিন তেল", "brand": "ফ্রেশ", "category": "তেল ও ঘি", "unit": "লিটার", "price_taka": 185, "wholesale_price": 0, "daily": true}, {"id": 42, "name": "সয়াবিন তেল", "brand": "রূপচাঁদা", "category": "তেল ও ঘি", "unit": "লিটার", "price_taka": 195, "wholesale_price": 0, "daily": true}, {"id": 43, "name": "সয়াবিন তেল", "brand": "পুষ্টি", "category": "তেল ও ঘি", "unit": "লিটার", "price_taka": 182, "wholesale_price": 0, "daily": true}, {"id": 44, "name": "সয়াবিন তেল", "brand": "বসুন্ধরা", "category": "তেল ও ঘি", "unit": "লিটার", "price_taka": 188, "wholesale_price": 0, "daily": true}, {"id": 45, "name": "সরিষার তেল", "brand": "প্রাণ", "category": "তেল ও ঘি", "unit": "লিটার", "price_taka": 310, "wholesale_price": 0, "daily": true}, {"id": 46, "name": "সরিষার তেল", "brand": "", "category": "তেল ও ঘি", "unit": "লিটার", "price_taka": 300, "wholesale_price": 0, "daily": true}, {"id": 47, "name": "ঘি", "brand": "আড়ং ডেইরি", "category": "তেল ও ঘি", "unit": "৫০০ গ্রাম", "price_taka": 680, "wholesale_price": 0, "daily": true}, {"id": 48, "name": "নারকেল তেল", "brand": "প্যারাশুট", "category": "তেল ও ঘি", "unit": "২০০ মিলি", "price_taka": 175, "wholesale_price": 0, "daily": true}, {"id": 4, "name": "মসুর ডাল", "brand": "", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 130, "wholesale_price": 0, "daily": true}, {"id": 5, "name": "চিনি", "brand": "", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 125, "wholesale_price": 0, "daily": true}, {"id": 6, "name": "লবণ", "brand": "এসিআই", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 42, "wholesale_price": 0, "daily": true}, {"id": 20, "name": "মুগ ডাল", "brand": "", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 170, "wholesale_price": 0, "daily": true}, {"id": 21, "name": "ছোলা", "brand": "", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 95, "wholesale_price": 0, "daily": true}, {"id": 49, "name": "বুটের ডাল", "brand": "", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 120, "wholesale_price": 0, "daily": true}, {"id": 50, "name": "মটর ডাল", "brand": "", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 105, "wholesale_price": 0, "daily": true}, {"id": 51, "name": "মাষকলাই ডাল", "brand": "", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 150, "wholesale_price": 0, "daily": true}, {"id": 52, "name": "চিনি", "brand": "ফ্রেশ", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 128, "wholesale_price": 0, "daily": true}, {"id": 53, "name": "লবণ", "brand": "মোল্লা সল্ট", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 38, "wholesale_price": 0, "daily": true}, {"id": 54, "name": "লবণ", "brand": "ফ্রেশ", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 40, "wholesale_price": 0, "daily": true}, {"id": 55, "name": "আখের গুড়", "brand": "", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 170, "wholesale_price": 0, "daily": true}, {"id": 137, "name": "খেসারি ডাল", "brand": "", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 95, "wholesale_price": 0, "daily": true}, {"id": 138, "name": "বেসন", "brand": "", "category": "ডাল ও চিনি", "unit": "৫০০ গ্রাম", "price_taka": 70, "wholesale_price": 0, "daily": true}, {"id": 139, "name": "খেজুরের গুড়", "brand": "", "category": "ডাল ও চিনি", "unit": "কেজি", "price_taka": 260, "wholesale_price": 0, "daily": true}, {"id": 7, "name": "হলুদ গুঁড়া", "brand": "", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 45, "wholesale_price": 0, "daily": true}, {"id": 8, "name": "মরিচ গুঁড়া", "brand": "", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 55, "wholesale_price": 0, "daily": true}, {"id": 9, "name": "ধনিয়া গুঁড়া", "brand": "", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 40, "wholesale_price": 0, "daily": true}, {"id": 22, "name": "জিরা", "brand": "", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 90, "wholesale_price": 0, "daily": true}, {"id": 23, "name": "গরম মসলা", "brand": "রাধুনী", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 120, "wholesale_price": 0, "daily": true}, {"id": 56, "name": "হলুদ গুঁড়া", "brand": "রাধুনী", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 60, "wholesale_price": 0, "daily": true}, {"id": 57, "name": "মরিচ গুঁড়া", "brand": "রাধুনী", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 70, "wholesale_price": 0, "daily": true}, {"id": 58, "name": "ধনিয়া গুঁড়া", "brand": "রাধুনী", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 55, "wholesale_price": 0, "daily": true}, {"id": 59, "name": "জিরা গুঁড়া", "brand": "রাধুনী", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 110, "wholesale_price": 0, "daily": true}, {"id": 60, "name": "পাঁচফোড়ন", "brand": "", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 60, "wholesale_price": 0, "daily": true}, {"id": 61, "name": "কালোজিরা", "brand": "", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 80, "wholesale_price": 0, "daily": true}, {"id": 62, "name": "এলাচ", "brand": "", "category": "মসলা", "unit": "৫০ গ্রাম", "price_taka": 350, "wholesale_price": 0, "daily": true}, {"id": 63, "name": "দারুচিনি", "brand": "", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 120, "wholesale_price": 0, "daily": true}, {"id": 64, "name": "লবঙ্গ", "brand": "", "category": "মসলা", "unit": "৫০ গ্রাম", "price_taka": 200, "wholesale_price": 0, "daily": true}, {"id": 65, "name": "তেজপাতা", "brand": "", "category": "মসলা", "unit": "প্যাকেট", "price_taka": 30, "wholesale_price": 0, "daily": true}, {"id": 66, "name": "শুকনা মরিচ", "brand": "", "category": "মসলা", "unit": "২৫০ গ্রাম", "price_taka": 110, "wholesale_price": 0, "daily": true}, {"id": 67, "name": "বিরিয়ানি মসলা", "brand": "রাধুনী", "category": "মসলা", "unit": "প্যাকেট", "price_taka": 70, "wholesale_price": 0, "daily": true}, {"id": 68, "name": "মাংসের মসলা", "brand": "রাধুনী", "category": "মসলা", "unit": "প্যাকেট", "price_taka": 65, "wholesale_price": 0, "daily": true}, {"id": 69, "name": "চাট মসলা", "brand": "প্রাণ", "category": "মসলা", "unit": "প্যাকেট", "price_taka": 50, "wholesale_price": 0, "daily": true}, {"id": 140, "name": "গোলমরিচ গুঁড়া", "brand": "", "category": "মসলা", "unit": "৫০ গ্রাম", "price_taka": 110, "wholesale_price": 0, "daily": true}, {"id": 141, "name": "সরিষা দানা", "brand": "", "category": "মসলা", "unit": "২৫০ গ্রাম", "price_taka": 90, "wholesale_price": 0, "daily": true}, {"id": 142, "name": "মেথি", "brand": "", "category": "মসলা", "unit": "১০০ গ্রাম", "price_taka": 60, "wholesale_price": 0, "daily": true}, {"id": 143, "name": "জায়ফল", "brand": "", "category": "মসলা", "unit": "পিস", "price_taka": 40, "wholesale_price": 0, "daily": true}, {"id": 10, "name": "কাপড় কাচার সাবান", "brand": "", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 35, "wholesale_price": 0, "daily": true}, {"id": 11, "name": "গায়ে মাখার সাবান", "brand": "লাক্স", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 55, "wholesale_price": 0, "daily": true}, {"id": 13, "name": "শ্যাম্পু", "brand": "সানসিল্ক", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 180, "wholesale_price": 0, "daily": true}, {"id": 12, "name": "ডিটারজেন্ট পাউডার", "brand": "সার্ফ এক্সেল", "category": "সাবান ও পরিষ্কারক", "unit": "৫০০ গ্রাম", "price_taka": 110, "wholesale_price": 0, "daily": true}, {"id": 29, "name": "বাসন মাজার লিকুইড", "brand": "ভিম", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 110, "wholesale_price": 0, "daily": true}, {"id": 30, "name": "টয়লেট ক্লিনার", "brand": "হারপিক", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 160, "wholesale_price": 0, "daily": true}, {"id": 95, "name": "কাপড় কাচার সাবান", "brand": "হুইল", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 30, "wholesale_price": 0, "daily": true}, {"id": 96, "name": "গায়ে মাখার সাবান", "brand": "লাইফবয়", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 48, "wholesale_price": 0, "daily": true}, {"id": 97, "name": "গায়ে মাখার সাবান", "brand": "ডেটল", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 62, "wholesale_price": 0, "daily": true}, {"id": 98, "name": "গায়ে মাখার সাবান", "brand": "স্যাভলন", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 58, "wholesale_price": 0, "daily": true}, {"id": 99, "name": "ডিটারজেন্ট পাউডার", "brand": "হুইল", "category": "সাবান ও পরিষ্কারক", "unit": "৫০০ গ্রাম", "price_taka": 85, "wholesale_price": 0, "daily": true}, {"id": 100, "name": "ডিটারজেন্ট পাউডার", "brand": "রিন", "category": "সাবান ও পরিষ্কারক", "unit": "৫০০ গ্রাম", "price_taka": 95, "wholesale_price": 0, "daily": true}, {"id": 101, "name": "ডিটারজেন্ট পাউডার", "brand": "ঘড়ি", "category": "সাবান ও পরিষ্কারক", "unit": "৫০০ গ্রাম", "price_taka": 75, "wholesale_price": 0, "daily": true}, {"id": 102, "name": "শ্যাম্পু", "brand": "ক্লিয়ার", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 195, "wholesale_price": 0, "daily": true}, {"id": 103, "name": "শ্যাম্পু", "brand": "প্যান্টিন", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 215, "wholesale_price": 0, "daily": true}, {"id": 104, "name": "শ্যাম্পু", "brand": "ডাভ", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 240, "wholesale_price": 0, "daily": true}, {"id": 105, "name": "বাসন মাজার বার", "brand": "ভিম", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 38, "wholesale_price": 0, "daily": true}, {"id": 106, "name": "টয়লেট ক্লিনার", "brand": "ডোমেক্স", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 150, "wholesale_price": 0, "daily": true}, {"id": 107, "name": "ফ্লোর ক্লিনার", "brand": "লাইজল", "category": "সাবান ও পরিষ্কারক", "unit": "৫০০ মিলি", "price_taka": 185, "wholesale_price": 0, "daily": true}, {"id": 108, "name": "গ্লাস ক্লিনার", "brand": "কলিন", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 135, "wholesale_price": 0, "daily": true}, {"id": 155, "name": "ফিনাইল", "brand": "", "category": "সাবান ও পরিষ্কারক", "unit": "১ লিটার", "price_taka": 120, "wholesale_price": 0, "daily": true}, {"id": 156, "name": "ব্লিচিং পাউডার", "brand": "", "category": "সাবান ও পরিষ্কারক", "unit": "৫০০ গ্রাম", "price_taka": 60, "wholesale_price": 0, "daily": true}, {"id": 157, "name": "ন্যাপথলিন", "brand": "", "category": "সাবান ও পরিষ্কারক", "unit": "প্যাকেট", "price_taka": 50, "wholesale_price": 0, "daily": true}, {"id": 158, "name": "কাপড় কাচা সোডা", "brand": "", "category": "সাবান ও পরিষ্কারক", "unit": "কেজি", "price_taka": 55, "wholesale_price": 0, "daily": true}, {"id": 159, "name": "বাসন মাজার স্পঞ্জ", "brand": "", "category": "সাবান ও পরিষ্কারক", "unit": "পিস", "price_taka": 25, "wholesale_price": 0, "daily": true}, {"id": 27, "name": "টুথপেস্ট", "brand": "ক্লোজআপ", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 120, "wholesale_price": 0, "daily": false}, {"id": 28, "name": "হ্যান্ডওয়াশ", "brand": "লাইফবয়", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 90, "wholesale_price": 0, "daily": false}, {"id": 109, "name": "টুথপেস্ট", "brand": "কোলগেট", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 135, "wholesale_price": 0, "daily": false}, {"id": 110, "name": "টুথপেস্ট", "brand": "পেপসোডেন্ট", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 115, "wholesale_price": 0, "daily": false}, {"id": 111, "name": "টুথপেস্ট", "brand": "সেনসোডাইন", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 190, "wholesale_price": 0, "daily": false}, {"id": 112, "name": "টুথব্রাশ", "brand": "ওরাল-বি", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 70, "wholesale_price": 0, "daily": false}, {"id": 113, "name": "হ্যান্ডওয়াশ", "brand": "ডেটল", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 105, "wholesale_price": 0, "daily": false}, {"id": 114, "name": "হ্যান্ডওয়াশ", "brand": "স্যাভলন", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 95, "wholesale_price": 0, "daily": false}, {"id": 115, "name": "পেট্রোলিয়াম জেলি", "brand": "ভ্যাসলিন", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 95, "wholesale_price": 0, "daily": false}, {"id": 116, "name": "বডি লোশন", "brand": "নিভিয়া", "category": "ব্যক্তিগত যত্ন", "unit": "২০০ মিলি", "price_taka": 320, "wholesale_price": 0, "daily": false}, {"id": 117, "name": "ফেসওয়াশ", "brand": "পন্ডস", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 175, "wholesale_price": 0, "daily": false}, {"id": 118, "name": "স্যানিটারি ন্যাপকিন", "brand": "হুইসপার", "category": "ব্যক্তিগত যত্ন", "unit": "প্যাকেট", "price_taka": 140, "wholesale_price": 0, "daily": false}, {"id": 119, "name": "স্যানিটারি ন্যাপকিন", "brand": "সেনোরা", "category": "ব্যক্তিগত যত্ন", "unit": "প্যাকেট", "price_taka": 120, "wholesale_price": 0, "daily": false}, {"id": 120, "name": "বেবি ডায়াপার", "brand": "মামিপোকো", "category": "ব্যক্তিগত যত্ন", "unit": "প্যাকেট", "price_taka": 650, "wholesale_price": 0, "daily": false}, {"id": 121, "name": "বেবি ডায়াপার", "brand": "হাগিস", "category": "ব্যক্তিগত যত্ন", "unit": "প্যাকেট", "price_taka": 690, "wholesale_price": 0, "daily": false}, {"id": 165, "name": "শেভিং ক্রিম", "brand": "", "category": "ব্যক্তিগত যত্ন", "unit": "পিস", "price_taka": 140, "wholesale_price": 0, "daily": false}, {"id": 166, "name": "রেজার ব্লেড", "brand": "", "category": "ব্যক্তিগত যত্ন", "unit": "প্যাকেট", "price_taka": 60, "wholesale_price": 0, "daily": false}, {"id": 167, "name": "চুলের তেল", "brand": "আমলা", "category": "ব্যক্তিগত যত্ন", "unit": "২০০ মিলি", "price_taka": 180, "wholesale_price": 0, "daily": false}, {"id": 24, "name": "চা পাতা", "brand": "ইস্পাহানি মির্জাপুর", "category": "চা ও পানীয়", "unit": "২০০ গ্রাম", "price_taka": 130, "wholesale_price": 0, "daily": false}, {"id": 25, "name": "গুঁড়া দুধ", "brand": "ডানো", "category": "চা ও পানীয়", "unit": "৫০০ গ্রাম", "price_taka": 420, "wholesale_price": 0, "daily": false}, {"id": 70, "name": "চা পাতা", "brand": "সিলন", "category": "চা ও পানীয়", "unit": "২০০ গ্রাম", "price_taka": 125, "wholesale_price": 0, "daily": false}, {"id": 71, "name": "চা পাতা (টি-ব্যাগ)", "brand": "টেটলি", "category": "চা ও পানীয়", "unit": "প্যাকেট", "price_taka": 320, "wholesale_price": 0, "daily": false}, {"id": 72, "name": "গুঁড়া দুধ", "brand": "নেসলে নিডো", "category": "চা ও পানীয়", "unit": "৪০০ গ্রাম", "price_taka": 480, "wholesale_price": 0, "daily": false}, {"id": 73, "name": "গুঁড়া দুধ", "brand": "ডিপ্লোমা", "category": "চা ও পানীয়", "unit": "৫০০ গ্রাম", "price_taka": 400, "wholesale_price": 0, "daily": false}, {"id": 74, "name": "গুঁড়া দুধ", "brand": "মার্কস", "category": "চা ও পানীয়", "unit": "৫০০ গ্রাম", "price_taka": 410, "wholesale_price": 0, "daily": false}, {"id": 75, "name": "কফি", "brand": "নেসক্যাফে", "category": "চা ও পানীয়", "unit": "৫০ গ্রাম", "price_taka": 210, "wholesale_price": 0, "daily": false}, {"id": 76, "name": "হরলিক্স", "brand": "", "category": "চা ও পানীয়", "unit": "৫০০ গ্রাম", "price_taka": 430, "wholesale_price": 0, "daily": false}, {"id": 77, "name": "ট্যাং", "brand": "", "category": "চা ও পানীয়", "unit": "৭৫০ গ্রাম", "price_taka": 520, "wholesale_price": 0, "daily": false}, {"id": 144, "name": "কনডেন্সড মিল্ক", "brand": "ডানো", "category": "চা ও পানীয়", "unit": "৩৯৭ গ্রাম", "price_taka": 140, "wholesale_price": 0, "daily": false}, {"id": 145, "name": "গ্রিন টি", "brand": "", "category": "চা ও পানীয়", "unit": "প্যাকেট", "price_taka": 180, "wholesale_price": 0, "daily": false}, {"id": 146, "name": "কোমল পানীয়", "brand": "", "category": "চা ও পানীয়", "unit": "২ লিটার", "price_taka": 150, "wholesale_price": 0, "daily": false}, {"id": 147, "name": "সেরেলাক (শিশু খাদ্য)", "brand": "", "category": "চা ও পানীয়", "unit": "৪০০ গ্রাম", "price_taka": 420, "wholesale_price": 0, "daily": false}, {"id": 148, "name": "ওরস্যালাইন", "brand": "", "category": "চা ও পানীয়", "unit": "প্যাকেট", "price_taka": 25, "wholesale_price": 0, "daily": false}, {"id": 26, "name": "নুডুলস", "brand": "ম্যাগি", "category": "নাস্তা", "unit": "প্যাকেট", "price_taka": 100, "wholesale_price": 0, "daily": false}, {"id": 78, "name": "নুডুলস", "brand": "কোকোলা", "category": "নাস্তা", "unit": "প্যাকেট", "price_taka": 85, "wholesale_price": 0, "daily": false}, {"id": 79, "name": "নুডুলস", "brand": "মামা", "category": "নাস্তা", "unit": "প্যাকেট", "price_taka": 75, "wholesale_price": 0, "daily": false}, {"id": 80, "name": "নুডুলস", "brand": "ডুডলস", "category": "নাস্তা", "unit": "প্যাকেট", "price_taka": 70, "wholesale_price": 0, "daily": false}, {"id": 81, "name": "বিস্কুট", "brand": "অলিম্পিক", "category": "নাস্তা", "unit": "প্যাকেট", "price_taka": 60, "wholesale_price": 0, "daily": false}, {"id": 82, "name": "বিস্কুট", "brand": "প্রাণ", "category": "নাস্তা", "unit": "প্যাকেট", "price_taka": 55, "wholesale_price": 0, "daily": false}, {"id": 83, "name": "বিস্কুট", "brand": "লেক্সাস", "category": "নাস্তা", "unit": "প্যাকেট", "price_taka": 50, "wholesale_price": 0, "daily": false}, {"id": 84, "name": "চানাচুর", "brand": "বোম্বে সুইটস", "category": "নাস্তা", "unit": "৩০০ গ্রাম", "price_taka": 90, "wholesale_price": 0, "daily": false}, {"id": 85, "name": "চানাচুর", "brand": "প্রাণ", "category": "নাস্তা", "unit": "৩০০ গ্রাম", "price_taka": 85, "wholesale_price": 0, "daily": false}, {"id": 86, "name": "সেমাই", "brand": "প্রাণ", "category": "নাস্তা", "unit": "২০০ গ্রাম", "price_taka": 45, "wholesale_price": 0, "daily": false}, {"id": 87, "name": "লাচ্ছা সেমাই", "brand": "", "category": "নাস্তা", "unit": "২০০ গ্রাম", "price_taka": 60, "wholesale_price": 0, "daily": false}, {"id": 88, "name": "পাস্তা", "brand": "", "category": "নাস্তা", "unit": "৫০০ গ্রাম", "price_taka": 130, "wholesale_price": 0, "daily": false}, {"id": 89, "name": "ওটস", "brand": "কোয়েকার", "category": "নাস্তা", "unit": "৫০০ গ্রাম", "price_taka": 330, "wholesale_price": 0, "daily": false}, {"id": 90, "name": "জ্যাম", "brand": "প্রাণ", "category": "নাস্তা", "unit": "৪০০ গ্রাম", "price_taka": 140, "wholesale_price": 0, "daily": false}, {"id": 91, "name": "টমেটো সস", "brand": "প্রাণ", "category": "নাস্তা", "unit": "৩৪০ গ্রাম", "price_taka": 85, "wholesale_price": 0, "daily": false}, {"id": 92, "name": "আমের আচার", "brand": "প্রাণ", "category": "নাস্তা", "unit": "৪০০ গ্রাম", "price_taka": 150, "wholesale_price": 0, "daily": false}, {"id": 93, "name": "মধু", "brand": "", "category": "নাস্তা", "unit": "২৫০ গ্রাম", "price_taka": 280, "wholesale_price": 0, "daily": false}, {"id": 94, "name": "মধু", "brand": "ডাবর", "category": "নাস্তা", "unit": "২৫০ গ্রাম", "price_taka": 320, "wholesale_price": 0, "daily": false}, {"id": 149, "name": "চিনাবাদাম", "brand": "", "category": "নাস্তা", "unit": "৫০০ গ্রাম", "price_taka": 110, "wholesale_price": 0, "daily": false}, {"id": 150, "name": "জলপাইয়ের আচার", "brand": "প্রাণ", "category": "নাস্তা", "unit": "৪০০ গ্রাম", "price_taka": 160, "wholesale_price": 0, "daily": false}, {"id": 151, "name": "ভিনেগার", "brand": "", "category": "নাস্তা", "unit": "৫০০ মিলি", "price_taka": 80, "wholesale_price": 0, "daily": false}, {"id": 152, "name": "সয়া সস", "brand": "", "category": "নাস্তা", "unit": "৫০০ মিলি", "price_taka": 130, "wholesale_price": 0, "daily": false}, {"id": 153, "name": "বেকিং পাউডার", "brand": "", "category": "নাস্তা", "unit": "১০০ গ্রাম", "price_taka": 70, "wholesale_price": 0, "daily": false}, {"id": 154, "name": "কর্নফ্লাওয়ার", "brand": "", "category": "নাস্তা", "unit": "২০০ গ্রাম", "price_taka": 60, "wholesale_price": 0, "daily": false}, {"id": 122, "name": "টিস্যু পেপার", "brand": "বসুন্ধরা", "category": "ঘরোয়া সামগ্রী", "unit": "প্যাকেট", "price_taka": 65, "wholesale_price": 0, "daily": false}, {"id": 123, "name": "টয়লেট টিস্যু", "brand": "বসুন্ধরা", "category": "ঘরোয়া সামগ্রী", "unit": "প্যাকেট", "price_taka": 90, "wholesale_price": 0, "daily": false}, {"id": 124, "name": "মশার কয়েল", "brand": "মর্টিন", "category": "ঘরোয়া সামগ্রী", "unit": "প্যাকেট", "price_taka": 75, "wholesale_price": 0, "daily": false}, {"id": 125, "name": "মশা মারার স্প্রে", "brand": "মর্টিন", "category": "ঘরোয়া সামগ্রী", "unit": "পিস", "price_taka": 290, "wholesale_price": 0, "daily": false}, {"id": 126, "name": "মোমবাতি", "brand": "", "category": "ঘরোয়া সামগ্রী", "unit": "প্যাকেট", "price_taka": 60, "wholesale_price": 0, "daily": false}, {"id": 127, "name": "পেন্সিল ব্যাটারি", "brand": "", "category": "ঘরোয়া সামগ্রী", "unit": "জোড়া", "price_taka": 70, "wholesale_price": 0, "daily": false}, {"id": 128, "name": "দিয়াশলাই", "brand": "", "category": "ঘরোয়া সামগ্রী", "unit": "প্যাকেট", "price_taka": 20, "wholesale_price": 0, "daily": false}, {"id": 160, "name": "পলিথিন ব্যাগ", "brand": "", "category": "ঘরোয়া সামগ্রী", "unit": "প্যাকেট", "price_taka": 40, "wholesale_price": 0, "daily": false}, {"id": 161, "name": "অ্যালুমিনিয়াম ফয়েল", "brand": "", "category": "ঘরোয়া সামগ্রী", "unit": "পিস", "price_taka": 120, "wholesale_price": 0, "daily": false}, {"id": 162, "name": "মশা মারার ব্যাট", "brand": "", "category": "ঘরোয়া সামগ্রী", "unit": "পিস", "price_taka": 350, "wholesale_price": 0, "daily": false}, {"id": 163, "name": "আগরবাতি", "brand": "", "category": "ঘরোয়া সামগ্রী", "unit": "প্যাকেট", "price_taka": 45, "wholesale_price": 0, "daily": false}, {"id": 164, "name": "গ্যাস লাইটার", "brand": "", "category": "ঘরোয়া সামগ্রী", "unit": "পিস", "price_taka": 60, "wholesale_price": 0, "daily": false}, {"id": 14, "name": "পেঁয়াজ", "brand": "", "category": "অন্যান্য", "unit": "কেজি", "price_taka": 60, "wholesale_price": 0, "daily": false}, {"id": 15, "name": "রসুন", "brand": "", "category": "অন্যান্য", "unit": "কেজি", "price_taka": 160, "wholesale_price": 0, "daily": false}, {"id": 129, "name": "আদা", "brand": "", "category": "অন্যান্য", "unit": "কেজি", "price_taka": 150, "wholesale_price": 0, "daily": false}, {"id": 130, "name": "ডিম", "brand": "", "category": "অন্যান্য", "unit": "ডজন", "price_taka": 155, "wholesale_price": 0, "daily": false}, {"id": 131, "name": "কিসমিস", "brand": "", "category": "অন্যান্য", "unit": "২৫০ গ্রাম", "price_taka": 130, "wholesale_price": 0, "daily": false}, {"id": 132, "name": "কাঠবাদাম", "brand": "", "category": "অন্যান্য", "unit": "২৫০ গ্রাম", "price_taka": 320, "wholesale_price": 0, "daily": false}, {"id": 133, "name": "খেজুর", "brand": "", "category": "অন্যান্য", "unit": "৫০০ গ্রাম", "price_taka": 280, "wholesale_price": 0, "daily": false}, {"id": 168, "name": "আলু", "brand": "", "category": "অন্যান্য", "unit": "কেজি", "price_taka": 45, "wholesale_price": 0, "daily": false}, {"id": 169, "name": "ফ্রেশ কাটি গরুর দুধ", "brand": "", "category": "চা ও পানীয়", "unit": "লিটার", "price_taka": 90, "wholesale_price": 0, "daily": false, "special": true}], "packages": [{"id": 1, "size": 2, "kind": "family", "scale": {"base": 2, "min": 2, "max": 12, "step": 1, "unit": "সদস্য"}, "name": "২ জনের পরিবার প্যাকেজ", "tagline": "২ জনের পরিবারের মাসিক বাজার", "estimated_total_taka": 1870, "items": [{"product_id": 1, "name": "চাল (খোলা চাল) বি-২৯", "brand": "নৌকা", "qty_label": "১২ কেজি", "qty_multiplier": 12.0, "line_total_taka": 780}, {"product_id": 3, "name": "সয়াবিন তেল", "brand": "তীর", "qty_label": "২.৫ লিটার", "qty_multiplier": 2.5, "line_total_taka": 475}, {"product_id": 4, "name": "মসুর ডাল", "brand": "", "qty_label": "১ কেজি", "qty_multiplier": 1.0, "line_total_taka": 130}, {"product_id": 5, "name": "চিনি", "brand": "", "qty_label": "১ কেজি", "qty_multiplier": 1.0, "line_total_taka": 125}, {"product_id": 6, "name": "লবণ", "brand": "এসিআই", "qty_label": "১ কেজি", "qty_multiplier": 1.0, "line_total_taka": 42}, {"product_id": 2, "name": "আটা", "brand": "", "qty_label": "২.৫ কেজি", "qty_multiplier": 2.5, "line_total_taka": 138}, {"product_id": 10, "name": "কাপড় কাচার সাবান", "brand": "", "qty_label": "২ পিস", "qty_multiplier": 2.0, "line_total_taka": 70}, {"product_id": 11, "name": "গায়ে মাখার সাবান", "brand": "লাক্স", "qty_label": "২ পিস", "qty_multiplier": 2.0, "line_total_taka": 110}]}, {"id": 2, "size": 3, "kind": "family", "scale": {"base": 3, "min": 2, "max": 12, "step": 1, "unit": "সদস্য"}, "name": "৩ জনের পরিবার প্যাকেজ", "tagline": "৩ জনের পরিবারের মাসিক বাজার", "estimated_total_taka": 2504, "items": [{"product_id": 1, "name": "চাল (খোলা চাল) বি-২৯", "brand": "নৌকা", "qty_label": "১৮ কেজি", "qty_multiplier": 18.0, "line_total_taka": 1170}, {"product_id": 3, "name": "সয়াবিন তেল", "brand": "তীর", "qty_label": "৩.৫ লিটার", "qty_multiplier": 3.5, "line_total_taka": 665}, {"product_id": 4, "name": "মসুর ডাল", "brand": "", "qty_label": "১ কেজি", "qty_multiplier": 1.0, "line_total_taka": 130}, {"product_id": 5, "name": "চিনি", "brand": "", "qty_label": "১ কেজি", "qty_multiplier": 1.0, "line_total_taka": 125}, {"product_id": 6, "name": "লবণ", "brand": "এসিআই", "qty_label": "১ কেজি", "qty_multiplier": 1.0, "line_total_taka": 42}, {"product_id": 2, "name": "আটা", "brand": "", "qty_label": "৩.৫ কেজি", "qty_multiplier": 3.5, "line_total_taka": 192}, {"product_id": 10, "name": "কাপড় কাচার সাবান", "brand": "", "qty_label": "২ পিস", "qty_multiplier": 2.0, "line_total_taka": 70}, {"product_id": 11, "name": "গায়ে মাখার সাবান", "brand": "লাক্স", "qty_label": "২ পিস", "qty_multiplier": 2.0, "line_total_taka": 110}]}, {"id": 3, "size": 4, "kind": "family", "scale": {"base": 4, "min": 2, "max": 12, "step": 1, "unit": "সদস্য"}, "name": "৪ জনের পরিবার প্যাকেজ", "tagline": "৪ জনের পরিবারের মাসিক বাজার", "estimated_total_taka": 3884, "items": [{"product_id": 1, "name": "চাল (খোলা চাল) বি-২৯", "brand": "নৌকা", "qty_label": "২২ কেজি", "qty_multiplier": 22.0, "line_total_taka": 1430}, {"product_id": 3, "name": "সয়াবিন তেল", "brand": "তীর", "qty_label": "৪.৫ লিটার", "qty_multiplier": 4.5, "line_total_taka": 855}, {"product_id": 4, "name": "মসুর ডাল", "brand": "", "qty_label": "২ কেজি", "qty_multiplier": 2.0, "line_total_taka": 260}, {"product_id": 5, "name": "চিনি", "brand": "", "qty_label": "২ কেজি", "qty_multiplier": 2.0, "line_total_taka": 250}, {"product_id": 6, "name": "লবণ", "brand": "এসিআই", "qty_label": "১ কেজি", "qty_multiplier": 1.0, "line_total_taka": 42}, {"product_id": 2, "name": "আটা", "brand": "", "qty_label": "৪.৫ কেজি", "qty_multiplier": 4.5, "line_total_taka": 248}, {"product_id": 7, "name": "হলুদ গুঁড়া", "brand": "", "qty_label": "১০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 45}, {"product_id": 8, "name": "মরিচ গুঁড়া", "brand": "", "qty_label": "১০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 55}, {"product_id": 9, "name": "ধনিয়া গুঁড়া", "brand": "", "qty_label": "১০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 40}, {"product_id": 10, "name": "কাপড় কাচার সাবান", "brand": "", "qty_label": "৪ পিস", "qty_multiplier": 4.0, "line_total_taka": 140}, {"product_id": 11, "name": "গায়ে মাখার সাবান", "brand": "লাক্স", "qty_label": "২ পিস", "qty_multiplier": 2.0, "line_total_taka": 110}, {"product_id": 12, "name": "ডিটারজেন্ট পাউডার", "brand": "সার্ফ এক্সেল", "qty_label": "৪৫০ গ্রাম", "qty_multiplier": 0.9, "line_total_taka": 99}, {"product_id": 13, "name": "শ্যাম্পু", "brand": "সানসিল্ক", "qty_label": "১ পিস", "qty_multiplier": 1.0, "line_total_taka": 180}, {"product_id": 24, "name": "চা পাতা", "brand": "ইস্পাহানি মির্জাপুর", "qty_label": "২০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 130}]}, {"id": 4, "size": 5, "kind": "family", "scale": {"base": 5, "min": 2, "max": 12, "step": 1, "unit": "সদস্য"}, "name": "৫ জনের পরিবার প্যাকেজ", "tagline": "৫ জনের পরিবারের মাসিক বাজার", "estimated_total_taka": 4540, "items": [{"product_id": 1, "name": "চাল (খোলা চাল) বি-২৯", "brand": "নৌকা", "qty_label": "২৮ কেজি", "qty_multiplier": 28.0, "line_total_taka": 1820}, {"product_id": 3, "name": "সয়াবিন তেল", "brand": "তীর", "qty_label": "৫.৫ লিটার", "qty_multiplier": 5.5, "line_total_taka": 1045}, {"product_id": 4, "name": "মসুর ডাল", "brand": "", "qty_label": "২ কেজি", "qty_multiplier": 2.0, "line_total_taka": 260}, {"product_id": 5, "name": "চিনি", "brand": "", "qty_label": "২ কেজি", "qty_multiplier": 2.0, "line_total_taka": 250}, {"product_id": 6, "name": "লবণ", "brand": "এসিআই", "qty_label": "১ কেজি", "qty_multiplier": 1.0, "line_total_taka": 42}, {"product_id": 2, "name": "আটা", "brand": "", "qty_label": "৫.৫ কেজি", "qty_multiplier": 5.5, "line_total_taka": 302}, {"product_id": 7, "name": "হলুদ গুঁড়া", "brand": "", "qty_label": "১০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 45}, {"product_id": 8, "name": "মরিচ গুঁড়া", "brand": "", "qty_label": "১০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 55}, {"product_id": 9, "name": "ধনিয়া গুঁড়া", "brand": "", "qty_label": "১০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 40}, {"product_id": 10, "name": "কাপড় কাচার সাবান", "brand": "", "qty_label": "৪ পিস", "qty_multiplier": 4.0, "line_total_taka": 140}, {"product_id": 11, "name": "গায়ে মাখার সাবান", "brand": "লাক্স", "qty_label": "২ পিস", "qty_multiplier": 2.0, "line_total_taka": 110}, {"product_id": 12, "name": "ডিটারজেন্ট পাউডার", "brand": "সার্ফ এক্সেল", "qty_label": "৫৫০ গ্রাম", "qty_multiplier": 1.1, "line_total_taka": 121}, {"product_id": 13, "name": "শ্যাম্পু", "brand": "সানসিল্ক", "qty_label": "১ পিস", "qty_multiplier": 1.0, "line_total_taka": 180}, {"product_id": 24, "name": "চা পাতা", "brand": "ইস্পাহানি মির্জাপুর", "qty_label": "২০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 130}]}, {"id": 5, "size": 6, "kind": "family", "scale": {"base": 6, "min": 2, "max": 12, "step": 1, "unit": "সদস্য"}, "name": "৬ জনের পরিবার প্যাকেজ", "tagline": "৬ জনের পরিবারের মাসিক বাজার", "estimated_total_taka": 5607, "items": [{"product_id": 1, "name": "চাল (খোলা চাল) বি-২৯", "brand": "নৌকা", "qty_label": "৩৪.৫ কেজি", "qty_multiplier": 34.5, "line_total_taka": 2242}, {"product_id": 3, "name": "সয়াবিন তেল", "brand": "তীর", "qty_label": "৭ লিটার", "qty_multiplier": 7.0, "line_total_taka": 1330}, {"product_id": 4, "name": "মসুর ডাল", "brand": "", "qty_label": "২.৫ কেজি", "qty_multiplier": 2.5, "line_total_taka": 325}, {"product_id": 5, "name": "চিনি", "brand": "", "qty_label": "২.৫ কেজি", "qty_multiplier": 2.5, "line_total_taka": 312}, {"product_id": 6, "name": "লবণ", "brand": "এসিআই", "qty_label": "১.৫ কেজি", "qty_multiplier": 1.5, "line_total_taka": 63}, {"product_id": 2, "name": "আটা", "brand": "", "qty_label": "৭ কেজি", "qty_multiplier": 7.0, "line_total_taka": 385}, {"product_id": 7, "name": "হলুদ গুঁড়া", "brand": "", "qty_label": "১৫০ গ্রাম", "qty_multiplier": 1.5, "line_total_taka": 68}, {"product_id": 8, "name": "মরিচ গুঁড়া", "brand": "", "qty_label": "১৫০ গ্রাম", "qty_multiplier": 1.5, "line_total_taka": 82}, {"product_id": 9, "name": "ধনিয়া গুঁড়া", "brand": "", "qty_label": "১৫০ গ্রাম", "qty_multiplier": 1.5, "line_total_taka": 60}, {"product_id": 10, "name": "কাপড় কাচার সাবান", "brand": "", "qty_label": "৫ পিস", "qty_multiplier": 5.0, "line_total_taka": 175}, {"product_id": 11, "name": "গায়ে মাখার সাবান", "brand": "লাক্স", "qty_label": "৩ পিস", "qty_multiplier": 3.0, "line_total_taka": 165}, {"product_id": 12, "name": "ডিটারজেন্ট পাউডার", "brand": "সার্ফ এক্সেল", "qty_label": "১ কেজি", "qty_multiplier": 2.0, "line_total_taka": 220}, {"product_id": 13, "name": "শ্যাম্পু", "brand": "সানসিল্ক", "qty_label": "১ পিস", "qty_multiplier": 1.0, "line_total_taka": 180}]}, {"id": 6, "size": 7, "kind": "family", "scale": {"base": 7, "min": 2, "max": 12, "step": 1, "unit": "সদস্য"}, "name": "৭ জনের পরিবার প্যাকেজ", "tagline": "৭ জনের পরিবারের মাসিক বাজার", "estimated_total_taka": 6519, "items": [{"product_id": 1, "name": "চাল (খোলা চাল) বি-২৯", "brand": "নৌকা", "qty_label": "৪০ কেজি", "qty_multiplier": 40.0, "line_total_taka": 2600}, {"product_id": 3, "name": "সয়াবিন তেল", "brand": "তীর", "qty_label": "৮ লিটার", "qty_multiplier": 8.0, "line_total_taka": 1520}, {"product_id": 4, "name": "মসুর ডাল", "brand": "", "qty_label": "৩ কেজি", "qty_multiplier": 3.0, "line_total_taka": 390}, {"product_id": 5, "name": "চিনি", "brand": "", "qty_label": "৩ কেজি", "qty_multiplier": 3.0, "line_total_taka": 375}, {"product_id": 6, "name": "লবণ", "brand": "এসিআই", "qty_label": "২ কেজি", "qty_multiplier": 2.0, "line_total_taka": 84}, {"product_id": 2, "name": "আটা", "brand": "", "qty_label": "৮ কেজি", "qty_multiplier": 8.0, "line_total_taka": 440}, {"product_id": 7, "name": "হলুদ গুঁড়া", "brand": "", "qty_label": "২০০ গ্রাম", "qty_multiplier": 2.0, "line_total_taka": 90}, {"product_id": 8, "name": "মরিচ গুঁড়া", "brand": "", "qty_label": "২০০ গ্রাম", "qty_multiplier": 2.0, "line_total_taka": 110}, {"product_id": 9, "name": "ধনিয়া গুঁড়া", "brand": "", "qty_label": "২০০ গ্রাম", "qty_multiplier": 2.0, "line_total_taka": 80}, {"product_id": 10, "name": "কাপড় কাচার সাবান", "brand": "", "qty_label": "৬ পিস", "qty_multiplier": 6.0, "line_total_taka": 210}, {"product_id": 11, "name": "গায়ে মাখার সাবান", "brand": "লাক্স", "qty_label": "৪ পিস", "qty_multiplier": 4.0, "line_total_taka": 220}, {"product_id": 12, "name": "ডিটারজেন্ট পাউডার", "brand": "সার্ফ এক্সেল", "qty_label": "১ কেজি", "qty_multiplier": 2.0, "line_total_taka": 220}, {"product_id": 13, "name": "শ্যাম্পু", "brand": "সানসিল্ক", "qty_label": "১ পিস", "qty_multiplier": 1.0, "line_total_taka": 180}]}, {"id": 7, "size": 8, "kind": "family", "scale": {"base": 8, "min": 2, "max": 12, "step": 1, "unit": "সদস্য"}, "name": "৮ জনের পরিবার প্যাকেজ", "tagline": "৮ জনের পরিবারের মাসিক বাজার", "estimated_total_taka": 7431, "items": [{"product_id": 1, "name": "চাল (খোলা চাল) বি-২৯", "brand": "নৌকা", "qty_label": "৪৫.৫ কেজি", "qty_multiplier": 45.5, "line_total_taka": 2958}, {"product_id": 3, "name": "সয়াবিন তেল", "brand": "তীর", "qty_label": "৯ লিটার", "qty_multiplier": 9.0, "line_total_taka": 1710}, {"product_id": 4, "name": "মসুর ডাল", "brand": "", "qty_label": "৩.৫ কেজি", "qty_multiplier": 3.5, "line_total_taka": 455}, {"product_id": 5, "name": "চিনি", "brand": "", "qty_label": "৩.৫ কেজি", "qty_multiplier": 3.5, "line_total_taka": 438}, {"product_id": 6, "name": "লবণ", "brand": "এসিআই", "qty_label": "২.৫ কেজি", "qty_multiplier": 2.5, "line_total_taka": 105}, {"product_id": 2, "name": "আটা", "brand": "", "qty_label": "৯ কেজি", "qty_multiplier": 9.0, "line_total_taka": 495}, {"product_id": 7, "name": "হলুদ গুঁড়া", "brand": "", "qty_label": "২৫০ গ্রাম", "qty_multiplier": 2.5, "line_total_taka": 112}, {"product_id": 8, "name": "মরিচ গুঁড়া", "brand": "", "qty_label": "২৫০ গ্রাম", "qty_multiplier": 2.5, "line_total_taka": 138}, {"product_id": 9, "name": "ধনিয়া গুঁড়া", "brand": "", "qty_label": "২৫০ গ্রাম", "qty_multiplier": 2.5, "line_total_taka": 100}, {"product_id": 10, "name": "কাপড় কাচার সাবান", "brand": "", "qty_label": "৭ পিস", "qty_multiplier": 7.0, "line_total_taka": 245}, {"product_id": 11, "name": "গায়ে মাখার সাবান", "brand": "লাক্স", "qty_label": "৫ পিস", "qty_multiplier": 5.0, "line_total_taka": 275}, {"product_id": 12, "name": "ডিটারজেন্ট পাউডার", "brand": "সার্ফ এক্সেল", "qty_label": "১ কেজি", "qty_multiplier": 2.0, "line_total_taka": 220}, {"product_id": 13, "name": "শ্যাম্পু", "brand": "সানসিল্ক", "qty_label": "১ পিস", "qty_multiplier": 1.0, "line_total_taka": 180}]}, {"id": 8, "size": 100, "kind": "occasion", "note": "মাছ-মাংস ও কাঁচা সবজি এই প্যাকেজে নেই — সেগুলো আলাদা ব্যবস্থা করতে হবে।", "scale": {"base": 100, "min": 100, "max": 600, "step": 50, "unit": "অতিথি"}, "name": "বিয়ের বাজার", "tagline": "১০০ অতিথির বিয়ের রান্নার বাজার", "estimated_total_taka": 15004, "items": [{"product_id": 16, "name": "পোলাও চাল (চিনিগুঁড়া)", "brand": "", "qty_label": "১৫ কেজি", "qty_multiplier": 15.0, "line_total_taka": 1650}, {"product_id": 33, "name": "মিনিকেট চাল", "brand": "", "qty_label": "৫ কেজি", "qty_multiplier": 5.0, "line_total_taka": 390}, {"product_id": 3, "name": "সয়াবিন তেল", "brand": "তীর", "qty_label": "৫ লিটার", "qty_multiplier": 5.0, "line_total_taka": 950}, {"product_id": 14, "name": "পেঁয়াজ", "brand": "", "qty_label": "১০ কেজি", "qty_multiplier": 10.0, "line_total_taka": 600}, {"product_id": 15, "name": "রসুন", "brand": "", "qty_label": "২ কেজি", "qty_multiplier": 2.0, "line_total_taka": 320}, {"product_id": 129, "name": "আদা", "brand": "", "qty_label": "১ কেজি", "qty_multiplier": 1.0, "line_total_taka": 150}, {"product_id": 7, "name": "হলুদ গুঁড়া", "brand": "", "qty_label": "১০০০ গ্রাম", "qty_multiplier": 10.0, "line_total_taka": 450}, {"product_id": 8, "name": "মরিচ গুঁড়া", "brand": "", "qty_label": "৮০০ গ্রাম", "qty_multiplier": 8.0, "line_total_taka": 440}, {"product_id": 9, "name": "ধনিয়া গুঁড়া", "brand": "", "qty_label": "৮০০ গ্রাম", "qty_multiplier": 8.0, "line_total_taka": 320}, {"product_id": 22, "name": "জিরা", "brand": "", "qty_label": "৫০০ গ্রাম", "qty_multiplier": 5.0, "line_total_taka": 450}, {"product_id": 23, "name": "গরম মসলা", "brand": "রাধুনী", "qty_label": "৩০০ গ্রাম", "qty_multiplier": 3.0, "line_total_taka": 360}, {"product_id": 63, "name": "দারুচিনি", "brand": "", "qty_label": "২০০ গ্রাম", "qty_multiplier": 2.0, "line_total_taka": 240}, {"product_id": 5, "name": "চিনি", "brand": "", "qty_label": "৫ কেজি", "qty_multiplier": 5.0, "line_total_taka": 625}, {"product_id": 6, "name": "লবণ", "brand": "এসিআই", "qty_label": "২ কেজি", "qty_multiplier": 2.0, "line_total_taka": 84}, {"product_id": 19, "name": "ঘি", "brand": "", "qty_label": "২০০০ গ্রাম", "qty_multiplier": 4.0, "line_total_taka": 2200}, {"product_id": 25, "name": "গুঁড়া দুধ", "brand": "ডানো", "qty_label": "২০০০ গ্রাম", "qty_multiplier": 4.0, "line_total_taka": 1680}, {"product_id": 130, "name": "ডিম", "brand": "", "qty_label": "৮ ডজন", "qty_multiplier": 8.0, "line_total_taka": 1240}, {"product_id": 38, "name": "সুজি", "brand": "", "qty_label": "৩০০০ গ্রাম", "qty_multiplier": 6.0, "line_total_taka": 330}, {"product_id": 4, "name": "মসুর ডাল", "brand": "", "qty_label": "৫ কেজি", "qty_multiplier": 5.0, "line_total_taka": 650}, {"product_id": 24, "name": "চা পাতা", "brand": "ইস্পাহানি মির্জাপুর", "qty_label": "৬০০ গ্রাম", "qty_multiplier": 3.0, "line_total_taka": 390}, {"product_id": 122, "name": "টিস্যু পেপার", "brand": "বসুন্ধরা", "qty_label": "৫ প্যাকেট", "qty_multiplier": 5.0, "line_total_taka": 325}, {"product_id": 131, "name": "কিসমিস", "brand": "", "qty_label": "১০০০ গ্রাম", "qty_multiplier": 4.0, "line_total_taka": 520}, {"product_id": 132, "name": "কাঠবাদাম", "brand": "", "qty_label": "৫০০ গ্রাম", "qty_multiplier": 2.0, "line_total_taka": 640}]}, {"id": 9, "size": 100, "kind": "occasion", "note": "মাছ-মাংস ও কাঁচা সবজি এই প্যাকেজে নেই — সেগুলো আলাদা ব্যবস্থা করতে হবে।", "scale": {"base": 100, "min": 100, "max": 600, "step": 50, "unit": "অতিথি"}, "name": "সিন্নির বাজার", "tagline": "১০০ অতিথির সিন্নি / মিলাদের বাজার", "estimated_total_taka": 11442, "items": [{"product_id": 134, "name": "আতপ চাল (পাইজাম)", "brand": "", "qty_label": "১২ কেজি", "qty_multiplier": 12.0, "line_total_taka": 840}, {"product_id": 4, "name": "মসুর ডাল", "brand": "", "qty_label": "৪ কেজি", "qty_multiplier": 4.0, "line_total_taka": 520}, {"product_id": 3, "name": "সয়াবিন তেল", "brand": "তীর", "qty_label": "৩ লিটার", "qty_multiplier": 3.0, "line_total_taka": 570}, {"product_id": 14, "name": "পেঁয়াজ", "brand": "", "qty_label": "৫ কেজি", "qty_multiplier": 5.0, "line_total_taka": 300}, {"product_id": 15, "name": "রসুন", "brand": "", "qty_label": "১ কেজি", "qty_multiplier": 1.0, "line_total_taka": 160}, {"product_id": 129, "name": "আদা", "brand": "", "qty_label": "৫০০ গ্রাম", "qty_multiplier": 0.5, "line_total_taka": 75}, {"product_id": 7, "name": "হলুদ গুঁড়া", "brand": "", "qty_label": "৫০০ গ্রাম", "qty_multiplier": 5.0, "line_total_taka": 225}, {"product_id": 8, "name": "মরিচ গুঁড়া", "brand": "", "qty_label": "৪০০ গ্রাম", "qty_multiplier": 4.0, "line_total_taka": 220}, {"product_id": 9, "name": "ধনিয়া গুঁড়া", "brand": "", "qty_label": "৪০০ গ্রাম", "qty_multiplier": 4.0, "line_total_taka": 160}, {"product_id": 22, "name": "জিরা", "brand": "", "qty_label": "৩০০ গ্রাম", "qty_multiplier": 3.0, "line_total_taka": 270}, {"product_id": 23, "name": "গরম মসলা", "brand": "রাধুনী", "qty_label": "২০০ গ্রাম", "qty_multiplier": 2.0, "line_total_taka": 240}, {"product_id": 5, "name": "চিনি", "brand": "", "qty_label": "৮ কেজি", "qty_multiplier": 8.0, "line_total_taka": 1000}, {"product_id": 6, "name": "লবণ", "brand": "এসিআই", "qty_label": "১ কেজি", "qty_multiplier": 1.0, "line_total_taka": 42}, {"product_id": 38, "name": "সুজি", "brand": "", "qty_label": "৩০০০ গ্রাম", "qty_multiplier": 6.0, "line_total_taka": 330}, {"product_id": 19, "name": "ঘি", "brand": "", "qty_label": "১৫০০ গ্রাম", "qty_multiplier": 3.0, "line_total_taka": 1650}, {"product_id": 25, "name": "গুঁড়া দুধ", "brand": "ডানো", "qty_label": "১৫০০ গ্রাম", "qty_multiplier": 3.0, "line_total_taka": 1260}, {"product_id": 133, "name": "খেজুর", "brand": "", "qty_label": "২৫০০ গ্রাম", "qty_multiplier": 5.0, "line_total_taka": 1400}, {"product_id": 131, "name": "কিসমিস", "brand": "", "qty_label": "৫০০ গ্রাম", "qty_multiplier": 2.0, "line_total_taka": 260}, {"product_id": 136, "name": "সাগু দানা", "brand": "", "qty_label": "১৫০০ গ্রাম", "qty_multiplier": 3.0, "line_total_taka": 180}, {"product_id": 40, "name": "মুড়ি", "brand": "", "qty_label": "২০০০ গ্রাম", "qty_multiplier": 4.0, "line_total_taka": 180}, {"product_id": 39, "name": "চিড়া", "brand": "", "qty_label": "২ কেজি", "qty_multiplier": 2.0, "line_total_taka": 160}, {"product_id": 139, "name": "খেজুরের গুড়", "brand": "", "qty_label": "২ কেজি", "qty_multiplier": 2.0, "line_total_taka": 520}, {"product_id": 24, "name": "চা পাতা", "brand": "ইস্পাহানি মির্জাপুর", "qty_label": "৪০০ গ্রাম", "qty_multiplier": 2.0, "line_total_taka": 260}, {"product_id": 130, "name": "ডিম", "brand": "", "qty_label": "৪ ডজন", "qty_multiplier": 4.0, "line_total_taka": 620}]}, {"id": 10, "size": 4, "kind": "expat", "note": "", "scale": {"base": 4, "min": 2, "max": 12, "step": 1, "unit": "সদস্য"}, "name": "প্রবাসী পরিবার", "tagline": "প্রবাসে থেকে পরিবারের মাসিক বাজার", "estimated_total_taka": 4697, "items": [{"product_id": 1, "name": "চাল (খোলা চাল) বি-২৯", "brand": "নৌকা", "qty_label": "২০ কেজি", "qty_multiplier": 20.0, "line_total_taka": 1300}, {"product_id": 3, "name": "সয়াবিন তেল", "brand": "তীর", "qty_label": "৪ লিটার", "qty_multiplier": 4.0, "line_total_taka": 760}, {"product_id": 4, "name": "মসুর ডাল", "brand": "", "qty_label": "২ কেজি", "qty_multiplier": 2.0, "line_total_taka": 260}, {"product_id": 5, "name": "চিনি", "brand": "", "qty_label": "২ কেজি", "qty_multiplier": 2.0, "line_total_taka": 250}, {"product_id": 6, "name": "লবণ", "brand": "এসিআই", "qty_label": "১ কেজি", "qty_multiplier": 1.0, "line_total_taka": 42}, {"product_id": 2, "name": "আটা", "brand": "", "qty_label": "৪ কেজি", "qty_multiplier": 4.0, "line_total_taka": 220}, {"product_id": 7, "name": "হলুদ গুঁড়া", "brand": "", "qty_label": "১০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 45}, {"product_id": 8, "name": "মরিচ গুঁড়া", "brand": "", "qty_label": "১০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 55}, {"product_id": 9, "name": "ধনিয়া গুঁড়া", "brand": "", "qty_label": "১০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 40}, {"product_id": 10, "name": "কাপড় কাচার সাবান", "brand": "", "qty_label": "৩ পিস", "qty_multiplier": 3.0, "line_total_taka": 105}, {"product_id": 11, "name": "গায়ে মাখার সাবান", "brand": "লাক্স", "qty_label": "২ পিস", "qty_multiplier": 2.0, "line_total_taka": 110}, {"product_id": 24, "name": "চা পাতা", "brand": "ইস্পাহানি মির্জাপুর", "qty_label": "২০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 130}, {"product_id": 25, "name": "গুঁড়া দুধ", "brand": "ডানো", "qty_label": "৫০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 420}, {"product_id": 133, "name": "খেজুর", "brand": "", "qty_label": "৫০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 280}, {"product_id": 131, "name": "কিসমিস", "brand": "", "qty_label": "২৫০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 130}, {"product_id": 19, "name": "ঘি", "brand": "", "qty_label": "৫০০ গ্রাম", "qty_multiplier": 1.0, "line_total_taka": 550}]}]};var CATS = ["চাল ও আটা", "তেল ও ঘি", "ডাল ও চিনি", "মসলা", "সাবান ও পরিষ্কারক", "ব্যক্তিগত যত্ন", "চা ও পানীয়", "নাস্তা", "ঘরোয়া সামগ্রী", "অন্যান্য"];
+var DATA = FALLBACK;
+var DRAFT = null;
+var view="grid", cat="সব", cart={}, customCart=[];
+try{ cart = JSON.parse(localStorage.getItem("mb-cart")||"{}"); }catch(e){ cart={}; }
+try{ customCart = JSON.parse(localStorage.getItem("mb-custom-cart")||"[]"); }catch(e){ customCart=[]; }
+function bn(n){ return String(n).replace(/\d/g, function(d){ return "০১২৩৪৫৬৭৮৯"[+d]; }); }
+function saveCart(){ localStorage.setItem("mb-cart", JSON.stringify(cart)); localStorage.setItem("mb-custom-cart", JSON.stringify(customCart)); }
+function code(){ if(!localStorage.getItem("mb-code")) localStorage.setItem("mb-code","MB-"+Math.random().toString(36).slice(2,8).toUpperCase()); return localStorage.getItem("mb-code"); }
+/* ---- customer login (optional; order history needs it) ---- */
+function getCustomer(){ try{ return JSON.parse(localStorage.getItem("mb-customer")||"null"); }catch(e){ return null; } }
+function canSeePrices(){ return (DATA.show_prices!==false) && !!getCustomer(); }
+function setCustomer(c){ if(c) localStorage.setItem("mb-customer", JSON.stringify(c)); else localStorage.removeItem("mb-customer"); }
+async function sha256hex(str){ try{ var b=await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str)); return Array.from(new Uint8Array(b)).map(function(x){ return ("0"+x.toString(16)).slice(-2); }).join(""); }catch(e){ var h=0; for(var i=0;i<str.length;i++){ h=((h<<5)-h+str.charCodeAt(i))|0; } return "h"+h; } }
+function renderCustomerBox(){
+  var box=document.getElementById("customerBox"); if(!box) return;
+  var c=getCustomer();
+  if(c){
+    box.innerHTML='<p>👋 <b>'+c.name+'</b> ('+c.phone+(c.email?(' • '+c.email):'')+') — লগইন করা আছে। আপনার অর্ডারগুলো এখানে সেভ থাকবে। <button class="ghost" onclick="customerLogout()">লগআউট</button></p>';
+    var cn=document.getElementById("cname"); if(cn && !cn.value) cn.value=c.name||"";
+    var cp=document.getElementById("cphone"); if(cp && !cp.value) cp.value=c.phone||"";
+  } else {
+    box.innerHTML='<p><b>🔑 লগইন করুন (ঐচ্ছিক)</b> — মোবাইল নম্বর বা ই-মেইল + পাসওয়ার্ড দিয়ে একবার লগইন করলেই হবে, বারবার করতে হবে না। লগইন ছাড়াও পণ্য দেখা ও অর্ডার করা যাবে, তবে আপনার অর্ডারের রেকর্ড সেভ থাকবে শুধু লগইন করলে।</p><input id="cuName" placeholder="আপনার নাম"><input id="cuId" placeholder="মোবাইল নম্বর বা ই-মেইল"><input id="cuPass" type="password" placeholder="পাসওয়ার্ড (নতুন হলে নিজে বসান)"><button class="primary" onclick="customerLogin()">লগইন / নিবন্ধন</button> <span id="cuMsg" class="small"></span>';
+  }
+}
+async function customerLogin(){
+  var name=(document.getElementById("cuName").value||"").trim();
+  var idv=(document.getElementById("cuId").value||"").trim();
+  var pass=document.getElementById("cuPass").value||"";
+  var msg=document.getElementById("cuMsg");
+  if(!idv || pass.length<4){ msg.textContent="মোবাইল/ই-মেইল আর কমপক্ষে ৪ সংখ্যার পাসওয়ার্ড দিন।"; return; }
+  if(!sb){ msg.textContent="ইন্টারনেট সংযোগ পাওয়া যাচ্ছে না — পরে আবার চেষ্টা করুন।"; return; }
+  msg.textContent="হচ্ছে…";
+  var isEmail=idv.indexOf("@")>=0;
+  var q=sb.from("customers").select("*").limit(1);
+  var res = isEmail ? await q.eq("email", idv) : await q.eq("phone", idv);
+  if(res.error){ msg.textContent="হয়নি: "+res.error.message; return; }
+  var hash=await sha256hex(idv+"|"+pass);
+  var row=(res.data||[])[0];
+  if(row){
+    if(row.password_hash!==hash){ msg.textContent="পাসওয়ার্ড মিলছে না। আবার চেষ্টা করুন।"; return; }
+    await sb.from("customers").update({last_seen:new Date().toISOString()}).eq("id", row.id);
+    setCustomer({id:row.id, name:row.name, phone:row.phone, email:row.email});
+    msg.textContent="লগইন হয়েছে।";
+  } else {
+    var ins=await sb.from("customers").insert([{name:name||"কাস্টমার", phone:isEmail?"":idv, email:isEmail?idv:"", password_hash:hash, last_seen:new Date().toISOString()}]).select().single();
+    if(ins.error){ msg.textContent="নিবন্ধন হয়নি: "+ins.error.message; return; }
+    var r=ins.data;
+    setCustomer({id:r.id, name:r.name, phone:r.phone, email:r.email});
+    msg.textContent="নিবন্ধন ও লগইন হয়েছে।";
+  }
+  renderCustomerBox(); renderMyOrders();
+}
+function customerLogout(){ setCustomer(null); renderCustomerBox(); renderMyOrders(); }
+function reorderByNo(no){
+  if(!sb) return;
+  sb.from("orders").select("items").eq("order_no", no).limit(1).then(function(res){
+    var o=(res.data||[])[0]; if(!o) return;
+    (o.items||[]).forEach(function(it){ var p=null; DATA.products.forEach(function(x){ if(x.name===it.name) p=x; }); if(p) cart[p.id]=(cart[p.id]||0)+it.qty; });
+    saveCart(); renderCart(); showTab("cart");
+  });
+}
+/* ---- visits ---- */
+function logVisit(ev, detail){
+  if(!sb) return;
+  try{ if(ev==="open" && sessionStorage.getItem("mb-visit-open")) return; if(ev==="open") sessionStorage.setItem("mb-visit-open","1"); }catch(e){}
+  var c=getCustomer();
+  sb.from("visits").insert([{phone:c?c.phone:"", event:ev, detail:detail||""}]).then(function(){});
+}
+function waNumber(){ return (DATA.whatsapp||"01631421995").replace(/[^0-9]/g,"").replace(/^0/,"880"); }
+function findProduct(id){ var f=null; DATA.products.forEach(function(x){ if(String(x.id)===String(id)) f=x; }); return f; }
+function showTab(t){
+  ["shop","packages","cart","orders","admin"].forEach(function(x){
+    document.getElementById("tab-"+x).style.display = (x===t)?"block":"none";
+    document.getElementById("nav-"+x).classList.toggle("on", x===t);
+  });
+  if(t==="cart") renderCart();
+  if(t==="orders") renderMyOrders();
+  if(t==="admin") renderAdmin();
+  logVisit("tab", t);
+}
+function setView(v){ view=v; document.getElementById("vGrid").classList.toggle("on",v==="grid"); document.getElementById("vList").classList.toggle("on",v==="list"); renderShop(); }
+function setCat(c){ cat=c; renderShop(); }
+function add(id){ cart[id]=(cart[id]||0)+1; saveCart(); renderShop(); renderCart(); }
+function chg(id,d){ cart[id]=(cart[id]||0)+d; if(cart[id]<=0) delete cart[id]; saveCart(); renderShop(); renderCart(); }
+function moveCart(id,d){ var ks=Object.keys(cart); var i=ks.indexOf(String(id)); var j=i+d; if(j<0||j>=ks.length) return; var t=ks[i]; ks[i]=ks[j]; ks[j]=t; var nc={}; ks.forEach(function(k){ nc[k]=cart[k]; }); cart=nc; saveCart(); renderCart(); }
+function pkgTotal(pkg){ var total=0; pkg.items.forEach(function(it){ if(it.active!==false) total += it.line_total_taka||0; }); return total; }
+function recalcPackages(d){
+  d.packages.forEach(function(pkg){
+    var total=0;
+    pkg.items.forEach(function(it){
+      var p=null; d.products.forEach(function(x){ if(x.id===it.product_id) p=x; });
+      if(!p){ it.line_total_taka=0; return; }
+      var amt=Math.round(p.price_taka*(it.qty_multiplier||1));
+      it.line_total_taka=amt;
+      if(it.active!==false) total+=amt;
+    });
+    pkg.estimated_total_taka=total;
+  });
+}
+function multLabel(label,unit){
+  function pm(t){ var n=String(t||"").replace(/[০-৯]/g,function(d){return "০১২৩৪৫৬৭৮৯".indexOf(d);}); var mm=n.match(/(\d+(?:\.\d+)?)?\s*(কেজি|গ্রাম|লিটার|মিলি|মিলিলিটার|পিস|টি|প্যাকেট|ডজন|জোড়া)?/); if(!mm||(mm[1]==null&&!mm[2])) return null; var v=mm[1]!=null?parseFloat(mm[1]):1; var u=mm[2]||""; if(u==="কেজি") return [v*1000,"weight"]; if(u==="গ্রাম") return [v,"weight"]; if(u==="লিটার") return [v*1000,"volume"]; if(u==="মিলি"||u==="মিলিলিটার") return [v,"volume"]; return [v,"count"]; }
+  var l=pm(label),u=pm(unit);
+  if(!l||!u||l[1]!==u[1]||u[0]<=0) return 1;
+  return l[0]/u[0];
+}
+function cardHtml(p){
+  var q=cart[p.id];
+  var ctrl = q ? '<div class="qty"><button onclick="chg('+p.id+',-1)">−</button><b>'+bn(q)+'</b><button onclick="chg('+p.id+',1)">+</button></div>' : '<button class="add" onclick="add('+p.id+')">কার্টে যোগ করুন</button>';
+  return '<div class="card"><h3>'+p.name+'</h3><div class="brand">'+(p.brand||"")+' • '+p.category+'</div>'+(canSeePrices()?'<div class="price">৳'+bn(p.price_taka)+' <span class="unit">/ '+p.unit+'</span></div>':'<div class="small">দাম দেখতে লগইন করুন</div>')+ctrl+'</div>';
+}
+function renderShop(){
+  var q=(document.getElementById("q").value||"").trim();
+  var chips=document.getElementById("chips");
+  var allCats=["সব"].concat(CATS.filter(function(c){ return DATA.products.some(function(p){ return p.category===c; }); }));
+  chips.innerHTML=allCats.map(function(c){ return '<button class="chip '+(cat===c?'on':'')+'" onclick="setCat(\''+c+'\')">'+c+'</button>'; }).join("");
+  document.getElementById("shopTitle").textContent=DATA.shop||"মাসিক বাজার";
+  document.getElementById("companyTitle").textContent=DATA.company||"নীড়";
+  document.getElementById("heroCount").textContent=bn(DATA.products.length)+"টি পণ্য • "+bn(DATA.packages.length)+"টি পরিবার প্যাকেজ • WhatsApp-এ অর্ডার";
+  var lh=document.getElementById("loginHint");
+  if(lh){ lh.innerHTML = getCustomer()? "" : '<div class="note">🔑 <b>দাম দেখতে লগইন করুন</b> — এখন শুধু পণ্যের নাম আর ব্র্যান্ড দেখা যাচ্ছে। <button class="primary" style="padding:8px 14px" onclick="showTab(\'orders\')">লগইন করুন</button></div>'; }
+  var daily=DATA.products.filter(function(p){ return p.daily; }).slice(0,12);
+  document.getElementById("daily").innerHTML=daily.map(cardHtml).join("");
+  var list=DATA.products.filter(function(p){ return (cat==="সব"||p.category===cat)&&(!q||p.name.indexOf(q)>=0||(p.brand||"").indexOf(q)>=0||p.category.indexOf(q)>=0); });
+  var el=document.getElementById("list");
+  if(view==="grid"){
+    el.className="grid";
+    el.innerHTML=list.map(cardHtml).join("")||"<p>কোনো পণ্য পাওয়া যায়নি।</p>";
+  } else {
+    el.className="";
+    el.innerHTML=list.map(function(p,i){ return '<div class="listrow"><b>'+bn(i+1)+'.</b><div class="n"><b>'+p.name+'</b> <span style="color:#666">'+(p.brand||"")+'</span><br>'+(canSeePrices()?'<span class="price">৳'+bn(p.price_taka)+'</span> <span class="unit">/ '+p.unit+'</span>':'<span class="small">দাম দেখতে লগইন করুন</span>')+'</div>'+(cart[p.id]?'<div class="qty"><button onclick="chg('+p.id+',-1)">−</button><b>'+bn(cart[p.id])+'</b><button onclick="chg('+p.id+',1)">+</button></div>':'<button class="add" style="width:auto;padding:8px 12px" onclick="add('+p.id+')">যোগ করুন</button>')+'</div>'; }).join("")||"<p>কোনো পণ্য পাওয়া যায়নি।</p>";
+  }
+  document.getElementById("pkgs").innerHTML=DATA.packages.map(function(pkg){ return '<div class="pkg"><h3>'+pkg.name+'</h3><p>'+(pkg.tagline||"")+'</p><ul>'+pkg.items.map(function(it){ return '<li>'+it.name+' — '+it.qty_label+(canSeePrices()?(' <span style="color:#666">(৳'+bn(it.line_total_taka||0)+')</span>'):"")+'</li>'; }).join("")+'</ul><p class="total">'+(canSeePrices()?('আনুমানিক মোট: ৳'+bn(pkgTotal(pkg))):'আনুমানিক মোট: লগইন করলে দেখা যাবে')+'</p><button class="add" onclick="addPackage('+pkg.id+')">প্যাকেজটি কার্টে নিন</button><button class="ghost" style="width:100%;margin-top:8px" onclick="openPkgCustom('+pkg.id+')">✏️ নিজের মতো সাজান</button></div>'; }).join("");
+}
+function addPackage(id){
+  var pkg=null; DATA.packages.forEach(function(p){ if(p.id===id) pkg=p; }); if(!pkg) return;
+  pkg.items.forEach(function(it){ cart[it.product_id]=(cart[it.product_id]||0)+Math.max(1, Math.round(it.qty_multiplier||1)); });
+  saveCart(); renderCart(); showTab("cart");
+}
+/* ---- package customise (customer's own copy only) ---- */
+var customPkg=null;
+function openPkgCustom(id){
+  var pkg=null; DATA.packages.forEach(function(p){ if(p.id===id) pkg=p; }); if(!pkg) return;
+  customPkg=JSON.parse(JSON.stringify(pkg));
+  document.getElementById("pkgCustom").style.display="block";
+  document.getElementById("pkgCustomTitle").textContent=pkg.name+" — নিজের মতো সাজান";
+  document.getElementById("pkgAddSelect").innerHTML=DATA.products.map(function(p){ return '<option value="'+p.id+'">'+p.name+' ('+(p.brand||"")+(canSeePrices()?(' — ৳'+p.price_taka+'/'+p.unit):"")+')</option>'; }).join("");
+  renderPkgCustom();
+  document.getElementById("pkgCustom").scrollIntoView();
+}
+function closePkgCustom(){ customPkg=null; document.getElementById("pkgCustom").style.display="none"; }
+function renderPkgCustom(){
+  if(!customPkg) return;
+  var total=0;
+  customPkg.items.forEach(function(it){ total+=it.line_total_taka||0; });
+  document.getElementById("pkgCustomItems").innerHTML=customPkg.items.map(function(it,idx){
+    return '<div class="listrow"><div class="n"><b>'+it.name+'</b> '+(it.brand||"")+'<br><input style="width:110px;display:inline-block" value="'+it.qty_label+'" onchange="pkgEditQty('+idx+',this.value)">'+(canSeePrices()?(' <span class="price">৳'+bn(it.line_total_taka||0)+'</span>'):"")+'</div><button class="danger" onclick="pkgRemoveItem('+idx+')">✕ মুছুন</button></div>';
+  }).join("")||"<p>প্যাকেজে কোনো পণ্য নেই — নিচে থেকে যোগ করুন।</p>";
+  document.getElementById("pkgCustomTotal").textContent=canSeePrices()?("৳"+bn(total)):"লগইন করলে দেখা যাবে";
+}
+function pkgEditQty(idx, label){
+  var it=customPkg.items[idx]; if(!it) return;
+  it.qty_label=label;
+  var p=findProduct(it.product_id);
+  if(p){ var m=1; var mm=label.match(/(\d+)/); if(mm) m=parseFloat(label.replace(/[০-৯]/g,function(d){return "০১২৩৪৫৬৭৮৯".indexOf(d);}))||1; it.qty_multiplier=m; it.line_total_taka=Math.round(p.price_taka*m); }
+  renderPkgCustom();
+}
+function pkgRemoveItem(idx){ customPkg.items.splice(idx,1); renderPkgCustom(); }
+function pkgAddItem(){
+  var id=document.getElementById("pkgAddSelect").value;
+  var p=findProduct(id); if(!p) return;
+  customPkg.items.push({product_id:p.id, name:p.name, brand:p.brand, qty_label:"১ "+p.unit, qty_multiplier:1, line_total_taka:p.price_taka});
+  renderPkgCustom();
+}
+function pkgCustomToCart(){
+  if(!customPkg) return;
+  customPkg.items.forEach(function(it){ cart[it.product_id]=(cart[it.product_id]||0)+Math.max(1, Math.round(it.qty_multiplier||1)); });
+  saveCart(); closePkgCustom(); renderCart(); showTab("cart");
+}
+/* ---- cart + custom items ---- */
+function addCustomItem(){
+  var name=document.getElementById("customName").value.trim();
+  var qty=document.getElementById("customQty").value.trim()||"১ পিস";
+  if(!name){ alert("পণ্যের নাম লিখুন।"); return; }
+  customCart.push({id:Date.now(), name:name, qty:qty});
+  document.getElementById("customName").value=""; document.getElementById("customQty").value="";
+  saveCart(); renderCart();
+}
+function delCustomItem(id){ customCart=customCart.filter(function(x){ return x.id!==id; }); saveCart(); renderCart(); }
+function cartTotals(){
+  var total=0, n=0;
+  Object.keys(cart).forEach(function(id){ var p=findProduct(id); if(p){ total+=p.price_taka*cart[id]; n+=cart[id]; } });
+  return {total:total, n:n+customCart.length};
+}
+function renderCart(){
+  var total=0, n=0, lines=[];
+  Object.keys(cart).forEach(function(id){
+    var p=findProduct(id); if(!p) return;
+    var amt=p.price_taka*cart[id]; total+=amt; n+=cart[id];
+    lines.push('<div class="listrow"><b>'+bn(lines.length+1)+'.</b><div class="n"><b>'+p.name+'</b> '+(p.brand||"")+(canSeePrices()?('<br>৳'+bn(p.price_taka)+' × '+bn(cart[id])+' '+p.unit+' = <b>৳'+bn(amt)+'</b>'):('<br>'+bn(cart[id])+' '+p.unit))+'</div><div class="qty"><button onclick="moveCart('+id+',-1)">↑</button><button onclick="moveCart('+id+',1)">↓</button><button onclick="chg('+id+',-1)">−</button><b>'+bn(cart[id])+'</b><button onclick="chg('+id+',1)">+</button></div></div>');
+  });
+  customCart.forEach(function(c){
+    lines.push('<div class="listrow"><b>'+bn(lines.length+1)+'.</b><div class="n"><b>'+c.name+'</b> — '+c.qty+'<br><span class="small">দাম দোকান থেকে জানানো হবে</span></div><button class="danger" onclick="delCustomItem('+c.id+')">✕</button></div>');
+  });
+  document.getElementById("cart").innerHTML=lines.join("")||"<p>কার্ট খালি — দোকান থেকে পণ্য যোগ করুন।</p>";
+  var fee=DATA.delivery_fee_taka||0;
+  document.getElementById("total").textContent=canSeePrices()?("৳"+bn(total)):"—";
+  document.getElementById("feeLine").textContent=canSeePrices()?("৳"+bn(fee)):"—";
+  document.getElementById("grand").textContent=canSeePrices()?("৳"+bn(total+fee)):"—";
+  document.getElementById("cartPriceNote").textContent=canSeePrices()?"":"🔑 দাম দেখতে লগইন করুন — আমার অর্ডার ট্যাবে লগইন করলে দাম দেখা যাবে। অর্ডার পাঠালে দোকান WhatsApp-এ দাম জানিয়ে দেবে।";
+  document.getElementById("cartCount").textContent=cartTotals().n?("("+bn(cartTotals().n)+")"):"";
+  document.getElementById("ocode").textContent=code();
+  var name=document.getElementById("cname").value||"", phone=document.getElementById("cphone").value||"";
+  var msg="আসসালামু আলাইকুম, মাসিক বাজারে অর্ডার দিতে চাই।%0Aঅর্ডার নম্বর: "+code()+"%0Aনাম: "+encodeURIComponent(name)+"%0Aমোবাইল: "+encodeURIComponent(phone)+"%0A----------------%0A";
+  var i=1;
+  Object.keys(cart).forEach(function(id){ var p=findProduct(id); if(p) msg+=(i++)+". "+encodeURIComponent(p.name)+((p.brand)?" ("+encodeURIComponent(p.brand)+")":"")+" — "+cart[id]+" "+encodeURIComponent(p.unit)+(canSeePrices()?(" × ৳"+p.price_taka+" = ৳"+(p.price_taka*cart[id])):"")+"%0A"; });
+  customCart.forEach(function(c){ msg+=(i++)+". "+encodeURIComponent(c.name)+" — "+encodeURIComponent(c.qty)+" (দাম পরে জানাবেন)%0A"; });
+  msg+=canSeePrices()?("----------------%0Aপণ্যের মোট: ৳"+total+"%0Aডেলিভারি চার্জ: ৳"+fee+"%0Aসর্বমোট: ৳"+(total+fee)+"%0A— মাসিক বাজার, "+encodeURIComponent(DATA.company||"নীড়")):("----------------%0A(দাম দোকান থেকে জানানো হবে)%0A— মাসিক বাজার, "+encodeURIComponent(DATA.company||"নীড়"));
+  document.getElementById("walink").href="https://wa.me/"+waNumber()+"?text="+msg;
+  document.getElementById("walink").textContent="WhatsApp-এ অর্ডার পাঠান — "+(DATA.whatsapp||"");
+}
+/* ---- my orders (saved on this phone) ---- */
+function getOrders(){ try{ return JSON.parse(localStorage.getItem("mb-orders")||"[]"); }catch(e){ return []; } }
+function saveOrder(){
+  var t=cartTotals(); if(t.n===0) return;
+  var _c=getCustomer();
+  if(_c){ var _cn=document.getElementById("cname"); if(_cn && !_cn.value) _cn.value=_c.name||""; var _cp=document.getElementById("cphone"); if(_cp && !_cp.value) _cp.value=_c.phone||""; }
+  var items=[];
+  Object.keys(cart).forEach(function(id){ var p=findProduct(id); if(p) items.push({name:p.name, brand:p.brand, qty:cart[id], unit:p.unit, price:p.price_taka, total:p.price_taka*cart[id]}); });
+  var ord={code:code(), date:new Date().toISOString(), name:document.getElementById("cname").value||"", phone:document.getElementById("cphone").value||"", items:items, custom:customCart.slice(), total:t.total, fee:DATA.delivery_fee_taka||0, grand:t.total+(DATA.delivery_fee_taka||0), status:"sent"};
+  var list=getOrders(); list.unshift(ord); localStorage.setItem("mb-orders", JSON.stringify(list));
+  if(sb){
+    var profit=0;
+    ord.items.forEach(function(it){ var pp=null; DATA.products.forEach(function(x){ if(x.name===it.name) pp=x; }); if(pp) profit+=((pp.price_taka-(pp.wholesale_price||0))*it.qty); });
+    sb.from("orders").insert([{order_no:ord.code, customer_name:ord.name, phone:ord.phone, items:ord.items.concat(ord.custom.map(function(c){ return {name:c.name, brand:"", qty:1, unit:c.qty, price:0, total:0}; })), subtotal:ord.total, delivery_fee:ord.fee, total:ord.grand, profit:Math.round(profit), status:"New Order"}]).then(function(r){ if(r.error) console.log("order sync failed", r.error.message); });
+  }
+  localStorage.removeItem("mb-code");
+  cart={}; customCart=[]; saveCart(); renderCart();
+}
+function setOrderStatus(codeStr, status){
+  var list=getOrders(); list.forEach(function(o){ if(o.code===codeStr) o.status=status; });
+  localStorage.setItem("mb-orders", JSON.stringify(list)); renderMyOrders();
+}
+function reorder(codeStr){
+  var o=null; getOrders().forEach(function(x){ if(x.code===codeStr) o=x; }); if(!o) return;
+  o.items.forEach(function(it){ var p=null; DATA.products.forEach(function(x){ if(x.name===it.name) p=x; }); if(p) cart[p.id]=(cart[p.id]||0)+it.qty; });
+  saveCart(); renderCart(); showTab("cart");
+}
+async function renderMyOrders(){
+  renderCustomerBox();
+  var el=document.getElementById("myOrders"); if(!el) return;
+  var c=getCustomer();
+  if(c && sb){
+    el.innerHTML="<p>আসছে…</p>";
+    var res=await sb.from("orders").select("*").eq("phone", c.phone||"__none__").order("created_at",{ascending:false}).limit(20);
+    if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
+    var rows=res.data||[];
+    if(!rows.length){ el.innerHTML="<p>লগইন করা আছে — এখনো কোনো অর্ডার নেই। প্রথম অর্ডার দিলে এখানে দেখা যাবে।</p>"; return; }
+    var bnStatus={"New Order":"নতুন অর্ডার","Contacted":"যোগাযোগ হয়েছে","Confirmed":"নিশ্চিত","Preparing":"তৈরি হচ্ছে","Out for Delivery":"ডেলিভারিতে","Delivered":"ডেলিভারি সম্পন্ন","Cancelled":"বাতিল"};
+    el.innerHTML=rows.map(function(o){
+      var d=new Date(o.created_at);
+      return '<div class="ordercard"><b>'+o.order_no+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br><b>'+(bnStatus[o.status]||o.status)+'</b><br>'+(o.items||[]).map(function(it){ return it.name+' — '+bn(it.qty)+' '+(it.unit||"")+' (৳'+bn(it.total||0)+')'; }).join("<br>")+'<br><b>সর্বমোট: ৳'+bn(o.total)+'</b><br><button class="primary" onclick="reorderByNo(\''+o.order_no+'\')">🔁 আবার এই অর্ডারটি করুন</button></div>';
+    }).join("");
+    return;
+  }
+  var list=getOrders();
+  if(!list.length){ el.innerHTML="<p>এখনো কোনো অর্ডার নেই। প্রথম অর্ডার দিলে এখানে দেখা যাবে। অর্ডারের রেকর্ড সেভ রাখতে ওপরে লগইন করুন।</p>"; return; }
+  var statusText={sent:"WhatsApp-এ পাঠানো হয়েছে", confirmed:"দোকান নিশ্চিত করেছে", delivered:"ডেলিভারি সম্পন্ন"};
+  el.innerHTML=list.map(function(o){
+    var d=new Date(o.date);
+    var steps='<div class="timeline"><div class="done">✓ অর্ডার দেওয়া হয়েছে</div><div class="done">✓ WhatsApp-এ পাঠানো হয়েছে</div><div class="'+(o.status==="sent"?"todo":"done")+'">'+(o.status==="sent"?"○":"✓")+' দোকান থেকে নিশ্চিতকরণ — WhatsApp-এ জানানো হবে</div><div class="'+(o.status==="delivered"?"done":"todo")+'">'+(o.status==="delivered"?"✓":"○")+' ডেলিভারি সম্পন্ন</div></div>';
+    return '<div class="ordercard"><b>'+o.code+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br><b>'+statusText[o.status]+'</b><br>'+o.items.map(function(it){ return it.name+' — '+bn(it.qty)+' '+it.unit+' (৳'+bn(it.total)+')'; }).join("<br>")+(o.custom.length?("<br>"+o.custom.map(function(c){ return c.name+" — "+c.qty; }).join("<br>")):"")+'<br><b>সর্বমোট: ৳'+bn(o.grand)+'</b>'+steps+'<button class="primary" onclick="reorder(\''+o.code+'\')">🔁 আবার এই অর্ডারটি করুন</button> '+(o.status==="sent"?'<button class="ghost" onclick="setOrderStatus(\''+o.code+'\',\'confirmed\')">দোকান নিশ্চিত করেছে</button>':"")+(o.status==="confirmed"?'<button class="ghost" onclick="setOrderStatus(\''+o.code+'\',\'delivered\')">ডেলিভারি পেয়েছি</button>':"")+'</div>';
+  }).join("");
+}
+/* ---- install as app ---- */
+var deferredPrompt=null;
+function isStandalone(){ return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone; }
+function inAppBrowser(){ var ua=navigator.userAgent||""; return /WhatsApp|FBAN|FBAV|Instagram|imo|Line|Viber|Telegram/i.test(ua); }
+window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); deferredPrompt=e; showInstallBanner(); });
+function showInstallBanner(){
+  if(isStandalone()) return;
+  var b=document.getElementById("installBanner"); if(!b) return;
+  b.style.display="block";
+  if(inAppBrowser()) document.getElementById("installText").textContent="আপনি WhatsApp / Messenger / IMO-এর ভেতরে আছেন — নিচের বোতাম চাপলে Chrome-এ খোলার ধাপ দেখাবে, সেখান থেকে এক ট্যাপে অ্যাপ হবে।";
+  else if(deferredPrompt) document.getElementById("installText").textContent="এক ট্যাপে ফোনে অ্যাপের মতো রাখুন — পরে আর লিংক খুঁজতে হবে না।";
+}
+function doInstall(){
+  var steps=document.getElementById("installSteps");
+  if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.then(function(){ deferredPrompt=null; }); return; }
+  var ua=navigator.userAgent||"";
+  var app = /WhatsApp/i.test(ua) ? "WhatsApp" : (/FBAN|FBAV/i.test(ua) ? "Messenger / Facebook" : (/imo/i.test(ua) ? "IMO" : "এই অ্যাপ"));
+  steps.style.display="block";
+  steps.innerHTML="<b>"+app+"-এর ভেতরে সরাসরি ইনস্টল হয় না — ২টা ধাপ:</b><br>১. ওপরে <b>⋮</b> (বা <b>•••</b>) চাপুন → <b>Open in Chrome</b> / <b>ব্রাউজারে খুলুন</b> চাপুন।<br>২. Chrome খুললে আবার <b>⋮</b> চাপুন → <b>Add to Home screen</b> → <b>Add</b> চাপুন।<br>ব্যস — মাসিক বাজার অ্যাপ ফোনের হোম স্ক্রিনে চলে আসবে, তারপর থেকে ওখান থেকেই পণ্য দেখে অর্ডার করা যাবে।";
+}
+if("serviceWorker" in navigator){ window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
+showInstallBanner();
 var CATS = ["চাল ও আটা", "তেল ও ঘি", "ডাল ও চিনি", "মসলা", "সাবান ও পরিষ্কারক", "ব্যক্তিগত যত্ন", "চা ও পানীয়", "নাস্তা", "ঘরোয়া সামগ্রী", "অন্যান্য"];
 var DATA = FALLBACK;
 var DRAFT = null;
@@ -425,6 +738,12 @@ function logVisit(ev, detail){
 }
 function getCustomer(){ try{ return JSON.parse(localStorage.getItem("mb-customer")||"null"); }catch(e){ return null; } }
 async function sha256hex(str){ try{ var b=await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str)); return Array.from(new Uint8Array(b)).map(function(x){ return ("0"+x.toString(16)).slice(-2); }).join(""); }catch(e){ var h=0; for(var i=0;i<str.length;i++){ h=((h<<5)-h+str.charCodeAt(i))|0; } return "h"+h; } }
+function multLabel(label,unit){
+  function pm(t){ var n=String(t||"").replace(/[০-৯]/g,function(d){return "০১২৩৪৫৬৭৮৯".indexOf(d);}); var mm=n.match(/(\d+(?:\.\d+)?)?\s*(কেজি|গ্রাম|লিটার|মিলি|মিলিলিটার|পিস|টি|প্যাকেট|ডজন|জোড়া)?/); if(!mm||(mm[1]==null&&!mm[2])) return null; var v=mm[1]!=null?parseFloat(mm[1]):1; var u=mm[2]||""; if(u==="কেজি") return [v*1000,"weight"]; if(u==="গ্রাম") return [v,"weight"]; if(u==="লিটার") return [v*1000,"volume"]; if(u==="মিলি"||u==="মিলিলিটার") return [v,"volume"]; return [v,"count"]; }
+  var l=pm(label),u=pm(unit);
+  if(!l||!u||l[1]!==u[1]||u[0]<=0) return 1;
+  return l[0]/u[0];
+}
 var deferredPrompt=null;
 function isStandalone(){ return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone; }
 function inAppBrowser(){ var ua=navigator.userAgent||""; return /WhatsApp|FBAN|FBAV|Instagram|imo|Line|Viber|Telegram/i.test(ua); }
@@ -464,7 +783,23 @@ function loadDraft(){
   try{ var d=JSON.parse(localStorage.getItem("mb-draft")||"null"); if(d && d.products) { DRAFT=d; return; } }catch(e){}
   DRAFT=JSON.parse(JSON.stringify(DATA));
 }
-function saveDraft(){ localStorage.setItem("mb-draft", JSON.stringify(DRAFT)); updateDraftInfo(); updateAdminStats(); }
+function draftMaxId(){ var m=0; (DRAFT&&DRAFT.products||[]).forEach(function(p){ if(p.id>m) m=p.id; }); return m; }
+function saveDraft(){ localStorage.setItem("mb-draft", JSON.stringify(DRAFT)); try{ var m=draftMaxId(); var w=parseInt(localStorage.getItem("mb-draft-maxid")||"0",10)||0; if(m>w) localStorage.setItem("mb-draft-maxid", String(m)); }catch(e){} updateDraftInfo(); updateAdminStats(); }
+function mergeNewProducts(){
+  if(!DRAFT || !DATA || !DATA.products) return;
+  var wm=0; try{ wm=parseInt(localStorage.getItem("mb-draft-maxid")||"0",10)||0; }catch(e){}
+  var floor=Math.max(wm, draftMaxId());
+  var added=false;
+  DATA.products.forEach(function(p){ if(p.id>floor){ DRAFT.products.push(JSON.parse(JSON.stringify(p))); added=true; } });
+  if(added) saveDraft();
+}
+function mergeNewPackages(){
+  if(!DRAFT || !DATA || !DATA.packages) return;
+  var have={}; DRAFT.packages.forEach(function(p){ have[p.id]=true; });
+  var added=false;
+  DATA.packages.forEach(function(p){ if(!have[p.id]){ DRAFT.packages.push(JSON.parse(JSON.stringify(p))); added=true; } });
+  if(added) saveDraft();
+}
 function updateDraftInfo(){
   var el=document.getElementById("draftInfo"); if(!el) return;
   var same = JSON.stringify(DRAFT)===JSON.stringify(DATA);
@@ -540,11 +875,31 @@ function fixOldRiceName(){
   var dn=null; DATA.products.forEach(function(p){ if(p.id===1) dn=p; });
   if(!dn || !dn.name || dn.name==="চাল (কোলা চাল)") return;
   var changed=false;
-  DRAFT.products.forEach(function(p){ if(p.id===1 && p.name==="চাল (কোলা চাল)"){ p.name=dn.name; p.brand=dn.brand||""; changed=true; } });
+  DRAFT.products.forEach(function(p){ if(p.name==="চাল (কোলা চাল)"){ p.name=dn.name; p.brand=dn.brand||""; changed=true; } });
+  (DRAFT.packages||[]).forEach(function(pkg){ (pkg.items||[]).forEach(function(it){ if(it.name==="চাল (কোলা চাল)"){ it.name=dn.name; changed=true; } }); });
   if(changed){ saveDraft(); if(typeof renderAdminProducts==="function") renderAdminProducts(); }
 }
+function normName(n){ return n==="চাল (কোলা চাল)" ? "চাল (খোলা চাল) বি-২৯" : n; }
+function findProdForItem(it, src){
+  var list=(src||DRAFT||{}).products||[];
+  var p=null;
+  if(it.product_id) list.forEach(function(x){ if(x.id===it.product_id) p=x; });
+  if(!p){ var nn=normName(it.name); list.forEach(function(x){ if(x.name===nn && (x.brand||"")===(it.brand||"")) p=x; }); }
+  if(!p){ var nn2=normName(it.name); list.forEach(function(x){ if(x.name===nn2) p=x; }); }
+  return p;
+}
+function orderProfit(o){
+  if(o.bulk_total!=null && o.bulk_total!==""){ var sub=(o.subtotal!=null?+o.subtotal:+o.total); return Math.round(sub-(+o.bulk_total)); }
+  var pr=0;
+  (o.items||[]).forEach(function(it){
+    var pp=findProdForItem(it, DRAFT) || findProdForItem(it, DATA);
+    var w=pp?(pp.wholesale_price||0):0;
+    pr+=(((it.price!=null?it.price:(pp?pp.price_taka:0))-w)*(+it.qty||0));
+  });
+  return Math.round(pr);
+}
 function openAdmin(){
-  loadDraft();
+  loadDraft(); fixOldRiceName(); mergeNewProducts(); mergeNewPackages();
   document.getElementById("pinBox").style.display="none";
   document.getElementById("sShop").value=DRAFT.shop||"";
   document.getElementById("sCompany").value=DRAFT.company||"";
@@ -614,13 +969,13 @@ function showAdminTab(t){
     document.getElementById("admin-"+x).style.display=(x===t)?"block":"none";
     document.getElementById("atab-"+x).classList.toggle("on", x===t);
   });
-  if(t==="settings") loadCoupons();
+  if(t==="settings"){ loadCoupons(); loadBulkTiers(); }
   if(t==="products") loadProductRatingsAdmin();
   if(t==="analytics") loadAnalytics();
   if(t==="orders") loadAdminOrders();
   if(t==="subs") loadSubs();
   if(t==="profit") loadProfit();
-  if(t==="supplier"){ loadSupplierPrices(); loadSuppliers(); }
+  if(t==="supplier"){ loadSupplierPrices(); loadSuppliers(); loadBulkPOs(); }
   if(t==="customers") loadCustomers();
   if(t==="visitors") loadVisitors();
   if(t==="feedback") loadFeedback();
@@ -665,7 +1020,7 @@ async function loadCoupons(){
   if(!rows.length){ el.innerHTML="<p>এখনো কোনো কুপন নেই।</p>"; return; }
   el.innerHTML=rows.map(function(c){
     var exp=c.expires_at?new Date(c.expires_at).toLocaleDateString("bn-BD"):"মেয়াদ নেই";
-    var disc=c.discount_type==="percent"?("ছাড় "+bn(c.discount_value)+"%"):("ছাড় ৳"+bn(c.discount_value));
+    var disc=c.discount_type==="percent"?("ছাড় "+bn(c.discount_value)+"%"):(c.discount_type==="free_delivery"?"ফ্রি ডেলিভারি":("ছাড় ৳"+bn(c.discount_value)));
     return '<div class="ordercard"><b>'+esc(c.code)+'</b> — '+disc+'<br>ন্যূনতম অর্ডার: ৳'+bn(c.min_order||0)+' • মেয়াদ: '+exp+' • ব্যবহৃত: '+bn(c.usage_count||0)+' বার<br>'+(c.active?"✅ চালু":"❌ বন্ধ")+' <button class="ghost" onclick="toggleCoupon(\''+c.id+'\','+(c.active?"false":"true")+')">'+(c.active?"বন্ধ করুন":"চালু করুন")+'</button></div>';
   }).join("");
 }
@@ -676,7 +1031,7 @@ async function addCoupon(){
   var exp=document.getElementById("cpExp").value||"";
   var msg=document.getElementById("cpMsg");
   if(!code){ msg.textContent="কোড লিখুন।"; return; }
-  if(val<=0){ msg.textContent="ছাড়ের পরিমাণ লিখুন।"; return; }
+  if(val<=0 && document.getElementById("cpType").value!=="free_delivery"){ msg.textContent="ছাড়ের পরিমাণ লিখুন।"; return; }
   if(!sb){ msg.textContent="ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।"; return; }
   var res=await sb.from("coupons").insert([{code:code, discount_type:document.getElementById("cpType").value, discount_value:val, min_order:min, active:true, expires_at:exp?new Date(exp).toISOString():null}]);
   if(res.error){ msg.textContent="হয়নি: "+res.error.message; return; }
@@ -688,6 +1043,52 @@ async function toggleCoupon(id, active){
   if(!sb) return;
   await sb.from("coupons").update({active:active}).eq("id", id);
   loadCoupons();
+}
+async function loadBulkTiers(){
+  var el=document.getElementById("bulkTierList"); if(!el) return;
+  if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
+  var res=await sb.from("bulk_discount_tiers").select("*").order("min_order",{ascending:true});
+  if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
+  var rows=res.data||[];
+  var mg=document.getElementById("btMargin");
+  try{
+    var ores=await sb.from("orders").select("subtotal,total,items").order("created_at",{ascending:false}).limit(50);
+    var sSub=0, sPr=0, nOrd=0;
+    (ores.data||[]).forEach(function(o){ var pr=orderProfit(o); var sub=+(o.subtotal||o.total||0); if(sub>0){ sSub+=sub; sPr+=pr; nOrd++; } });
+    if(mg) mg.textContent=nOrd?("📊 দোকানের গড় লাভের হার: "+bn(Math.round(sPr/sSub*1000)/10)+"% (শেষ "+bn(nOrd)+" অর্ডার) — ছাড় যেন লাভের হারের চেয়ে কম হয়, নইলে লোকসান হবে।"):"";
+  }catch(e){}
+  if(!rows.length){ el.innerHTML="<p>এখনো কোনো নিয়ম নেই — ওপরে নিয়ম যোগ করুন। যেমন: ৳৫০০০ অর্ডারে ৳৫০ ছাড়।</p>"; return; }
+  el.innerHTML=rows.map(function(t){
+    var txt=t.discount_type==="percent"?("ছাড় "+bn(t.discount_value)+"%"):(t.discount_type==="free_delivery"?"ফ্রি ডেলিভারি":("ছাড় ৳"+bn(t.discount_value)));
+    var pct=t.discount_type==="fixed"&&(+t.min_order||0)>0?(" • অর্ডারের "+bn(Math.round((+t.discount_value||0)/(+t.min_order||1)*1000)/10)+"%"):"";
+    return '<div class="ordercard"><b>৳'+bn(t.min_order||0)+' অর্ডারে → '+txt+'</b>'+pct+'<br>'+(t.active?"✅ চালু":"❌ বন্ধ")+' <button class="ghost" onclick="toggleBulkTier(\''+t.id+'\','+(t.active?"false":"true")+')">'+(t.active?"বন্ধ করুন":"চালু করুন")+'</button> <button class="danger" onclick="deleteBulkTier(\''+t.id+'\')">🗑️ মুছুন</button></div>';
+  }).join("");
+}
+async function addBulkTier(){
+  var min=parseInt((document.getElementById("btMin")||{}).value||"0",10)||0;
+  var type=(document.getElementById("btType")||{}).value||"fixed";
+  var val=parseInt((document.getElementById("btValue")||{}).value||"0",10)||0;
+  var msg=document.getElementById("btMsg");
+  if(min<=0){ msg.textContent="ন্যূনতম অর্ডার লিখুন।"; return; }
+  if(type!=="free_delivery" && val<=0){ msg.textContent="ছাড়ের পরিমাণ লিখুন।"; return; }
+  if(type==="percent" && val>50){ msg.textContent="৫০%-এর বেশি ছাড় দিলে লোকসান হতে পারে — কম ছাড় বসান।"; return; }
+  if(!sb){ msg.textContent="ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।"; return; }
+  var res=await sb.from("bulk_discount_tiers").insert([{min_order:min, discount_type:type, discount_value:(type==="free_delivery"?0:val), active:true}]);
+  if(res.error){ msg.textContent="হয়নি: "+res.error.message; return; }
+  msg.textContent="✅ নিয়ম যোগ হয়েছে — ৳"+bn(min)+" অর্ডারে কুপন মিলবে।";
+  document.getElementById("btMin").value=""; document.getElementById("btValue").value="";
+  loadBulkTiers();
+}
+async function toggleBulkTier(id, active){
+  if(!sb) return;
+  await sb.from("bulk_discount_tiers").update({active:active}).eq("id", id);
+  loadBulkTiers();
+}
+async function deleteBulkTier(id){
+  if(!sb) return;
+  var res=await sb.from("bulk_discount_tiers").delete().eq("id", id);
+  if(res.error){ alert("হয়নি: "+res.error.message); return; }
+  loadBulkTiers();
 }
 async function loadFeedback(){
   var el=document.getElementById("feedbackList"); if(!el) return;
@@ -801,7 +1202,7 @@ function renderAdminProducts(){
   }
   h+=list.map(function(g){
     var brands=g.vars.map(function(v){ var b=(v.brand||"").trim(); return '<div class="brandrow">'+(b?'<span class="bname">'+esc(b)+'</span>':'<span class="bunit">/ '+esc(v.unit||"")+'</span>')+'<span class="bprices"><span class="pr">খুচরা ৳'+bn(v.price_taka||0)+'</span><span class="pw">পাইকারি ৳'+bn(v.wholesale_price||0)+'</span></span></div>'; }).join("");
-    return '<div class="pcard" onclick="openGroupEdit('+g.gid+')"><div><b>'+esc(g.name)+'</b><span class="pcat">'+esc(g.category)+'</span></div><div class="pbrands">'+brands+'</div><div class="pacts"><button class="primary" onclick="event.stopPropagation();openGroupEdit('+g.gid+')">✏️ বদলান</button><button class="ghost" onclick="event.stopPropagation();moveGroup('+g.gid+',-1)">↑ ওপরে</button><button class="ghost" onclick="event.stopPropagation();moveGroup('+g.gid+',1)">↓ নিচে</button></div></div>';
+    return '<div class="pcard" onclick="openGroupEdit('+g.gid+')"><div><b>'+esc(g.name)+'</b>'+(g.vars.some(function(v){ return v.special; })?' ⭐':'')+'<span class="pcat">'+esc(g.category)+'</span></div><div class="pbrands">'+brands+'</div><div class="pacts"><button class="primary" onclick="event.stopPropagation();openGroupEdit('+g.gid+')">✏️ বদলান</button><button class="ghost" onclick="event.stopPropagation();moveGroup('+g.gid+',-1)">↑ ওপরে</button><button class="ghost" onclick="event.stopPropagation();moveGroup('+g.gid+',1)">↓ নিচে</button></div></div>';
   }).join("")||"<p>কোনো পণ্য পাওয়া যায়নি।</p>";
   el.innerHTML=h;
 }
@@ -861,6 +1262,7 @@ function renderGroupEdit(g){
   h+='<p class="small">যা বদলাবেন, তা সাথে সাথে সংরক্ষণ হবে। শেষে প্রকাশ ট্যাবে গিয়ে প্রকাশ করলেই কাস্টমার নতুন তথ্য দেখবে।</p>';
   h+='<label>পণ্যের নাম</label><input value="'+esc(g.name)+'" onchange="renameGroup('+g.gid+',this.value)" placeholder="যেমন: সয়াবিন তেল">';
   h+='<label>ক্যাটাগরি</label><select onchange="setGroupCategory('+g.gid+',this.value)">'+CATS.map(function(c){ return '<option '+(c===g.category?'selected':'')+'>'+c+'</option>'; }).join("")+'</select>';
+  h+='<label style="display:flex;gap:8px;align-items:center;margin:10px 0"><input type="checkbox" style="width:auto;height:auto" '+(g.vars.some(function(v){ return v.special; })?'checked':'')+' onchange="setGroupSpecial('+g.gid+',this.checked)"> ⭐ স্পেশাল আইটেম হিসেবে দেখান (কাস্টমার অ্যাপে সবার ওপরে দেখাবে)</label>';
   h+='<h4>ব্র্যান্ড ও দাম</h4>';
   g.vars.forEach(function(p){
     h+='<div class="vcard">';
@@ -888,6 +1290,11 @@ function setGroupCategory(gid, cat){
   var name=groupNameA(gid); if(!name) return;
   DRAFT.products.forEach(function(p){ if(p.name===name) p.category=cat; });
   recalcPackages(DRAFT); saveDraft(); renderAdminProducts();
+}
+function setGroupSpecial(gid, on){
+  var name=groupNameA(gid); if(!name) return;
+  DRAFT.products.forEach(function(p){ if(p.name===name) p.special=!!on; });
+  saveDraft(); renderAdminProducts();
 }
 function addVariant(gid){
   var p0=null; DRAFT.products.forEach(function(x){ if(x.id===gid) p0=x; }); if(!p0) return;
@@ -996,7 +1403,7 @@ function renderAdminPackages(){
     el.innerHTML=DRAFT.packages.map(function(pkg){
       var act=pkg.items.filter(function(it){ return it.active!==false; });
       var inact=pkg.items.length-act.length;
-      return '<div class="pkg" style="cursor:pointer" onclick="openAdminPackage('+pkg.id+')"><h3>'+esc(pkg.name)+'</h3><p>'+(pkg.tagline||"")+'</p><p class="small">'+bn(act.length)+'টি পণ্য'+(inact?(' • '+bn(inact)+'টি নিস্ক্রিয়'):'')+'</p><p class="total">আনুমানিক মোট: ৳'+bn(pkgTotal(pkg))+'</p><button class="add" onclick="event.stopPropagation();openAdminPackage('+pkg.id+')">📦 প্যাকেজটি খুলুন</button></div>';
+      return '<div class="pkg" style="cursor:pointer" onclick="openAdminPackage('+pkg.id+')"><h3>'+esc(pkg.name)+'</h3><p>'+(pkg.tagline||"")+'</p>'+(pkg.kind==="occasion"?'<p class="small">🎉 অনুষ্ঠানের প্যাকেজ</p>':(pkg.kind==="expat"?'<p class="small">✈️ প্রবাসী পরিবার</p>':""))+(pkg.scale?('<p class="small">📏 ভিত্তি: '+bn(pkg.scale.base)+' '+pkg.scale.unit+' • '+bn(pkg.scale.min)+'–'+bn(pkg.scale.max)+'</p>'):"")+'<p class="small">'+bn(act.length)+'টি পণ্য'+(inact?(' • '+bn(inact)+'টি নিস্ক্রিয়'):'')+'</p><p class="total">আনুমানিক মোট: ৳'+bn(pkgTotal(pkg))+'</p><button class="add" onclick="event.stopPropagation();openAdminPackage('+pkg.id+')">📦 প্যাকেজটি খুলুন</button></div>';
     }).join("")+'<button class="gold" style="width:100%" onclick="addPackage()">➕ নতুন প্যাকেজ</button>';
     return;
   }
@@ -1004,6 +1411,15 @@ function renderAdminPackages(){
   if(!pkg){ openPkgId=null; renderAdminPackages(); return; }
   el.innerHTML='<button class="ghost" onclick="closeAdminPackage()">← সব প্যাকেজ</button>'
     +'<div class="pkg"><label>প্যাকেজের নাম</label><input value="'+pkg.name.replace(/"/g,"&quot;")+'" onchange="editPackage('+pkg.id+',\'name\',this.value)"><label>ট্যাগলাইন</label><input value="'+(pkg.tagline||"").replace(/"/g,"&quot;")+'" onchange="editPackage('+pkg.id+',\'tagline\',this.value)">'
+    +'<label>ধরন</label><select onchange="editPkgKind('+pkg.id+',this.value)"><option value="family"'+(pkg.kind!=="occasion"&&pkg.kind!=="expat"?" selected":"")+'>পরিবার প্যাকেজ</option><option value="occasion"'+(pkg.kind==="occasion"?" selected":"")+'>অনুষ্ঠানের প্যাকেজ (বিয়ে/সিন্নি)</option><option value="expat"'+(pkg.kind==="expat"?" selected":"")+'>প্রবাসী পরিবার</option></select>'
+    +'<div'+(pkg.kind==="family"||!pkg.kind?' style="display:none"':"")+'>'
+    +'<p class="small">📏 কাস্টমার এই সংখ্যা বদলে প্রতিটি পণ্যের পরিমাণ বদলাতে পারবে। নিচের পরিমাণগুলো ভিত্তি সংখ্যার জন্য।</p>'
+    +'<label>ভিত্তি সংখ্যা</label><input type="number" value="'+(pkg.scale?pkg.scale.base:"")+'" onchange="editPkgScale('+pkg.id+',\'base\',this.value)">'
+    +'<label>সর্বনিম্ন</label><input type="number" value="'+(pkg.scale?pkg.scale.min:"")+'" onchange="editPkgScale('+pkg.id+',\'min\',this.value)">'
+    +'<label>সর্বোচ্চ</label><input type="number" value="'+(pkg.scale?pkg.scale.max:"")+'" onchange="editPkgScale('+pkg.id+',\'max\',this.value)">'
+    +'<label>ধাপ</label><input type="number" value="'+(pkg.scale?pkg.scale.step:"")+'" onchange="editPkgScale('+pkg.id+',\'step\',this.value)">'
+    +'<label>একক</label><input value="'+(pkg.scale?pkg.scale.unit:"")+'" onchange="editPkgScale('+pkg.id+',\'unit\',this.value)">'
+    +'</div>'
     +'<div>'+pkg.items.map(function(it,idx){
         var inactive = it.active===false;
         return '<div class="listrow"'+(inactive?' style="opacity:.55;background:#f3f4f6"':'')+'><div class="n"><b>'+it.name+'</b> <span style="color:#666">(৳'+bn(it.line_total_taka||0)+')</span>'+(inactive?' <span class="badge rejected">নিস্ক্রিয়</span>':'')+'</div><input style="width:90px" value="'+it.qty_label+'" onchange="editPkgItemQty('+pkg.id+','+idx+',this.value)"><button class="ghost" onclick="togglePkgItemActive('+pkg.id+','+idx+')">'+(inactive?'সক্রিয় করুন':'নিস্ক্রিয়')+'</button><button class="danger" onclick="delPkgItem('+pkg.id+','+idx+')">✕</button></div>';
@@ -1013,10 +1429,23 @@ function renderAdminPackages(){
     +'<button class="danger" onclick="delPackage('+pkg.id+')">'+(pendingDelPkg===pkg.id?'নিশ্চিত? প্যাকেজটি মুছুন':'প্যাকেজটি মুছুন')+'</button></div>';
 }
 function editPackage(id, field, val){ DRAFT.packages.forEach(function(p){ if(p.id===id) p[field]=val; }); saveDraft(); }
+function editPkgKind(id, kind){
+  DRAFT.packages.forEach(function(p){ if(p.id!==id) return; p.kind=kind;
+    if(kind==="family"){ p.scale=null; }
+    else if(!p.scale){ p.scale={base:(kind==="occasion"?100:4),min:(kind==="occasion"?100:2),max:(kind==="occasion"?600:12),step:(kind==="occasion"?50:1),unit:(kind==="occasion"?"অতিথি":"সদস্য")}; }
+  });
+  saveDraft(); renderAdminPackages();
+}
+function editPkgScale(id, field, val){
+  DRAFT.packages.forEach(function(p){ if(p.id!==id) return; if(!p.scale) p.scale={base:100,min:100,max:600,step:50,unit:"অতিথি"};
+    if(field==="unit"){ p.scale.unit=val; } else { var n=parseInt(val,10); if(!isNaN(n)&&n>0) p.scale[field]=n; }
+  });
+  saveDraft(); renderAdminPackages();
+}
 function editPkgItemQty(pkgId, idx, label){
   DRAFT.packages.forEach(function(pkg){ if(pkg.id!==pkgId) return; var it=pkg.items[idx]; if(!it) return; it.qty_label=label;
     var p=null; DRAFT.products.forEach(function(x){ if(x.id===it.product_id) p=x; });
-    if(p){ var m=1; var num=parseFloat(label.replace(/[০-৯]/g,function(d){return "০১২৩৪৫৬৭৮৯".indexOf(d);})); if(!isNaN(num)) m=num; it.qty_multiplier=m; it.line_total_taka=Math.round(p.price_taka*m); }
+    if(p){ it.qty_multiplier=multLabel(label,p.unit); it.line_total_taka=Math.round(p.price_taka*it.qty_multiplier); }
   });
   recalcPackages(DRAFT); saveDraft(); renderAdminPackages();
 }
@@ -1104,7 +1533,7 @@ var adminOrderCount=null;
 var memoData=null;
 function openMemo(orderId){
   var o=adminOrdersById[orderId]; if(!o) return;
-  memoData={no:o.order_no, date:o.created_at, name:o.customer_name||"", phone:o.phone||"", address:"—", pay:o.payment_method||"", payStatus:o.payment_status||"unpaid",
+  memoData={no:o.order_no, date:o.created_at, name:o.customer_name||"", phone:o.phone||"", address:o.address||"—", pay:o.payment_method||"", payStatus:o.payment_status||"unpaid", delivery_day:o.delivery_day||"", delivery_slot:o.delivery_slot||"",
     items:(o.items||[]).map(function(it){ return {name:it.name||"", brand:it.brand||"", qty:+it.qty||0, unit:it.unit||"", price:+it.price||0}; }),
     fee:+o.delivery_fee||0};
   renderMemo(true);
@@ -1121,7 +1550,7 @@ function renderMemo(editable){
   var d=new Date(m.date);
   var t=memoTotals();
   var head='<div style="text-align:center;border-bottom:2px solid #065f46;padding-bottom:10px;margin-bottom:12px"><h2 style="margin:0;color:#065f46">মাসিক বাজার</h2><p style="margin:2px 0">নীড় • WhatsApp: 01631421995</p><h3 style="margin:8px 0 0">🧾 ক্যাশ মেমো</h3></div>';
-  var info='<p>অর্ডার নম্বর: <b>'+esc(m.no)+'</b><br>তারিখ: '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br>কাস্টমার: <b>'+esc(m.name||"—")+'</b><br>মোবাইল: '+esc(m.phone||"—")+'<br>ঠিকানা: '+esc(m.address||"—")+(m.pay?('<br>পেমেন্ট: '+esc(m.pay)+' ('+(m.payStatus==="paid"?"পাওয়া গেছে":"বাকি")+')'):"")+'</p>';
+  var info='<p>অর্ডার নম্বর: <b>'+esc(m.no)+'</b><br>তারিখ: '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br>কাস্টমার: <b>'+esc(m.name||"—")+'</b><br>মোবাইল: '+esc(m.phone||"—")+'<br>ঠিকানা: '+esc(m.address||"—")+(m.delivery_day?('<br>🚚 ডেলিভারি: '+esc(m.delivery_day)+', '+esc(m.delivery_slot||"")):'')+(m.pay?('<br>পেমেন্ট: '+esc(m.pay)+' ('+(m.payStatus==="paid"?"পাওয়া গেছে":"বাকি")+')'):"")+'</p>';
   var rows=m.items.map(function(it,i){
     var line=(+it.qty||0)*(+it.price||0);
     if(editable){
@@ -1184,7 +1613,9 @@ async function loadAdminOrders(){
     var agg={};
     drows.forEach(function(o){ (o.items||[]).forEach(function(it){ var k=it.name+"|"+(it.unit||""); if(!agg[k]) agg[k]={name:it.name, unit:it.unit||"", qty:0}; agg[k].qty+=(+it.qty||0); }); });
     var aggLines=Object.keys(agg).map(function(k){ var a=agg[k]; return a.name+' — '+bn(a.qty)+' '+(a.unit||""); }).join("<br>");
-    plannerHtml+='<div style="border-top:1px solid #ddd;padding-top:8px;margin-top:8px"><b>'+day+'</b> — '+bn(drows.length)+'টি অর্ডার • মোট ৳'+bn(dayTotal)+'<br><span class="small">'+(aggLines||"কোনো পণ্য নেই")+'</span></div>';
+    var slotCounts={}; drows.forEach(function(o){ var sk=(o.delivery_slot||"সময় বসানো হয়নি"); slotCounts[sk]=(slotCounts[sk]||0)+1; });
+    var slotLine=Object.keys(slotCounts).map(function(sk){ return sk+' — '+bn(slotCounts[sk])+'টি'; }).join(' • ');
+    plannerHtml+='<div style="border-top:1px solid #ddd;padding-top:8px;margin-top:8px"><b>'+day+'</b> — '+bn(drows.length)+'টি অর্ডার • মোট ৳'+bn(dayTotal)+'<br><span class="small">🕐 '+slotLine+'</span><br><span class="small">'+(aggLines||"কোনো পণ্য নেই")+'</span></div>';
   });
   plannerHtml+='</div>';
   window.__plannerHtml=plannerHtml;
@@ -1196,7 +1627,7 @@ async function loadAdminOrders(){
       onMyWay=' <a class="primary" style="display:inline-block;padding:8px 12px;text-decoration:none" href="https://wa.me/'+ph2+'?text='+encodeURIComponent("আসসালামু আলাইকুম "+(o.customer_name||"")+"! আপনার অর্ডার ("+o.order_no+") রওনা হয়েছে, শীঘ্রই পৌঁছাবে। — মাসিক বাজার")+'" target="_blank">🛵 পথে আছি</a>';
     }
     var payLine='<br><span class="small">💰 পেমেন্ট: '+esc(o.payment_method||"ক্যাশ অন ডেলিভারি")+' ('+((o.payment_status||"unpaid")==="paid"?"পাওয়া গেছে":"বাকি")+')</span> <button class="ghost" onclick="togglePaymentStatus(\''+o.id+'\')">'+((o.payment_status||"unpaid")==="paid"?"↩️ বাকি করুন":"✅ টাকা পাওয়া গেছে")+'</button>';
-    return '<div class="ordercard"><b>'+o.order_no+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br>'+(o.customer_name||"")+' • '+(o.phone||"")+'<br>'+(o.items||[]).map(function(it){ return it.name+' — '+bn(it.qty)+' '+(it.unit||""); }).join("<br>")+'<br><b>মোট: ৳'+bn(o.total)+' • লাভ: ৳'+bn(o.profit||0)+'</b>'+payLine+'<br><label>স্ট্যাটাস</label><select onchange="setAdminOrderStatus(\''+o.id+'\',this.value)">'+statuses.map(function(s){ return '<option value="'+s+'" '+(s===o.status?'selected':'')+'>'+bnStatus[s]+'</option>'; }).join("")+'</select><br><button class="gold" onclick="openMemo(\''+o.id+'\')">🧾 ক্যাশ মেমো</button>'+onMyWay+'</div>';
+    return '<div class="ordercard"><b>'+o.order_no+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br>'+(o.customer_name||"")+' • '+(o.phone||"")+(o.address?('<br>ঠিকানা: '+esc(o.address)):'')+(o.delivery_day?('<br><span class="small">🚚 ডেলিভারি: '+esc(o.delivery_day)+', '+esc(o.delivery_slot||"")+'</span>'):'')+'<br>'+(o.items||[]).map(function(it){ return it.name+' — '+bn(it.qty)+' '+(it.unit||""); }).join("<br>")+'<br><b>মোট: ৳'+bn(o.total)+' • লাভ: ৳'+bn(orderProfit(o))+'</b>'+(o.bulk_total?('<br><span class="small">📦 বাল্ক কেনা: ৳'+bn(o.bulk_total)+'</span>'):"")+payLine+'<br><label>স্ট্যাটাস</label><select onchange="setAdminOrderStatus(\''+o.id+'\',this.value)">'+statuses.map(function(s){ return '<option value="'+s+'" '+(s===o.status?'selected':'')+'>'+bnStatus[s]+'</option>'; }).join("")+'</select><br><button class="gold" onclick="openMemo(\''+o.id+'\')">🧾 ক্যাশ মেমো</button> <button class="primary" onclick="openBulkSend(\''+o.id+'\')">📤 পাইকারিকে পাঠান</button>'+onMyWay+'</div>';
   }).join("");
 }
 async function setAdminOrderStatus(id, status){
@@ -1225,9 +1656,7 @@ function deductStockForOrder(o){
   if(!DRAFT) return;
   var changed=false;
   (o.items||[]).forEach(function(it){
-    var p=null;
-    DRAFT.products.forEach(function(x){ if(x.name===it.name && (x.brand||"")===(it.brand||"")) p=x; });
-    if(!p) DRAFT.products.forEach(function(x){ if(x.name===it.name) p=x; });
+    var p=findProdForItem(it, DRAFT);
     if(p && (p.stock_qty||0)>0){ p.stock_qty=Math.max(0, Math.round(((p.stock_qty||0)-(+it.qty||0))*100)/100); changed=true; }
   });
   if(changed) saveDraft();
@@ -1258,11 +1687,11 @@ async function loadProfit(){
   var el=document.getElementById("profitBox"); if(!el) return;
   if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
   el.innerHTML="<p>হিসাব করা হচ্ছে…</p>";
-  var res = await sb.from("orders").select("total,profit,created_at,status").neq("status","Cancelled");
+  var res = await sb.from("orders").select("total,items,created_at,status").neq("status","Cancelled");
   if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
   var rows=res.data||[];
   var sales=0, profit=0, byDay={};
-  rows.forEach(function(o){ sales+=o.total||0; profit+=o.profit||0; var day=new Date(o.created_at).toLocaleDateString("bn-BD"); if(!byDay[day]) byDay[day]={sales:0,profit:0,n:0}; byDay[day].sales+=o.total||0; byDay[day].profit+=o.profit||0; byDay[day].n++; });
+  rows.forEach(function(o){ var op=orderProfit(o); sales+=o.total||0; profit+=op; var day=new Date(o.created_at).toLocaleDateString("bn-BD"); if(!byDay[day]) byDay[day]={sales:0,profit:0,n:0}; byDay[day].sales+=o.total||0; byDay[day].profit+=op; byDay[day].n++; });
   var days=Object.keys(byDay).slice(-14).reverse();
   el.innerHTML='<div class="statgrid"><div class="stat"><b>'+bn(rows.length)+'</b>টি অর্ডার</div><div class="stat"><b>৳'+bn(sales)+'</b>মোট বিক্রি</div><div class="stat"><b>৳'+bn(profit)+'</b>মোট লাভ</div></div>'+days.map(function(d){ return '<div class="listrow"><div class="n"><b>'+d+'</b> — '+bn(byDay[d].n)+'টি অর্ডার</div><b>বিক্রি ৳'+bn(byDay[d].sales)+' • লাভ ৳'+bn(byDay[d].profit)+'</b></div>'; }).join("");
 }
@@ -1291,15 +1720,15 @@ async function loadAnalytics(){
   var live=rows.filter(function(o){ return o.status!=="Cancelled"; });
   var del=live.filter(function(o){ return o.status==="Delivered"; });
   var unpaid=live.filter(function(o){ return (o.payment_status||"unpaid")!=="paid"; });
-  var sales=0, profit=0; live.forEach(function(o){ sales+=+o.total||0; profit+=+o.profit||0; });
+  var sales=0, profit=0; live.forEach(function(o){ sales+=+o.total||0; profit+=orderProfit(o); });
   var byDay={};
   live.forEach(function(o){ var d=new Date(o.created_at).toLocaleDateString("bn-BD"); if(!byDay[d]) byDay[d]={n:0,sales:0}; byDay[d].n++; byDay[d].sales+=+o.total||0; });
   var days=Object.keys(byDay).slice(-14).reverse();
   var byProd={};
-  live.forEach(function(o){ (o.items||[]).forEach(function(it){ var k=it.name+((it.brand)?(" ("+it.brand+")"):""); if(!byProd[k]) byProd[k]={qty:0,total:0}; byProd[k].qty+=+it.qty||0; byProd[k].total+=+it.total||0; }); });
+  live.forEach(function(o){ (o.items||[]).forEach(function(it){ var k=normName(it.name)+((it.brand)?(" ("+it.brand+")"):""); if(!byProd[k]) byProd[k]={qty:0,total:0}; byProd[k].qty+=+it.qty||0; byProd[k].total+=+it.total||0; }); });
   var top=Object.keys(byProd).map(function(k){ return {name:k, qty:byProd[k].qty, total:byProd[k].total}; }).sort(function(a,b){ return b.qty-a.qty; }).slice(0,10);
   var byCat={};
-  live.forEach(function(o){ (o.items||[]).forEach(function(it){ var c="—"; DATA.products.forEach(function(p){ if(p.name===it.name) c=p.category||"—"; }); if(!byCat[c]) byCat[c]=0; byCat[c]+= +it.total||0; }); });
+  live.forEach(function(o){ (o.items||[]).forEach(function(it){ var c="—"; DATA.products.forEach(function(p){ if(p.name===normName(it.name)) c=p.category||"—"; }); if(!byCat[c]) byCat[c]=0; byCat[c]+= +it.total||0; }); });
   var cats=Object.keys(byCat).sort(function(a,b){ return byCat[b]-byCat[a]; });
   el.innerHTML='<div class="statgrid"><div class="stat"><b>'+bn(live.length)+'</b>টি অর্ডার</div><div class="stat"><b>৳'+bn(sales)+'</b>মোট বিক্রি</div><div class="stat"><b>৳'+bn(profit)+'</b>মোট লাভ</div><div class="stat"><b>৳'+bn(live.length?Math.round(sales/live.length):0)+'</b>গড় অর্ডার</div><div class="stat"><b>'+bn(del.length)+'</b>টি ডেলিভারি সম্পন্ন</div><div class="stat"><b>'+bn(unpaid.length)+'</b>টি পেমেন্ট বাকি</div></div>'
     +'<h3 style="margin-top:14px">📅 শেষ ১৪ দিন</h3>'+days.map(function(d){ return '<div class="listrow"><div class="n"><b>'+d+'</b> — '+bn(byDay[d].n)+'টি অর্ডার</div><b>৳'+bn(byDay[d].sales)+'</b></div>'; }).join("")
@@ -1452,8 +1881,9 @@ async function createPO(id){
 function viewPO(poNo){
   var po=(window.__poRows||{})[poNo]; if(!po) return;
   var d=new Date(po.created_at);
-  var rows=(po.items||[]).map(function(it){ return '<tr><td>'+esc(it.product_name||"")+'</td><td>'+esc(it.brand||"")+'</td><td>'+bn(it.qty)+' '+(it.unit||"")+'</td><td>৳'+bn(it.price)+'</td><td>৳'+bn(Math.round(it.price*it.qty))+'</td></tr>'; }).join("");
-  document.getElementById("poPaper").innerHTML='<h2 style="margin:0">🧾 ক্রয় আদেশ — '+esc(po.po_no)+'</h2><p class="small">মাসিক বাজার (নীড়) • '+d.toLocaleDateString("bn-BD")+'</p><p>দোকানদার: <b>'+esc(po.supplier_name||"")+'</b></p><table><tr><th>পণ্য</th><th>ব্র্যান্ড</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr>'+rows+'</table><p><b>সর্বমোট: ৳'+bn(po.total)+'</b></p><p class="small">এই আদেশ অনুযায়ী পণ্য পাঠাবেন। পণ্য পাওয়ার পর টাকা দেওয়া হবে।</p>';
+  var supTotal=0, hasSup=false;
+  var rows=(po.items||[]).map(function(it){ var sp=(it.supplier_price!=null?+it.supplier_price:null); if(sp!=null){ hasSup=true; supTotal+=Math.round(sp*it.qty); } return '<tr><td>'+esc(it.product_name||"")+'</td><td>'+esc(it.brand||"")+'</td><td>'+bn(it.qty)+' '+(it.unit||"")+'</td><td>৳'+bn(it.price)+(sp!=null?('<br><span class="small">পাইকারি: ৳'+bn(sp)+'</span>'):"")+'</td><td>৳'+bn(Math.round(it.price*it.qty))+'</td></tr>'; }).join("");
+  document.getElementById("poPaper").innerHTML='<h2 style="margin:0">🧾 ক্রয় আদেশ — '+esc(po.po_no)+'</h2><p class="small">মাসিক বাজার (নীড়) • '+d.toLocaleDateString("bn-BD")+'</p><p>দোকানদার: <b>'+esc(po.supplier_name||"")+'</b>'+(po.order_no?('<br>কাস্টমার অর্ডার: <b>'+esc(po.order_no)+'</b>'):"")+'</p><table><tr><th>পণ্য</th><th>ব্র্যান্ড</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr>'+rows+'</table><p><b>সর্বমোট: ৳'+bn(po.total)+'</b>'+(hasSup?('<br>পাইকারি মোট: <b>৳'+bn(supTotal)+'</b> • ছাড়: ৳'+bn(Math.round(po.total)-supTotal)):"")+'</p><p class="small">এই আদেশ অনুযায়ী পণ্য পাঠাবেন। পণ্য পাওয়ার পর টাকা দেওয়া হবে।</p>';
   document.getElementById("poOverlay").style.display="block";
   window.scrollTo(0,0);
 }
@@ -1468,6 +1898,82 @@ async function loadPOs(){
   rows.forEach(function(po){ window.__poRows[po.po_no]=po; });
   if(!rows.length){ el.innerHTML="<p>এখনো কোনো ক্রয় আদেশ বানানো হয়নি।</p>"; return; }
   el.innerHTML=rows.map(function(po){ var d=new Date(po.created_at); return '<div class="listrow"><div class="n"><b>'+esc(po.po_no)+'</b> — '+esc(po.supplier_name||"")+'<br><span class="small">'+d.toLocaleDateString("bn-BD")+' • মোট ৳'+bn(po.total)+' • '+(po.status||"")+'</span></div><button class="primary" onclick="viewPO(\''+po.po_no+'\')">👁️ দেখুন</button></div>'; }).join("");
+}
+/* ---- bulk orders: big customer order -> supplier repricing ---- */
+function bulkSupplierTotal(po){ var t=0; (po.items||[]).forEach(function(it){ if(it.supplier_price!=null) t+=Math.round(it.supplier_price*it.qty); }); return t; }
+function bulkHasPrices(po){ return (po.items||[]).some(function(it){ return it.supplier_price!=null; }); }
+async function openBulkSend(orderId){
+  var o=adminOrdersById[orderId]; if(!o) return;
+  if(!sb){ alert("ইন্টারনেট চেক করুন।"); return; }
+  var sres=await sb.from("suppliers").select("id,name,phone").eq("active",true).order("created_at",{ascending:false});
+  var sups=(sres.data||[]);
+  var items=o.items||[];
+  var retail=0; items.forEach(function(it){ retail+=Math.round((+it.price||0)*(+it.qty||0)); });
+  window.__bulkOrder=o;
+  var rows=items.map(function(it){ return '<tr><td>'+esc(it.name||"")+'</td><td>'+esc(it.brand||"")+'</td><td>'+bn(it.qty)+' '+(it.unit||"")+'</td><td>৳'+bn(it.price||0)+'</td><td>৳'+bn(Math.round((+it.price||0)*(+it.qty||0)))+'</td></tr>'; }).join("");
+  document.getElementById("bulkPaper").innerHTML='<h2 style="margin:0">📤 পাইকারিকে পাঠান — '+esc(o.order_no||"")+'</h2><p class="small">'+esc(o.customer_name||"")+' • '+esc(o.phone||"")+' • মোট ৳'+bn(o.total)+'</p><table><tr><th>পণ্য</th><th>ব্র্যান্ড</th><th>পরিমাণ</th><th>দর</th><th>মোট</th></tr>'+rows+'</table><p><b>খুচরা মোট: ৳'+bn(retail)+'</b></p><label>কোন দোকানদারকে পাঠাবেন</label><select id="bulkSupSel">'+sups.map(function(s){ return '<option value="'+s.id+'">'+esc(s.name||"")+' • '+esc(s.phone||"")+'</option>'; }).join("")+'</select><label>দোকানদারকে বার্তা</label><input id="bulkNote" value="বিয়ের/বড় অর্ডার — এই সব পণ্যের পাইকারি দাম (খুচরা দামের চেয়ে কম) দিন।"><p class="small">দোকানদার তার অ্যাপে এই অর্ডার দেখে প্রতিটা পণ্যের পাইকারি দাম লিখে পাঠাবে। দাম খুচরা দামের চেয়ে কম হতেই হবে।</p><div style="display:flex;gap:8px"><button class="primary" style="flex:1" onclick="sendBulkPO()">✅ পাঠান</button><button class="ghost" onclick="closeBulk()">বাতিল</button></div><p id="bulkMsg" class="small"></p><div id="bulkWa"></div>';
+  document.getElementById("bulkOverlay").style.display="block";
+  window.scrollTo(0,0);
+}
+function closeBulk(){ var ov=document.getElementById("bulkOverlay"); if(ov) ov.style.display="none"; }
+async function sendBulkPO(){
+  var o=window.__bulkOrder; if(!o||!sb) return;
+  var msg=document.getElementById("bulkMsg");
+  var sel=document.getElementById("bulkSupSel"); if(!sel||!sel.value){ msg.textContent="কোনো চালু দোকানদার পাওয়া যায়নি।"; return; }
+  var supId=sel.value; var supName=""; var supPhone="";
+  var sres=await sb.from("suppliers").select("id,name,phone").eq("id",supId).limit(1);
+  if(sres.data&&sres.data.length){ supName=sres.data[0].name||""; supPhone=sres.data[0].phone||""; }
+  var items=(o.items||[]).map(function(it){ return {product_name:it.name||"", brand:it.brand||"", unit:it.unit||"", price:+it.price||0, qty:+it.qty||0}; });
+  var retail=0; items.forEach(function(it){ retail+=Math.round(it.price*it.qty); });
+  var d=new Date();
+  var poNo="PO-"+d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0")+"-"+Math.floor(1000+Math.random()*9000);
+  var note=(document.getElementById("bulkNote")||{}).value||"";
+  var res=await sb.from("purchase_orders").insert([{po_no:poNo, supplier_id:supId, supplier_name:supName, items:items, total:retail, status:"sent", order_no:o.order_no||"", customer_name:o.customer_name||"", customer_phone:o.phone||""}]);
+  if(res.error){ msg.textContent="হয়নি: "+res.error.message; return; }
+  window.__poRows=window.__poRows||{};
+  window.__poRows[poNo]={po_no:poNo, supplier_id:supId, supplier_name:supName, items:items, total:retail, status:"sent", order_no:o.order_no||"", customer_name:o.customer_name||"", customer_phone:o.phone||"", created_at:d.toISOString()};
+  var ph=(supPhone||"").replace(/[^0-9]/g,""); if(ph.indexOf("88")!==0) ph="88"+ph;
+  var txt="আসসালামু আলাইকুম "+supName+"! মাসিক বাজার থেকে বাল্ক অর্ডার ("+(o.order_no||"")+"): "+items.map(function(it){ return it.product_name+" — "+it.qty+" "+it.unit; }).join(", ")+". "+note+" — আপনার অ্যাপে দাম লিখে পাঠান।";
+  document.getElementById("bulkWa").innerHTML='<a class="primary" style="display:inline-block;padding:10px 14px;text-decoration:none;margin-top:8px" href="https://wa.me/'+ph+'?text='+encodeURIComponent(txt)+'" target="_blank">💬 WhatsApp-এ দোকানদারকে জানান</a>';
+  msg.textContent="✅ পাঠানো হয়েছে — দোকানদার দাম দিলে এখানে আসবে।";
+  loadBulkPOs();
+}
+async function loadBulkPOs(){
+  var el=document.getElementById("bulkList"); if(!el) return;
+  if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
+  var res=await sb.from("purchase_orders").select("*").not("order_no","is",null).order("created_at",{ascending:false}).limit(20);
+  if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
+  var rows=(res.data||[]).filter(function(po){ return po.order_no; });
+  window.__poRows=window.__poRows||{};
+  rows.forEach(function(po){ window.__poRows[po.po_no]=po; });
+  if(!rows.length){ el.innerHTML="<p>এখনো কোনো বড় অর্ডার পাইকারিকে পাঠানো হয়নি।</p>"; return; }
+  var stTxt={sent:"📤 পাঠানো হয়েছে — দামের অপেক্ষায়", priced:"💰 দাম দিয়েছে — যাচাই করুন", confirmed:"✅ নিশ্চিত", cancelled:"❌ বাতিল", draft:"খসড়া"};
+  el.innerHTML=rows.map(function(po){
+    var d=new Date(po.created_at);
+    var sup=bulkHasPrices(po)?bulkSupplierTotal(po):null;
+    var save=sup!=null?Math.round(po.total)-sup:null;
+    var pct=sup!=null&&po.total>0?Math.round((save/po.total)*1000)/10:null;
+    var btns='<button class="primary" onclick="viewPO(\''+po.po_no+'\')">👁️ দেখুন</button>';
+    if(po.status==="priced") btns+=' <button class="gold" onclick="confirmBulkPO(\''+po.po_no+'\')">✅ এই দামে নিশ্চিত করুন</button> <button class="danger" onclick="cancelBulkPO(\''+po.po_no+'\')">✕ বাতিল</button>';
+    if(po.status==="sent") btns+=' <span class="small">দোকানদারের দামের অপেক্ষায়…</span>';
+    return '<div class="ordercard"><b>'+esc(po.po_no)+'</b> — অর্ডার '+esc(po.order_no||"")+'<br>'+esc(po.customer_name||"")+' • দোকানদার: '+esc(po.supplier_name||"")+'<br><span class="small">'+d.toLocaleDateString("bn-BD")+' • '+(stTxt[po.status]||po.status)+'</span><br>খুচরা মোট: ৳'+bn(po.total)+(sup!=null?('<br>পাইকারি মোট: <b>৳'+bn(sup)+'</b> • ছাড়: ৳'+bn(save)+' ('+bn(pct)+'%)'):"")+'<br>'+btns+'</div>';
+  }).join("");
+}
+async function confirmBulkPO(poNo){
+  var po=(window.__poRows||{})[poNo]; if(!po||!sb) return;
+  var sup=bulkSupplierTotal(po);
+  var r1=await sb.from("purchase_orders").update({status:"confirmed"}).eq("po_no",poNo);
+  if(r1.error){ alert("হয়নি: "+r1.error.message); return; }
+  if(po.order_no){ var r2=await sb.from("orders").update({bulk_total:sup}).eq("order_no",po.order_no); if(r2.error){ alert("অর্ডারে বাল্ক দাম বসানো যায়নি: "+r2.error.message); } }
+  po.status="confirmed";
+  loadBulkPOs(); loadAdminOrders();
+}
+async function cancelBulkPO(poNo){
+  if(!sb) return;
+  var r=await sb.from("purchase_orders").update({status:"cancelled"}).eq("po_no",poNo);
+  if(r.error){ alert("হয়নি: "+r.error.message); return; }
+  var po=(window.__poRows||{})[poNo]; if(po) po.status="cancelled";
+  loadBulkPOs();
 }
 async function loadSuppliers(){
   var el=document.getElementById("supplierList"); if(!el) return;
@@ -1650,12 +2156,13 @@ async function changePin(){
   }catch(e){ msg.textContent="ইন্টারনেট চেক করুন, আবার চেষ্টা করুন।"; }
 }
 
-fetch("../products.json", {cache:"no-store"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(j && j.products && j.packages && j.packages.length>=FALLBACK.packages.length){ DATA=j; } }).catch(function(){});
+fetch("../products.json", {cache:"no-store"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(j && j.products && j.packages && j.packages.length>=FALLBACK.packages.length){ DATA=j; fixOldRiceName(); if(DRAFT){ mergeNewProducts(); mergeNewPackages(); } } }).catch(function(){});
 renderAdmin();
 showInstallBanner();
 </script>
 <div id="memoOverlay"><div id="memoPaper"></div></div>
 <div id="plannerOverlay"><div id="plannerPaper"></div><div style="text-align:center;margin-top:10px" class="noprint"><button class="gold" onclick="window.print()">🖨️ ছাপান</button> <button class="ghost" onclick="closePlanner()">✕ বন্ধ করুন</button></div></div>
 <div id="poOverlay"><div id="poPaper"></div><div style="text-align:center;margin-top:10px" class="noprint"><button class="gold" onclick="window.print()">🖨️ ছাপান</button> <button class="ghost" onclick="closePO()">✕ বন্ধ করুন</button></div></div>
+<div id="bulkOverlay"><div id="bulkPaper"></div><div style="text-align:center;margin-top:10px" class="noprint"><button class="ghost" onclick="closeBulk()">✕ বন্ধ করুন</button></div></div>
 </body>
 </html>
