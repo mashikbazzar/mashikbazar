@@ -321,7 +321,8 @@ section h2{color:#6d28d9}
 
 <div id="admin-supplier" class="adminbox" style="display:none">
 <h3>🏪 পাইকারি দোকানদারের পাঠানো দাম</h3>
-<p class="small">দোকানদার দাম পাঠালে এখানে আসবে। দেখে <b>বসান</b> চাপলে সেটা পাইকারি দাম হয়ে যাবে — নাম/ব্র্যান্ড/একক বদলে পাঠালে সেটাও বসে যাবে (নামের বদল কাস্টমার দেখবে <b>প্রকাশ</b> করার পর), <b>বাতিল</b> চাপলে সরে যাবে।</p>
+<p class="small">দোকানদার দাম পাঠালে এখানে আসবে। <b>৪ ধাপে দাম ঠিক করুন:</b><br>১. নিচে প্রতিটা পণ্যের দাম দেখুন — 🟢 সবচেয়ে কম দাম সবুজে, 🔴 সবচেয়ে বেশি লালে চেনা যাবে। কোন দোকান কত ধরেছে, নামসহ দেখা যাবে।<br>২. যেটা নিতে চান, তার পাশে <b>✅ এই দাম বসান</b> চাপুন — সেটাই পাইকারি দাম হয়ে যাবে।<br>৩. নিচে লাভের হার % লিখে <b>সব খুচরা দাম বসান</b> চাপুন — কাস্টমারের দাম হিসাব হয়ে যাবে।<br>৪. <b>🚀 প্রকাশ</b> ট্যাবে গিয়ে প্রকাশ করুন — তবেই কাস্টমার নতুন দাম দেখবে।</p>
+<div class="card" style="background:#eff6ff"><b>⚙️ পাইকারি থেকে খুচরা দাম বসান</b><div style="display:flex;gap:8px;margin-top:8px;align-items:center"><input id="marginPct3" type="number" min="0" placeholder="লাভের হার % (যেমন: ১০)" style="flex:1"><button class="gold" onclick="applyMargin3()">সব খুচরা দাম বসান</button></div><p class="small">খুচরা দাম = পাইকারি × (১০০+লাভ%) ÷ ১০০। যেমন: পাইকারি ৳১০০ আর লাভ ১০% হলে খুচরা ৳১১০। যাদের পাইকারি দাম নেই, তাদের দাম বদলাবে না।</p></div>
 <button class="primary" onclick="loadSupplierPrices()">🔄 রিফ্রেশ করুন</button>
 <div id="supplierPrices"></div>
 <h3 style="margin-top:18px">👥 নিবন্ধিত পাইকারি দোকানদার</h3>
@@ -710,6 +711,15 @@ function applyMargin2(){
   recalcPackages(DRAFT); saveDraft(); renderAdminProducts(); renderAdminPackages();
   alert("হয়ে গেছে — "+bn(n)+"টি পণ্যের খুচরা দাম বসানো হয়েছে ("+bn(pct)+"% লাভে)। যাদের পাইকারি দাম নেই, তাদের দাম বদলায়নি। প্রকাশ করলে কাস্টমার নতুন দাম দেখবে।");
 }
+function applyMargin3(){
+  var pct=parseFloat(document.getElementById("marginPct3").value)||0;
+  if(pct<=0){ alert("লাভের হার লিখুন — যেমন: ১০"); return; }
+  var n=0;
+  DRAFT.products.forEach(function(p){ var w=p.wholesale_price||0; if(w>0){ p.price_taka=Math.round(w*(1+pct/100)); n++; } });
+  DRAFT.margin_pct=pct;
+  recalcPackages(DRAFT); saveDraft(); renderAdminProducts(); renderAdminPackages(); loadSupplierPrices();
+  alert("হয়ে গেছে — "+bn(n)+"টি পণ্যের খুচরা দাম বসানো হয়েছে ("+bn(pct)+"% লাভে)। যাদের পাইকারি দাম নেই, তাদের দাম বদলায়নি। প্রকাশ করলে কাস্টমার নতুন দাম দেখবে।");
+}
 function renderGroupEdit(g){
   var h='<button class="ghost" onclick="closeGroupEdit()">← পণ্যের তালিকা</button>';
   h+='<h3>✏️ '+esc(g.name||"নতুন পণ্য")+'</h3>';
@@ -1055,7 +1065,8 @@ async function loadSupplierPrices(){
   var res = await sb.from("supplier_prices").select("*").eq("status","pending").order("created_at", {ascending:false}).limit(200);
   if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
   var rows=res.data||[];
-  if(!rows.length){ setTabBadge("supplier",0); el.innerHTML="<p>কোনো নতুন দাম আসেনি।</p>"; return; }
+  if(!rows.length){ setTabBadge("supplier",0); el.innerHTML="<p>কোনো নতুন দাম আসেনি।</p>"; }
+  else{
   setTabBadge("supplier", rows.length);
   var groups={}, order=[];
   rows.forEach(function(r){
@@ -1071,6 +1082,8 @@ async function loadSupplierPrices(){
     var curW=cur? (cur.wholesale_price||0) : 0;
     var h='<div class="agroup"><b>'+esc(g.name)+'</b> '+(g.brand?esc(g.brand):"")+' <span class="pcat">'+esc(g.unit||"")+'</span>';
     h+='<div class="small">এখন পাইকারি দাম: <b>৳'+bn(curW)+'</b>'+(curW? ' (এই দামে কেনা হচ্ছে)':' (এখনো বসানো হয়নি)')+'</div>';
+    var mg=(DRAFT&&DRAFT.margin_pct)||10;
+    h+=curW? '<div class="small">🛒 কাস্টমারের দাম হবে: <b>৳'+bn(Math.round(curW*(1+mg/100)))+'</b> ('+bn(mg)+'% লাভে)</div>' : '<div class="small">পাইকারি দাম বসালে এখানে কাস্টমারের দাম দেখা যাবে।</div>';
     h+=g.prices.map(function(r, idx){
       var d=new Date(r.created_at);
       var qv=Math.round(((r.qty===undefined||r.qty===null)?1:Number(r.qty))*100)/100; if(qv<=0) qv=1;
@@ -1089,6 +1102,15 @@ async function loadSupplierPrices(){
     h+='</div>';
     return h;
   }).join("");
+  }
+  var m3=document.getElementById("marginPct3"); if(m3) m3.value=(DRAFT&&DRAFT.margin_pct)||10;
+  try{
+    var ap=await sb.from("supplier_prices").select("*").eq("status","applied").order("created_at",{ascending:false}).limit(20);
+    var arows=(ap&&ap.data)||[];
+    if(arows.length){
+      el.innerHTML+='<h3 style="margin-top:18px">✅ বসানো হয়েছে — সাম্প্রতিক দাম</h3><p class="small">আগে কোন দোকান কোন পণ্যের কত দাম দিয়েছিল, আর সেটা বসানো হয়েছে — তার তালিকা।</p>'+arows.map(function(r){ var d=new Date(r.created_at); return '<div class="listrow"><div class="n"><b>'+esc(r.product_name||"")+'</b> '+(r.brand?esc(r.brand):"")+' — <b>৳'+bn(r.price||0)+'</b><br><span class="small">'+esc(r.supplier_name||"")+' • '+d.toLocaleDateString("bn-BD")+'</span></div></div>'; }).join("");
+    }
+  }catch(e){}
 }
 async function applySupplierPrice(id, productId, productName, brand, unit, price){
   if(!sb) return;
