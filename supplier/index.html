@@ -98,6 +98,7 @@ Chrome-এর ⋮ মেনুতে 'Add to Home screen' না দেখাল
 <div class="card">
 <h2>👋 <span id="helloName"></span></h2>
 <p id="helloNote" class="small"></p>
+<div id="myRating" class="small"></div>
 <p class="small">প্রতিটা পণ্যের <b>একটাই ক্রমিক নম্বর</b>, নাম <b>মোটা অক্ষরে</b>।<br>একটা পণ্যের দাম পাঠাতে পাশের <b>✏️ এডিট</b> চাপুন → ব্র্যান্ড বেছে দাম আর পরিমাণ লিখুন → <b>✓ সংরক্ষণ</b> চাপুন।<br>একটা ক্যাটাগরির সব পণ্য একসাথে এডিট করতে <b>🗂️ ক্যাটাগরি</b> থেকে ক্যাটাগরি বেছে <b>✏️ এই ক্যাটাগরি এডিট করুন</b> চাপুন, তারপর <b>✓ সব পাঠান</b> চাপুন।</p>
 <button class="ghost" onclick="logout()">লগআউট</button>
 </div>
@@ -109,6 +110,9 @@ Chrome-এর ⋮ মেনুতে 'Add to Home screen' না দেখাল
 <input id="newUnit" placeholder="একক — যেমন: কেজি / পিস / লিটার">
 <input id="newPrice" type="number" min="0" placeholder="পাইকারি দাম (টাকা)">
 <input id="newQty" type="number" min="0" step="0.5" placeholder="পরিমাণ — যেমন: ২৫">
+<input id="newMinQty" type="number" min="0" step="0.5" placeholder="ন্যূনতম পরিমাণ (ঐচ্ছিক)">
+<input id="newLead" type="number" min="0" placeholder="কত দিনে দিতে পারবেন (ঐচ্ছিক)">
+<label class="small">এই দাম কতদিন থাকবে (ঐচ্ছিক)</label><input id="newValid" type="date">
 <button class="gold" onclick="submitNewProduct()">এই পণ্যের দাম পাঠান</button>
 <p id="newProdMsg" class="small"></p>
 </div>
@@ -196,7 +200,18 @@ async function showApp(){
     if(!g){ g={name:p.name, category:p.category, unit:p.unit, variants:[]}; gmap[p.name]=g; groups.push(g); }
     g.variants.push(p);
   });
-  renderProducts(); loadMySubs();
+  renderProducts(); loadMySubs(); loadMyRating();
+}
+async function loadMyRating(){
+  var el=document.getElementById("myRating"); if(!el||!sb||!supplier) return;
+  try{
+    var res=await sb.from("supplier_ratings").select("on_time,quality,price").eq("supplier_id", supplier.id);
+    var rows=res.data||[];
+    if(!rows.length){ el.textContent="⭐ এখনো কোনো রেটিং পাননি।"; return; }
+    var sum=0; rows.forEach(function(r){ sum+=((+r.on_time||0)+(+r.quality||0)+(+r.price||0))/3; });
+    var avg=Math.round((sum/rows.length)*10)/10;
+    el.textContent="⭐ আপনার রেটিং: "+bn(avg)+" / ৫ ("+bn(rows.length)+"টি রেটিং)";
+  }catch(e){}
 }
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 var groups=[];
@@ -204,6 +219,9 @@ var selBrand={};
 var newBrandName={};
 var typedPrice={};
 var typedQty={};
+var typedMinQty={};
+var typedLead={};
+var typedValid={};
 var myPricesByName={};
 var singleEdit=-1;
 var catEdit="";
@@ -315,6 +333,8 @@ function renderProducts(){
       controlsHtml = '<div class="brandrow erow"><select onchange="setGroupBrand('+gi+', this.value)">'+opts+'</select>'
         +'<input type="number" min="0" id="pr-'+gi+'" style="flex:1;min-width:110px" value="'+priceVal+'" placeholder="পাইকারি দাম ৳" oninput="setTypedPrice('+gi+', this.value)"></div>'
         +'<div class="brandrow erow qrow"><input type="number" min="0" step="0.5" id="qt-'+gi+'" style="flex:1;min-width:110px" value="'+qv+'" placeholder="পরিমাণ" oninput="setTypedQty('+gi+', this.value)"><span class="small">'+esc(g.unit||"")+'</span></div>'
+        +'<div class="small">ন্যূনতম পরিমাণ • কত দিনে দিতে পারবেন • দাম কতদিন থাকবে</div>'
+        +'<div class="brandrow erow"><input type="number" min="0" step="0.5" id="mq-'+gi+'" style="flex:1;min-width:90px" value="'+((typedMinQty[key]!==undefined)?typedMinQty[key]:"")+'" placeholder="ন্যূনতম পরিমাণ" oninput="setTypedMinQty('+gi+', this.value)"><input type="number" min="0" id="ld-'+gi+'" style="flex:1;min-width:90px" value="'+((typedLead[key]!==undefined)?typedLead[key]:"")+'" placeholder="দিনে দেবেন" oninput="setTypedLead('+gi+', this.value)"><input type="date" id="vu-'+gi+'" style="flex:1;min-width:120px" value="'+((typedValid[key]!==undefined)?typedValid[key]:"")+'" oninput="setTypedValid('+gi+', this.value)"></div>'
         +'<div class="small" id="qt-tot-'+gi+'">'+totTxt+'</div>'
         +newInput
         +'<div class="brandrow erow"><button class="tick" style="flex:1" onclick="saveOne('+gi+')">✓ সংরক্ষণ</button><button class="ghost" style="flex:1" onclick="cancelOne('+gi+')">✕ বাতিল</button></div>';
@@ -337,16 +357,19 @@ function renderProducts(){
 function setGroupBrand(gi, val){ var g=groups[gi]; if(!g) return; selBrand[g.name]=val; renderProducts(); }
 function setTypedPrice(gi, val){ var g=groups[gi]; if(!g) return; var sel=selBrand[g.name]; typedPrice[gi+"|"+sel]=val; updQtyTotal(gi); }
 function setTypedQty(gi, val){ var g=groups[gi]; if(!g) return; var sel=selBrand[g.name]; typedQty[gi+"|"+sel]=val; updQtyTotal(gi); }
+function setTypedMinQty(gi, val){ var g=groups[gi]; if(!g) return; var sel=selBrand[g.name]; typedMinQty[gi+"|"+sel]=val; }
+function setTypedLead(gi, val){ var g=groups[gi]; if(!g) return; var sel=selBrand[g.name]; typedLead[gi+"|"+sel]=val; }
+function setTypedValid(gi, val){ var g=groups[gi]; if(!g) return; var sel=selBrand[g.name]; typedValid[gi+"|"+sel]=val; }
 function qtyVal(gi){ var g=groups[gi]; if(!g) return 1; var sel=selBrand[g.name]; var v=(typedQty[gi+"|"+sel]!==undefined)? parseFloat(typedQty[gi+"|"+sel]) : 1; if(!v||v<=0) v=1; return Math.round(v*100)/100; }
 function priceValOf(gi){ var g=groups[gi]; if(!g) return 0; var sel=selBrand[g.name]; var key=gi+"|"+sel; if(typedPrice[key]!==undefined) return parseFloat(typedPrice[key])||0; var cv=null; g.variants.forEach(function(v){ if((v.brand||"")===sel) cv=v; }); return cv? (cv.wholesale_price||0):0; }
 function updQtyTotal(gi){ var el=document.getElementById("qt-tot-"+gi); if(!el) return; var g=groups[gi]; if(!g) return; var p=priceValOf(gi); var q=qtyVal(gi); el.textContent = p? ("মোট: ৳"+bn(Math.round(p*q))+"  ("+bn(fmtQ(q))+" "+(g.unit||"")+" × ৳"+bn(p)+")") : ""; }
 function setNewBrandName(gi, val){ var g=groups[gi]; if(!g) return; newBrandName[g.name]=val; }
 function setGroupStatus(gi, msg){ var el=document.getElementById("gs-"+gi); if(el) el.textContent=msg; }
-async function submitPrice(productId, productName, brand, unit, price, qty){
+async function submitPrice(productId, productName, brand, unit, price, qty, minQty, leadDays, validUntil){
   if(price===undefined || price===null) return false;
   if(!sb || !supplier) return false;
   try{
-    var res = await sb.from("supplier_prices").insert([{supplier_id:supplier.id, supplier_name:supplier.name, product_id:productId, product_name:productName, brand:brand||"", unit:unit||"", price:price, qty:(qty||1), status:"pending"}]);
+    var res = await sb.from("supplier_prices").insert([{supplier_id:supplier.id, supplier_name:supplier.name, product_id:productId, product_name:productName, brand:brand||"", unit:unit||"", price:price, qty:(qty||1), min_qty:(minQty||1), lead_time_days:(leadDays||null), valid_until:(validUntil? new Date(validUntil).toISOString() : null), status:"pending"}]);
     return !res.error;
   }catch(e){ return false; }
 }
@@ -368,10 +391,16 @@ async function saveOne(gi){
   var varId=null;
   g.variants.forEach(function(v){ if((v.brand||"")===brand) varId=v.id; });
   var qty=qtyVal(gi);
-  var done = await submitPrice(varId, nm, brand, g.unit||"", price, qty);
+  var mqEl=document.getElementById("mq-"+gi); var mq=mqEl? parseFloat(mqEl.value)||1 : 1; if(mq<=0) mq=1;
+  var ldEl=document.getElementById("ld-"+gi); var ld=ldEl? parseInt(ldEl.value,10)||null : null;
+  var vuEl=document.getElementById("vu-"+gi); var vu=vuEl? vuEl.value||"" : "";
+  var done = await submitPrice(varId, nm, brand, g.unit||"", price, qty, mq, ld, vu);
   if(done){
     delete typedPrice[gi+"|"+sel];
     delete typedQty[gi+"|"+sel];
+    delete typedMinQty[gi+"|"+sel];
+    delete typedLead[gi+"|"+sel];
+    delete typedValid[gi+"|"+sel];
     delete nameEdit[gi];
     if(sel==="__new__"){ newBrandName[g.name]=""; selBrand[g.name]=brand; }
     if(singleEdit===gi) singleEdit=-1;
@@ -411,8 +440,11 @@ async function saveCatAll(){
     var varId=null;
     g.variants.forEach(function(v){ if((v.brand||"")===brand) varId=v.id; });
     var qty=(typedQty[key]!==undefined)? (parseFloat(typedQty[key])||1) : 1; qty=Math.round(qty*100)/100; if(qty<=0) qty=1;
-    var done = await submitPrice(varId, nm, brand, g.unit||"", price, qty);
-    if(done){ ok++; delete typedPrice[key]; delete typedQty[key]; delete nameEdit[gi]; if(sel==="__new__"){ newBrandName[g.name]=""; selBrand[g.name]=brand; } }
+    var mq=(typedMinQty[key]!==undefined)? (parseFloat(typedMinQty[key])||1) : 1; if(mq<=0) mq=1;
+    var ld=(typedLead[key]!==undefined)? (parseInt(typedLead[key],10)||null) : null;
+    var vu=(typedValid[key]!==undefined)? typedValid[key] : "";
+    var done = await submitPrice(varId, nm, brand, g.unit||"", price, qty, mq, ld, vu);
+    if(done){ ok++; delete typedPrice[key]; delete typedQty[key]; delete typedMinQty[key]; delete typedLead[key]; delete typedValid[key]; delete nameEdit[gi]; if(sel==="__new__"){ newBrandName[g.name]=""; selBrand[g.name]=brand; } }
     else fail++;
   }
   var m2 = "✅ "+bn(ok)+"টি দাম পাঠানো হয়েছে।";
@@ -431,13 +463,16 @@ async function submitNewProduct(){
   var unit=document.getElementById("newUnit").value.trim()||"পিস";
   var price=parseFloat(document.getElementById("newPrice").value)||0;
   var qty=parseFloat(document.getElementById("newQty").value)||1; qty=Math.round(qty*100)/100; if(qty<=0) qty=1;
+  var mq=parseFloat(document.getElementById("newMinQty").value)||1; if(mq<=0) mq=1;
+  var ld=parseInt(document.getElementById("newLead").value,10)||null;
+  var vu=document.getElementById("newValid").value||"";
   var m=document.getElementById("newProdMsg");
   if(!name||!price){ if(m) m.textContent="পণ্যের নাম আর দাম — দুটোই লিখুন।"; return; }
   if(m) m.textContent="পাঠানো হচ্ছে…";
-  var done = await submitPrice(null, name, brand, unit, price, qty);
+  var done = await submitPrice(null, name, brand, unit, price, qty, mq, ld, vu);
   if(done){
     if(m) m.textContent="✅ পাঠানো হয়েছে। অ্যাডমিন দেখে পণ্যটা তালিকায় যোগ করবে।";
-    document.getElementById("newName").value=""; document.getElementById("newBrand").value=""; document.getElementById("newUnit").value=""; document.getElementById("newPrice").value=""; document.getElementById("newQty").value="";
+    document.getElementById("newName").value=""; document.getElementById("newBrand").value=""; document.getElementById("newUnit").value=""; document.getElementById("newPrice").value=""; document.getElementById("newQty").value=""; document.getElementById("newMinQty").value=""; document.getElementById("newLead").value=""; document.getElementById("newValid").value="";
     await refreshMySubs();
   } else { if(m) m.textContent="পাঠানো যায়নি — আবার চেষ্টা করুন।"; }
 }
@@ -453,7 +488,7 @@ async function loadMySubs(){
     var key=r.product_name+"|"+(r.brand||"");
     if(seen[key]) return; seen[key]=1;
     if(!myPricesByName[r.product_name]) myPricesByName[r.product_name]=[];
-    myPricesByName[r.product_name].push({brand:r.brand||"", price:r.price, qty:(r.qty||1), unit:(r.unit||""), status:r.status});
+    myPricesByName[r.product_name].push({id:r.id, brand:r.brand||"", price:r.price, qty:(r.qty||1), unit:(r.unit||""), status:r.status, min_qty:r.min_qty, lead_time_days:r.lead_time_days, valid_until:r.valid_until, counter_price:r.counter_price, counter_status:r.counter_status});
   });
   if(el){
     if(!rows.length){ el.innerHTML="<p>এখনো কোনো দাম পাঠাননি।</p>"; }
@@ -461,11 +496,29 @@ async function loadMySubs(){
       var badge={pending:'<span class="badge pending">অপেক্ষায়</span>', applied:'<span class="badge applied">বসানো হয়েছে</span>', rejected:'<span class="badge rejected">বাতিল</span>'};
       el.innerHTML=rows.slice(0,30).map(function(r){
         var d=new Date(r.created_at);
-        return '<div class="row"><div class="n"><span class="pname">'+esc(r.product_name)+'</span>'+(r.brand?(' '+esc(r.brand)):"")+'<br>৳'+bn(r.price)+' / '+(r.unit||"")+' • '+bn(fmtQ(r.qty||1))+' '+(r.unit||"")+' = ৳'+bn(Math.round(r.price*(r.qty||1)))+' • '+d.toLocaleDateString("bn-BD")+'</div>'+(badge[r.status]||esc(r.status))+'</div>';
+        var det=[];
+        if(r.min_qty&&r.min_qty>1) det.push("ন্যূনতম "+bn(r.min_qty)+" "+(r.unit||""));
+        if(r.lead_time_days) det.push(bn(r.lead_time_days)+" দিনে দেবেন");
+        if(r.valid_until) det.push(new Date(r.valid_until).toLocaleDateString("bn-BD")+" পর্যন্ত");
+        var detTxt=det.length?('<br><span class="small">'+det.join(" • ")+'</span>'):"";
+        var ct="";
+        if(r.counter_price && r.counter_status==="pending"){
+          ct='<br><span class="small">💬 অ্যাডমিনের পাল্টা দাম: <b>৳'+bn(r.counter_price)+'</b></span><br><button class="tick" onclick="respondCounter(\''+r.id+'\',\'accepted\')">✅ মানলাম</button> <button class="ghost" onclick="respondCounter(\''+r.id+'\',\'rejected\')">✕ মানলাম না</button>';
+        } else if(r.counter_price && r.counter_status==="accepted"){
+          ct='<br><span class="small">✅ পাল্টা দাম মানা হয়েছে (৳'+bn(r.counter_price)+')</span>';
+        } else if(r.counter_price && r.counter_status==="rejected"){
+          ct='<br><span class="small">❌ পাল্টা দাম মানা হয়নি</span>';
+        }
+        return '<div class="row"><div class="n"><span class="pname">'+esc(r.product_name)+'</span>'+(r.brand?(' '+esc(r.brand)):"")+'<br>৳'+bn(r.price)+' / '+(r.unit||"")+' • '+bn(fmtQ(r.qty||1))+' '+(r.unit||"")+' = ৳'+bn(Math.round(r.price*(r.qty||1)))+' • '+d.toLocaleDateString("bn-BD")+detTxt+ct+'</div>'+(badge[r.status]||esc(r.status))+'</div>';
       }).join("");
     }
   }
   renderProducts();
+}
+async function respondCounter(id, status){
+  if(!sb) return;
+  await sb.from("supplier_prices").update({counter_status:status}).eq("id", id);
+  loadMySubs();
 }
 </script>
 
