@@ -151,6 +151,16 @@ async function login(){
 }
 function logout(){ localStorage.removeItem("mb-supplier"); supplier=null; document.getElementById("supName").value=""; document.getElementById("supPhone").value=""; document.getElementById("supCode").value=""; document.getElementById("loginMsg").textContent=""; document.getElementById("appBox").style.display="none"; document.getElementById("loginBox").style.display="block"; }
 async function showApp(){
+  if(sb && supplier){
+    try{
+      var chk = await sb.from("suppliers").select("id,active").eq("id", supplier.id);
+      if(!chk.error && (!chk.data || !chk.data.length || !chk.data[0].active)){
+        logout();
+        document.getElementById("loginMsg").textContent="এই অ্যাকাউন্টটি আর চালু নেই — আবার লগইন করুন।";
+        return;
+      }
+    }catch(e){}
+  }
   document.getElementById("loginBox").style.display="none";
   document.getElementById("appBox").style.display="block";
   document.getElementById("helloName").textContent=supplier.name;
