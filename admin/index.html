@@ -106,12 +106,14 @@ button.ghost{background:#fff;border:1px solid #065f46;color:#065f46;border-radiu
 footer{text-align:center;color:#555;padding:16px;font-size:14px}
 @media print{.bottomnav,.viewrow,.chips,.search,.add,.qty,.wa,.pdfbtn,#installBanner{display:none!important}}
 #memoOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;overflow:auto;padding:12px;display:none}
+#plannerOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;overflow:auto;padding:12px;display:none}
+#plannerPaper{background:#fff;max-width:640px;margin:0 auto;padding:20px;border-radius:8px;color:#111}
 #memoPaper{background:#fff;max-width:640px;margin:0 auto;padding:20px;border-radius:8px;color:#111}
 #memoPaper table{width:100%;border-collapse:collapse;margin:10px 0}
 #memoPaper th,#memoPaper td{border:1px solid #ccc;padding:6px 8px;font-size:15px;text-align:left;vertical-align:top}
 #memoPaper th{background:#e8f5ee;color:#065f46}
 #memoPaper input{padding:6px;font-size:15px;border:1px solid #999;border-radius:6px;margin:0}
-@media print{body *{visibility:hidden} #memoOverlay,#memoOverlay *{visibility:visible} #memoOverlay{position:absolute;left:0;top:0;width:100%;background:#fff;padding:0} .noprint{display:none!important}}
+@media print{body *{visibility:hidden} #memoOverlay,#memoOverlay *{visibility:visible} #memoOverlay{position:absolute;left:0;top:0;width:100%;background:#fff;padding:0} #plannerOverlay,#plannerOverlay *{visibility:visible} #plannerOverlay{position:absolute;left:0;top:0;width:100%;background:#fff;padding:0} .noprint{display:none!important}}
 
 /* ---- Neer Admin mobile-first polish (v22) ---- */
 html{-webkit-text-size-adjust:100%}
@@ -291,6 +293,16 @@ section h2{color:#6d28d9}
 <label>WhatsApp নম্বর (অর্ডার যাবে)</label><input id="sWa" onchange="saveSettings()">
 <label>ডেলিভারি চার্জ (টাকা) — ০ মানে ফ্রি</label><input id="sFee" type="number" min="0" onchange="saveSettings()">
 <p class="small">বদলালেই খসড়ায় সেভ হয়। কাস্টমার দেখবে শুধু <b>প্রকাশ</b> করার পর।</p>
+<h3 style="margin-top:18px">🎟️ কুপন কোড</h3>
+<p class="small">কাস্টমার কার্টে এই কোড লিখলে ছাড় পাবে। কোড বন্ধ করতে চাইলে "বন্ধ করুন" চাপুন — মুছে ফেলার দরকার নেই।</p>
+<label>কোড (বড় অক্ষরে লিখুন)</label><input id="cpCode" placeholder="যেমন: MASIK10">
+<label>ছাড়ের ধরন</label><select id="cpType"><option value="percent">শতাংশ (%)</option><option value="fixed">নির্দিষ্ট টাকা (৳)</option></select>
+<label>ছাড়ের পরিমাণ</label><input id="cpValue" type="number" min="0" placeholder="যেমন: ১০">
+<label>ন্যূনতম অর্ডার (৳) — ০ মানে কোনো সীমা নেই</label><input id="cpMin" type="number" min="0" value="0">
+<label>মেয়াদ শেষ (না বসালে মেয়াদ নেই)</label><input id="cpExp" type="date">
+<button class="gold" onclick="addCoupon()">➕ কুপন যোগ করুন</button>
+<p id="cpMsg" class="small"></p>
+<div id="couponList"></div>
 </div>
 
 <div id="admin-publish" class="adminbox" style="display:none">
@@ -576,6 +588,7 @@ function showAdminTab(t){
     document.getElementById("admin-"+x).style.display=(x===t)?"block":"none";
     document.getElementById("atab-"+x).classList.toggle("on", x===t);
   });
+  if(t==="settings") loadCoupons();
   if(t==="orders") loadAdminOrders();
   if(t==="subs") loadSubs();
   if(t==="profit") loadProfit();
@@ -614,6 +627,40 @@ async function setSubStatusAdmin(id,status){
   await sb.from("subscriptions").update({status:status}).eq("id",id);
   loadSubs();
 }
+async function loadCoupons(){
+  var el=document.getElementById("couponList"); if(!el) return;
+  if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
+  el.innerHTML="<p>আসছে…</p>";
+  var res=await sb.from("coupons").select("*").order("created_at",{ascending:false}).limit(100);
+  if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
+  var rows=res.data||[];
+  if(!rows.length){ el.innerHTML="<p>এখনো কোনো কুপন নেই।</p>"; return; }
+  el.innerHTML=rows.map(function(c){
+    var exp=c.expires_at?new Date(c.expires_at).toLocaleDateString("bn-BD"):"মেয়াদ নেই";
+    var disc=c.discount_type==="percent"?("ছাড় "+bn(c.discount_value)+"%"):("ছাড় ৳"+bn(c.discount_value));
+    return '<div class="ordercard"><b>'+esc(c.code)+'</b> — '+disc+'<br>ন্যূনতম অর্ডার: ৳'+bn(c.min_order||0)+' • মেয়াদ: '+exp+' • ব্যবহৃত: '+bn(c.usage_count||0)+' বার<br>'+(c.active?"✅ চালু":"❌ বন্ধ")+' <button class="ghost" onclick="toggleCoupon(\''+c.id+'\','+(c.active?"false":"true")+')">'+(c.active?"বন্ধ করুন":"চালু করুন")+'</button></div>';
+  }).join("");
+}
+async function addCoupon(){
+  var code=(document.getElementById("cpCode").value||"").trim().toUpperCase();
+  var val=parseInt(document.getElementById("cpValue").value||"0",10)||0;
+  var min=parseInt(document.getElementById("cpMin").value||"0",10)||0;
+  var exp=document.getElementById("cpExp").value||"";
+  var msg=document.getElementById("cpMsg");
+  if(!code){ msg.textContent="কোড লিখুন।"; return; }
+  if(val<=0){ msg.textContent="ছাড়ের পরিমাণ লিখুন।"; return; }
+  if(!sb){ msg.textContent="ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।"; return; }
+  var res=await sb.from("coupons").insert([{code:code, discount_type:document.getElementById("cpType").value, discount_value:val, min_order:min, active:true, expires_at:exp?new Date(exp).toISOString():null}]);
+  if(res.error){ msg.textContent="হয়নি: "+res.error.message; return; }
+  msg.textContent="✅ কুপন যোগ হয়েছে — "+code;
+  document.getElementById("cpCode").value=""; document.getElementById("cpValue").value=""; document.getElementById("cpExp").value="";
+  loadCoupons();
+}
+async function toggleCoupon(id, active){
+  if(!sb) return;
+  await sb.from("coupons").update({active:active}).eq("id", id);
+  loadCoupons();
+}
 async function loadFeedback(){
   var el=document.getElementById("feedbackList"); if(!el) return;
   if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
@@ -622,19 +669,34 @@ async function loadFeedback(){
   if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
   var rows=res.data||[];
   if(!rows.length){ setTabBadge("feedback",0); el.innerHTML="<p>এখনো কোনো অভিযোগ বা পরামর্শ আসেনি।</p>"; return; }
+  window.__fbRows={}; rows.forEach(function(r){ window.__fbRows[r.id]=r; });
   var nNew=rows.filter(function(r){ return r.status!=="done"; }).length;
   setTabBadge("feedback", nNew);
-  var typeEmoji={ "অভিযোগ":"😠", "পরামর্শ":"💡", "নতুন আইডিয়া":"🏆", "ফোনে কনফার্ম":"📞" };
+  var typeEmoji={ "অভিযোগ":"😠", "পরামর্শ":"💡", "নতুন আইডিয়া":"🏆", "ফোনে কনফার্ম":"📞", "নতুন পণ্য চাই":"🛒" };
   el.innerHTML='<div class="statgrid"><div class="stat"><b>'+bn(rows.length)+'</b>টি বার্তা</div><div class="stat"><b>'+bn(nNew)+'</b>টি নতুন</div></div>'+rows.map(function(r){
     var d=new Date(r.created_at);
     var done=r.status==="done";
-    return '<div class="ordercard" style="'+(done?"opacity:.65":"")+'">'+(typeEmoji[r.type]||"💬")+' <b>'+esc(r.type||"মতামত")+'</b> '+(done?"✅ সমাধান হয়েছে":"🆕 নতুন")+'<br><b>'+esc(r.name||"কাস্টমার")+'</b> • 📱 <a href="tel:'+(r.phone||"")+'">'+(r.phone||"—")+'</a><br>'+esc(r.message||"")+'<br><span class="small">'+d.toLocaleString("bn-BD")+'</span><br>'+(done?"":'<button class="primary" onclick="markFeedbackDone(\''+r.id+'\')">✅ সমাধান হয়েছে</button> ')+'<button class="danger" onclick="delFeedback(this,\''+r.id+'\')">🗑️ মুছুন</button></div>';
+    return '<div class="ordercard" style="'+(done?"opacity:.65":"")+'">'+(typeEmoji[r.type]||"💬")+' <b>'+esc(r.type||"মতামত")+'</b> '+(done?"✅ সমাধান হয়েছে":"🆕 নতুন")+'<br><b>'+esc(r.name||"কাস্টমার")+'</b> • 📱 <a href="tel:'+(r.phone||"")+'">'+(r.phone||"—")+'</a><br>'+esc(r.message||"")+'<br><span class="small">'+d.toLocaleString("bn-BD")+'</span><br>'+(done?"":'<button class="primary" onclick="markFeedbackDone(\''+r.id+'\')">✅ সমাধান হয়েছে</button> ')+(r.type==="নতুন পণ্য চাই"&&!done?'<button class="gold" onclick="addProductFromFeedback(\''+r.id+'\')">➕ পণ্য হিসেবে যোগ করুন</button> ':"")+'<button class="danger" onclick="delFeedback(this,\''+r.id+'\')">🗑️ মুছুন</button></div>';
   }).join("");
 }
 async function markFeedbackDone(id){
   if(!sb) return;
   await sb.from("feedback").update({status:"done"}).eq("id",id);
   loadFeedback();
+}
+async function addProductFromFeedback(id){
+  var r=(window.__fbRows||{})[id]; if(!r) return;
+  var name=(r.message||"").trim();
+  if(!name){ alert("পণ্যের নাম পাওয়া যায়নি।"); return; }
+  var maxId=0; DRAFT.products.forEach(function(p){ if(p.id>maxId) maxId=p.id; });
+  var newP={id:maxId+1, name:name, brand:"", category:"অন্যান্য", unit:"পিস", price_taka:0, wholesale_price:0, daily:false};
+  DRAFT.products.unshift(newP);
+  saveDraft();
+  if(sb) await sb.from("feedback").update({status:"done"}).eq("id", id);
+  editGroupId=newP.id;
+  showAdminTab("products");
+  renderAdminProducts();
+  alert("✅ \""+name+"\" পণ্য হিসেবে যোগ হয়েছে — দাম আর একক বসিয়ে প্রকাশ করুন।");
 }
 var pendingDelFb=null;
 function delFeedback(btn,id){
@@ -702,6 +764,13 @@ function renderAdminProducts(){
   });
   var h='<div class="chips">'+["সব"].concat(CATS).map(function(c){ return '<button class="chip'+(adminProdCat===c?' on':'')+'" onclick="setAdminProdCat(\''+c+'\')">'+c+'</button>'; }).join("")+'</div>';
   h+='<p class="small">মোট '+bn(groups.length)+'টি পণ্য • '+bn(DRAFT.products.length)+'টি ব্র্যান্ড — বদলাতে পণ্যের কার্ডে চাপ দিন।</p>';
+  var gidByName={}; groups.forEach(function(g){ gidByName[g.name]=g.gid; });
+  var lowStock=DRAFT.products.filter(function(p){ return (p.stock_qty||0)>0 && (p.stock_qty||0)<=5; });
+  if(lowStock.length){
+    h+='<div class="card" style="background:#fef3c7"><b>⚠️ কম স্টক ('+bn(lowStock.length)+'টি)</b><p class="small">৫ বা তার কম আছে — শেষ হওয়ার আগে কিনে নিন। কার্ডে চাপ দিলে স্টক বসাতে পারবেন।</p>'+lowStock.map(function(p){
+      return '<div class="listrow"><div class="n"><b>'+esc(p.name)+'</b>'+(p.brand?(' ('+esc(p.brand)+')'):'')+'<br><span class="small">স্টক: '+bn(p.stock_qty)+' '+esc(p.unit||'')+'</span></div><button class="primary" onclick="openGroupEdit('+gidByName[p.name]+')">স্টক বসান</button></div>';
+    }).join("")+'</div>';
+  }
   h+=list.map(function(g){
     var brands=g.vars.map(function(v){ var b=(v.brand||"").trim(); return '<div class="brandrow">'+(b?'<span class="bname">'+esc(b)+'</span>':'<span class="bunit">/ '+esc(v.unit||"")+'</span>')+'<span class="bprices"><span class="pr">খুচরা ৳'+bn(v.price_taka||0)+'</span><span class="pw">পাইকারি ৳'+bn(v.wholesale_price||0)+'</span></span></div>'; }).join("");
     return '<div class="pcard" onclick="openGroupEdit('+g.gid+')"><div><b>'+esc(g.name)+'</b><span class="pcat">'+esc(g.category)+'</span></div><div class="pbrands">'+brands+'</div><div class="pacts"><button class="primary" onclick="event.stopPropagation();openGroupEdit('+g.gid+')">✏️ বদলান</button><button class="ghost" onclick="event.stopPropagation();moveGroup('+g.gid+',-1)">↑ ওপরে</button><button class="ghost" onclick="event.stopPropagation();moveGroup('+g.gid+',1)">↓ নিচে</button></div></div>';
@@ -734,7 +803,8 @@ function renderPriceList(){
       + g.vars.map(function(v){
           return '<div class="listrow"><div class="n">'+((v.brand||"").trim()?'<b>'+esc(v.brand)+'</b> ':'')+'<span class="small">/'+esc(v.unit||"")+'</span></div>'
           +'<div><label class="small">পাইকারি ৳</label><input type="number" min="0" style="width:90px" value="'+(v.wholesale_price||0)+'" onchange="editProduct('+v.id+',\'wholesale_price\',this.value)"></div>'
-          +'<div><label class="small">খুচরা ৳</label><input type="number" min="0" style="width:90px" value="'+(v.price_taka||0)+'" onchange="editProduct('+v.id+',\'price_taka\',this.value)"></div></div>';
+          +'<div><label class="small">খুচরা ৳</label><input type="number" min="0" style="width:90px" value="'+(v.price_taka||0)+'" onchange="editProduct('+v.id+',\'price_taka\',this.value)"></div>'
+          +'<div><label class="small">স্টক</label><input type="number" min="0" style="width:70px" value="'+(v.stock_qty||0)+'" onchange="editProduct('+v.id+',\'stock_qty\',this.value)"></div></div>';
         }).join("")+'</div>';
   }).join("")||"<p>কোনো পণ্য পাওয়া যায়নি।</p>";
   el.innerHTML=h;
@@ -772,6 +842,7 @@ function renderGroupEdit(g){
     h+='<div><label>পাইকারি দাম (৳)</label><input type="number" min="0" value="'+(p.wholesale_price||0)+'" onchange="editProduct('+p.id+',\'wholesale_price\',this.value)"></div>';
     h+='<div><label>একক</label><input value="'+esc(p.unit||"")+'" onchange="editProduct('+p.id+',\'unit\',this.value)" placeholder="কেজি / লিটার"></div>';
     h+='</div>';
+    h+='<div><label>স্টক (পরিমাণ — এই এককে কত আছে; ০ মানে বসানো হয়নি)</label><input type="number" min="0" value="'+(p.stock_qty||0)+'" onchange="editProduct('+p.id+',\'stock_qty\',this.value)"></div>';
     h+='<div class="vacts"><button class="ghost" onclick="moveVariant('+p.id+',-1)">↑</button><button class="ghost" onclick="moveVariant('+p.id+',1)">↓</button><button class="danger" onclick="delProduct('+p.id+')">'+(pendingDelId===p.id?'নিশ্চিত?':'এই ব্র্যান্ডটি মুছুন')+'</button></div>';
     h+='</div>';
   });
@@ -855,7 +926,7 @@ function moveProduct(id,d){
   saveDraft(); renderAdminProducts();
 }
 function editProduct(id, field, val){
-  DRAFT.products.forEach(function(p){ if(p.id===id){ p[field]=(field==="price_taka"||field==="wholesale_price")?(parseInt(val,10)||0):val; } });
+  DRAFT.products.forEach(function(p){ if(p.id===id){ p[field]=(field==="price_taka"||field==="wholesale_price"||field==="stock_qty")?(parseInt(val,10)||0):val; } });
   recalcPackages(DRAFT); saveDraft(); renderAdminPackages();
 }
 var pendingDelId=null, pendingDelTimer=null;
@@ -1074,7 +1145,22 @@ async function loadAdminOrders(){
   if(!rows.length){ setTabBadge("orders",0); el.innerHTML="<p>এখনো কোনো অর্ডার আসেনি।</p>"; return; }
   var statuses=["New Order","Contacted","Confirmed","Preparing","Out for Delivery","Delivered","Cancelled"];
   var bnStatus={"New Order":"নতুন অর্ডার","Contacted":"যোগাযোগ হয়েছে","Confirmed":"নিশ্চিত","Preparing":"তৈরি হচ্ছে","Out for Delivery":"ডেলিভারিতে","Delivered":"ডেলিভারি সম্পন্ন","Cancelled":"বাতিল"};
-  el.innerHTML=rows.map(function(o){
+  var byDay={};
+  rows.forEach(function(o){ var k=(o.delivery_day||"").trim()||"দিন বসানো হয়নি"; (byDay[k]=byDay[k]||[]).push(o); });
+  var dayOrder=["আজ","আগামীকাল","পরশু"];
+  var days=Object.keys(byDay).sort(function(a,b){ var ia=dayOrder.indexOf(a), ib=dayOrder.indexOf(b); if(ia<0&&ib<0) return a<b?-1:1; if(ia<0) return 1; if(ib<0) return -1; return ia-ib; });
+  var plannerHtml='<div class="card" style="background:#f5f3ff;margin-bottom:12px"><h3 style="margin:0">🗓️ ডেলিভারি পরিকল্পনা</h3><p class="small">কোন দিন কত অর্ডার, আর সব মিলিয়ে কী কী কিনতে হবে।</p>';
+  days.forEach(function(day){
+    var drows=byDay[day];
+    var dayTotal=0; drows.forEach(function(o){ dayTotal+=+(o.total||0); });
+    var agg={};
+    drows.forEach(function(o){ (o.items||[]).forEach(function(it){ var k=it.name+"|"+(it.unit||""); if(!agg[k]) agg[k]={name:it.name, unit:it.unit||"", qty:0}; agg[k].qty+=(+it.qty||0); }); });
+    var aggLines=Object.keys(agg).map(function(k){ var a=agg[k]; return a.name+' — '+bn(a.qty)+' '+(a.unit||""); }).join("<br>");
+    plannerHtml+='<div style="border-top:1px solid #ddd;padding-top:8px;margin-top:8px"><b>'+day+'</b> — '+bn(drows.length)+'টি অর্ডার • মোট ৳'+bn(dayTotal)+'<br><span class="small">'+(aggLines||"কোনো পণ্য নেই")+'</span></div>';
+  });
+  plannerHtml+='</div>';
+  window.__plannerHtml=plannerHtml;
+  el.innerHTML=plannerHtml+'<div style="margin-bottom:12px"><button class="gold" onclick="printPlanner()">🖨️ পরিকল্পনা ছাপান</button></div>'+rows.map(function(o){
     var d=new Date(o.created_at);
     return '<div class="ordercard"><b>'+o.order_no+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br>'+(o.customer_name||"")+' • '+(o.phone||"")+'<br>'+(o.items||[]).map(function(it){ return it.name+' — '+bn(it.qty)+' '+(it.unit||""); }).join("<br>")+'<br><b>মোট: ৳'+bn(o.total)+' • লাভ: ৳'+bn(o.profit||0)+'</b><br><label>স্ট্যাটাস</label><select onchange="setAdminOrderStatus(\''+o.id+'\',this.value)">'+statuses.map(function(s){ return '<option value="'+s+'" '+(s===o.status?'selected':'')+'>'+bnStatus[s]+'</option>'; }).join("")+'</select><br><button class="gold" onclick="openMemo(\''+o.id+'\')">🧾 ক্যাশ মেমো</button></div>';
   }).join("");
@@ -1083,6 +1169,14 @@ async function setAdminOrderStatus(id, status){
   if(!sb) return;
   await sb.from("orders").update({status:status}).eq("id", id);
 }
+var __plannerHtml="";
+function printPlanner(){
+  var ov=document.getElementById("plannerOverlay"); if(!ov) return;
+  document.getElementById("plannerPaper").innerHTML='<h2 style="margin:0">🗓️ ডেলিভারি পরিকল্পনা — মাসিক বাজার</h2><p class="small">'+new Date().toLocaleDateString("bn-BD")+'</p>'+(__plannerHtml||"");
+  ov.style.display="block";
+  window.scrollTo(0,0);
+}
+function closePlanner(){ var ov=document.getElementById("plannerOverlay"); if(ov) ov.style.display="none"; }
 async function loadProfit(){
   var el=document.getElementById("profitBox"); if(!el) return;
   if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
@@ -1195,13 +1289,43 @@ async function loadCustomers(){
   if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
   var rows=res.data||[];
   if(!rows.length){ el.innerHTML="<p>এখনো কেউ লগইন করেনি।</p>"; return; }
-  var ores=await sb.from("orders").select("phone").limit(500);
-  var counts={};
-  (ores.data||[]).forEach(function(o){ if(o.phone) counts[o.phone]=(counts[o.phone]||0)+1; });
-  el.innerHTML='<div class="statgrid"><div class="stat"><b>'+bn(rows.length)+'</b>জন কাস্টমার</div></div>'+rows.map(function(r){
+  var ores=await sb.from("orders").select("phone,created_at,total").limit(500);
+  var stats={};
+  (ores.data||[]).forEach(function(o){ if(!o.phone) return; var st=stats[o.phone]||(stats[o.phone]={n:0,total:0,last:""}); st.n++; st.total+=+(o.total||0); if(!st.last||o.created_at>st.last) st.last=o.created_at; });
+  var nowMs=Date.now(), DAY=86400000;
+  function lastAct(r){ var st=stats[r.phone]; return (st&&st.last)||r.created_at||""; }
+  var remind=rows.filter(function(r){ var la=lastAct(r); return la && (nowMs-new Date(la).getTime())>25*DAY; });
+  var remHtml="";
+  if(remind.length){
+    remHtml='<h3 style="margin-top:16px">🔔 মনে করিয়ে দিন ('+bn(remind.length)+' জন)</h3><p class="small">২৫ দিনের বেশি অর্ডার করেননি — WhatsApp-এ জানান।</p>'+remind.map(function(r){
+      var ph=(r.phone||"").replace(/[^0-9]/g,""); if(ph.indexOf("88")!==0) ph="88"+ph;
+      var wa="https://wa.me/"+ph+"?text="+encodeURIComponent("আসসালামু আলাইকুম "+(r.name||"")+"! অনেকদিন বাজার নেননি — এই মাসের বাজার লাগবে কি? মাসিক বাজার থেকে জানাচ্ছি।");
+      var la=lastAct(r);
+      return '<div class="ordercard"><b>'+esc(r.name||"কাস্টমার")+'</b> • '+(r.phone||"")+'<br><span class="small">শেষ অর্ডার/নিবন্ধন: '+(la?new Date(la).toLocaleDateString("bn-BD"):"—")+'</span><br><a class="primary" style="display:inline-block;padding:8px 12px;text-decoration:none" href="'+wa+'" target="_blank">💬 WhatsApp-এ মনে করিয়ে দিন</a></div>';
+    }).join("");
+  }
+  el.innerHTML='<div class="statgrid"><div class="stat"><b>'+bn(rows.length)+'</b>জন কাস্টমার</div></div>'+remHtml+rows.map(function(r){
     var d=new Date(r.created_at);
-    return '<div class="ordercard"><b>'+(r.name||"কাস্টমার")+'</b><br>📱 <a href="tel:'+(r.phone||"")+'">'+(r.phone||"—")+'</a>'+(r.email?('<br>✉️ '+r.email):"")+'<br>অর্ডার: <b>'+bn(counts[r.phone]||0)+'</b>টি • নিবন্ধন: '+d.toLocaleDateString("bn-BD")+'</div>';
+    var st=stats[r.phone]||{n:0,total:0,last:""};
+    return '<div class="ordercard"><b>'+(r.name||"কাস্টমার")+'</b><br>📱 <a href="tel:'+(r.phone||"")+'">'+(r.phone||"—")+'</a>'+(r.email?('<br>✉️ '+r.email):"")+'<br>অর্ডার: <b>'+bn(st.n)+'</b>টি • মোট খরচ: <b>৳'+bn(st.total)+'</b>'+(st.last?('<br>শেষ অর্ডার: '+new Date(st.last).toLocaleDateString("bn-BD")):"")+'<br>নিবন্ধন: '+d.toLocaleDateString("bn-BD")+'<br><button class="primary" onclick="openCustomerCard(\''+(r.phone||"")+'\',\''+esc(r.name||"").replace(/'/g,"")+'\')">📇 কার্ড দেখুন</button></div>';
   }).join("");
+}
+async function openCustomerCard(phone, name){
+  var el=document.getElementById("customerList"); if(!el) return;
+  if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
+  el.innerHTML="<p>আসছে…</p>";
+  var ores=await sb.from("orders").select("*").eq("phone", phone).order("created_at",{ascending:false}).limit(50);
+  var sres=await sb.from("subscriptions").select("*").eq("customer_phone", phone).eq("status","active").limit(5);
+  var ords=ores.data||[];
+  var total=0; ords.forEach(function(o){ total+=+(o.total||0); });
+  var subs=sres.data||[];
+  var ph=(phone||"").replace(/[^0-9]/g,""); if(ph.indexOf("88")!==0) ph="88"+ph;
+  var wa="https://wa.me/"+ph+"?text="+encodeURIComponent("আসসালামু আলাইকুম "+(name||"")+"! মাসিক বাজার থেকে জানাচ্ছি।");
+  el.innerHTML='<button class="ghost" onclick="loadCustomers()">← কাস্টমারের তালিকা</button>'
+    +'<div class="ordercard"><h3 style="margin:0">📇 '+esc(name||"কাস্টমার")+'</h3>📱 <a href="tel:'+phone+'">'+phone+'</a><br>মোট অর্ডার: <b>'+bn(ords.length)+'</b>টি • মোট খরচ: <b>৳'+bn(total)+'</b><br>শেষ অর্ডার: '+(ords[0]?new Date(ords[0].created_at).toLocaleDateString("bn-BD"):"—")
+    +(subs.length?('<br>📅 সাবস্ক্রিপশন: <b>'+subs.map(function(s){ return s.package_name+" ("+s.delivery_day+")"; }).join(", ")+'</b>'):"<br>📅 সাবস্ক্রিপশন নেই")
+    +'<br><a class="primary" style="display:inline-block;padding:8px 12px;text-decoration:none" href="'+wa+'" target="_blank">💬 WhatsApp</a></div>'
+    +(ords.length?('<h3 style="margin-top:14px">📋 অর্ডারের তালিকা</h3>'+ords.map(function(o){ var d=new Date(o.created_at); return '<div class="ordercard"><b>'+o.order_no+'</b> — '+d.toLocaleDateString("bn-BD")+'<br>'+(o.items||[]).map(function(it){ return it.name+' — '+bn(it.qty)+' '+(it.unit||""); }).join("<br>")+'<br><b>মোট: ৳'+bn(o.total)+'</b> • '+(o.status||"")+'</div>'; }).join("")):"<p>এখনো কোনো অর্ডার করেননি।</p>");
 }
 async function loadVisitors(){
   var el=document.getElementById("visitorBox"); if(!el) return;
@@ -1306,5 +1430,6 @@ renderAdmin();
 showInstallBanner();
 </script>
 <div id="memoOverlay"><div id="memoPaper"></div></div>
+<div id="plannerOverlay"><div id="plannerPaper"></div><div style="text-align:center;margin-top:10px" class="noprint"><button class="gold" onclick="window.print()">🖨️ ছাপান</button> <button class="ghost" onclick="closePlanner()">✕ বন্ধ করুন</button></div></div>
 </body>
 </html>
