@@ -8,8 +8,8 @@
   "products": [
     {
       "id": 1,
-      "name": "চাল (কোলা চাল)",
-      "brand": "",
+      "name": "চাল (খোলা চাল) বি-২৯",
+      "brand": "নৌকা",
       "category": "চাল ও আটা",
       "unit": "কেজি",
       "price_taka": 65,
@@ -1697,8 +1697,8 @@
       "items": [
         {
           "product_id": 1,
-          "name": "চাল (কোলা চাল)",
-          "brand": "",
+          "name": "চাল (খোলা চাল) বি-২৯",
+          "brand": "নৌকা",
           "qty_label": "১২ কেজি",
           "qty_multiplier": 12.0,
           "line_total_taka": 780
@@ -1770,8 +1770,8 @@
       "items": [
         {
           "product_id": 1,
-          "name": "চাল (কোলা চাল)",
-          "brand": "",
+          "name": "চাল (খোলা চাল) বি-২৯",
+          "brand": "নৌকা",
           "qty_label": "১৮ কেজি",
           "qty_multiplier": 18.0,
           "line_total_taka": 1170
@@ -1843,8 +1843,8 @@
       "items": [
         {
           "product_id": 1,
-          "name": "চাল (কোলা চাল)",
-          "brand": "",
+          "name": "চাল (খোলা চাল) বি-২৯",
+          "brand": "নৌকা",
           "qty_label": "২২ কেজি",
           "qty_multiplier": 22.0,
           "line_total_taka": 1430
@@ -1964,8 +1964,8 @@
       "items": [
         {
           "product_id": 1,
-          "name": "চাল (কোলা চাল)",
-          "brand": "",
+          "name": "চাল (খোলা চাল) বি-২৯",
+          "brand": "নৌকা",
           "qty_label": "২৮ কেজি",
           "qty_multiplier": 28.0,
           "line_total_taka": 1820
@@ -2085,8 +2085,8 @@
       "items": [
         {
           "product_id": 1,
-          "name": "চাল (কোলা চাল)",
-          "brand": "",
+          "name": "চাল (খোলা চাল) বি-২৯",
+          "brand": "নৌকা",
           "qty_label": "৩৪.৫ কেজি",
           "qty_multiplier": 34.5,
           "line_total_taka": 2242
@@ -2198,8 +2198,8 @@
       "items": [
         {
           "product_id": 1,
-          "name": "চাল (কোলা চাল)",
-          "brand": "",
+          "name": "চাল (খোলা চাল) বি-২৯",
+          "brand": "নৌকা",
           "qty_label": "৪০ কেজি",
           "qty_multiplier": 40.0,
           "line_total_taka": 2600
@@ -2311,8 +2311,8 @@
       "items": [
         {
           "product_id": 1,
-          "name": "চাল (কোলা চাল)",
-          "brand": "",
+          "name": "চাল (খোলা চাল) বি-২৯",
+          "brand": "নৌকা",
           "qty_label": "৪৫.৫ কেজি",
           "qty_multiplier": 45.5,
           "line_total_taka": 2958
