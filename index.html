@@ -19,12 +19,11 @@ button:active{transform:scale(.97)}
 a.wa:active{filter:brightness(.92)}
 .bottomnav button:active{background:#4c1d95}
 body{margin:0;font-family:"Noto Sans Bengali","Hind Siliguri",system-ui,sans-serif;background:#f4f6f1;color:#1a1a1a;line-height:1.55;-webkit-text-size-adjust:100%}
-header{background:linear-gradient(135deg,#6d28d9,#5b21b6);color:#fff;padding:20px 16px 16px;text-align:center;border-radius:0 0 24px 24px;box-shadow:0 4px 16px rgba(6,95,70,.25)}
-.logo{width:64px;height:64px;border-radius:50%;background:#d4a017;color:#6d28d9;display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 8px;border:3px solid #f5d76e}
-h1{margin:0;font-size:30px;color:#ffd970}
-header p{margin:4px 0;color:#ede9fe}
-.hero{background:#5b21b6;color:#fff;text-align:center;padding:12px}
-.hero b{color:#ffd970}
+header{background:linear-gradient(135deg,#6d28d9,#5b21b6);color:#fff;padding:16px;display:flex;align-items:center;gap:14px;text-align:left;border-radius:0 0 24px 24px;box-shadow:0 4px 16px rgba(6,95,70,.25)}
+.logo{width:76px;height:76px;border-radius:50%;background:#d4a017;color:#6d28d9;display:flex;align-items:center;justify-content:center;font-size:34px;margin:0;flex:none;border:3px solid #f5d76e}
+.headtext{flex:1;min-width:0}
+h1{margin:0;font-size:26px;color:#ffd970}
+header p.slogan{margin:2px 0 0;color:rgba(255,255,255,.82);font-size:13px}
 .wrap{max-width:900px;margin:0 auto;padding:12px 12px 170px}
 .search{width:100%;padding:13px 16px;font-size:17px;border:2px solid #6d28d9;border-radius:999px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.06)}
 .stickybar{background:#f4f6f1;margin:0 -12px;padding:8px 12px 6px}
@@ -39,17 +38,12 @@ header p{margin:4px 0;color:#ede9fe}
 .card,.prow,.listrow{min-width:0}
 @media(min-width:640px){.grid{grid-template-columns:1fr 1fr 1fr}}
 .card{background:#fff;border:1px solid #e8e8e8;border-radius:18px;padding:12px;box-shadow:0 3px 10px rgba(0,0,0,.07)}
-.steps{display:flex;gap:8px;margin:12px 0}
-.step{flex:1;background:#fff;border:1.5px solid #6d28d9;border-radius:14px;padding:10px 6px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.05)}
-.step b{display:block;width:30px;height:30px;line-height:30px;border-radius:50%;background:#6d28d9;color:#fff;font-size:17px;margin:0 auto 6px}
-.step span{font-size:14px;font-weight:700;color:#6d28d9}
+.stepsline{text-align:center;color:#6b7280;font-size:13px;margin:10px 0 2px}
 .stephead{font-size:18px;color:#6d28d9;margin:14px 0 4px}
 .stephead b{margin-right:6px}
 .prizebanner{background:linear-gradient(135deg,#ffd970,#f5d76e);border:2px solid #d4a017;border-radius:16px;padding:14px;margin:12px 0;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(212,160,23,.3)}
 .prizebanner b{font-size:18px;color:#111}
 .prizebanner span{font-size:14px;color:#444;display:block;margin-top:4px}
-.headbtns{display:flex;gap:8px;justify-content:center;margin-top:12px}
-.headbtns button{background:rgba(255,255,255,.14);color:#fff;border:1.5px solid rgba(255,255,255,.65);border-radius:999px;padding:11px 18px;font-size:15px;font-weight:700;cursor:pointer;min-height:44px}
 .crow{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:2px 0}
 .ccat{color:#666;font-size:13px;white-space:nowrap}
 .card .brandsel{max-width:100%;width:100%}
@@ -156,9 +150,10 @@ button.ghost{background:#fff;border:1px solid #6d28d9;color:#6d28d9;border-radiu
 .ordercard{background:#fff;border:1px solid #d8d8d8;border-radius:14px;padding:12px;margin-bottom:10px}
 footer{text-align:center;color:#555;padding:16px 16px 90px;font-size:14px}
 @media(max-width:480px){
-header{padding:16px 12px 12px}
-.logo{width:56px;height:56px;font-size:30px}
-h1{font-size:26px}
+header{padding:14px 12px;gap:10px}
+.logo{width:68px;height:68px}
+.logo svg{width:44px;height:44px}
+h1{font-size:23px}
 .grid{grid-template-columns:1fr}
 .pl1 .brandsel{max-width:96px}
 .listrow .n{min-width:150px}
@@ -177,12 +172,10 @@ h1{font-size:26px}
 </head>
 <body>
 <header>
-<div class="logo"><svg viewBox="0 0 64 64" width="40" height="40" aria-hidden="true"><path d="M18 30 Q32 12 46 30" fill="none" stroke="#6d28d9" stroke-width="4" stroke-linecap="round"/><circle cx="24" cy="26" r="5" fill="#f97316"/><circle cx="32" cy="23" r="5.5" fill="#ef4444"/><circle cx="40" cy="26" r="5" fill="#7c3aed"/><path d="M14 30 L50 30 L46 52 Q45 55 42 55 L22 55 Q19 55 18 52 Z" fill="#6d28d9"/><path d="M19 37 L45 37 M20 45 L44 45" stroke="#d4a017" stroke-width="2"/><path d="M46 16 Q54 8 56 16 Q50 22 46 16" fill="#7c3aed"/></svg></div>
-<h1 id="shopTitle">মাসিক বাজার</h1>
-<p><span id="companyTitle">নীড়</span> &nbsp;•&nbsp; মাসিক বাজারের সবকিছু, এক জায়গায়</p>
-<div class="headbtns"><button onclick="showTab('feedback')">📝 মতামত</button></div>
+<div class="logo"><svg viewBox="0 0 64 64" width="52" height="52" aria-hidden="true"><path d="M18 30 Q32 12 46 30" fill="none" stroke="#6d28d9" stroke-width="4" stroke-linecap="round"/><circle cx="24" cy="26" r="5" fill="#f97316"/><circle cx="32" cy="23" r="5.5" fill="#ef4444"/><circle cx="40" cy="26" r="5" fill="#7c3aed"/><path d="M14 30 L50 30 L46 52 Q45 55 42 55 L22 55 Q19 55 18 52 Z" fill="#6d28d9"/><path d="M19 37 L45 37 M20 45 L44 45" stroke="#d4a017" stroke-width="2"/><path d="M46 16 Q54 8 56 16 Q50 22 46 16" fill="#7c3aed"/></svg></div>
+<div class="headtext"><h1 id="shopTitle">মাসিক বাজার (নীড়)</h1>
+<p class="slogan">পুরো মাসের বাজার একসাথে আপনার দরজায়</p></div>
 </header>
-<div class="hero"><b>পুরো মাসের বাজার একসাথে আপনার দরজায়</b><br><span id="heroCount">১৩৩টি পণ্য • ৭টি পরিবার প্যাকেজ • WhatsApp-এ অর্ডার</span></div>
 <div id="installBanner" style="display:none;background:#ffd970;color:#111;padding:14px 16px;text-align:center;border-bottom:3px solid #6d28d9">
 <b>📲 অ্যাপ হিসেবে হোম স্ক্রিনে যোগ করুন</b><br><span id="installText">এক ট্যাপে ফোনে অ্যাপের মতো রাখুন — পরে আর লিংক খুঁজতে হবে না।</span><br>
 <button class="primary" id="installBtn" style="margin-top:8px" onclick="doInstall()">হোম স্ক্রিনে যোগ করুন</button>
@@ -192,11 +185,7 @@ h1{font-size:26px}
 <div class="wrap">
 
 <div id="tab-shop">
-<div class="steps">
-<div class="step"><b>১</b><span>পণ্য বেছে নিন</span></div>
-<div class="step"><b>২</b><span>কার্টে যোগ করুন</span></div>
-<div class="step"><b>৩</b><span>WhatsApp-এ অর্ডার করুন</span></div>
-</div>
+<p class="stepsline">১. পণ্য বেছে নিন &nbsp;→&nbsp; ২. কার্টে যোগ করুন &nbsp;→&nbsp; ৩. WhatsApp-এ অর্ডার করুন</p>
 <div class="stickybar"><div style="display:flex;gap:6px"><input class="search" id="q" placeholder="পণ্য খুঁজুন… যেমন: চাল, তেল, সাবান" oninput="renderShop()" style="flex:1"><button id="voiceBtn" class="ghost" style="padding:10px 14px;min-height:44px" onclick="startVoiceSearch()" aria-label="ভয়েসে খুঁজুন">🎤</button></div>
 <div id="searchSug" style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0"></div>
 <div class="chips" id="chips"></div></div>
@@ -210,7 +199,17 @@ h1{font-size:26px}
 <div id="usuals"></div>
 <div id="specials"></div>
 <div id="list"></div>
-<div class="prizebanner" onclick="showTab('feedback')">💡 <b>নতুন আইডিয়া দিন, পুরস্কার জিতুন!</b><span>আমাদের সেবা কেমন? অ্যাপটি কেমন হলে আপনি আরও ভালোভাবে ব্যবহার করতে পারতেন? আপনার আইডিয়া জানান — সেরা আইডিয়ার জন্য থাকছে পুরস্কার!</span></div>
+<div class="prizebanner" onclick="document.getElementById('fbBox').scrollIntoView({behavior:'smooth'})">💡 <b>নতুন আইডিয়া দিন, পুরস্কার জিতুন!</b><span>আমাদের সেবা কেমন? অ্যাপটি কেমন হলে আপনি আরও ভালোভাবে ব্যবহার করতে পারতেন? আপনার আইডিয়া জানান — সেরা আইডিয়ার জন্য থাকছে পুরস্কার!</span></div>
+<section class="adminbox" id="fbBox"><h2>💬 মতামত</h2>
+<p>আপনার অভিযোগ, পরামর্শ বা নতুন আইডিয়া জানান — অ্যাডমিন দেখে সমাধান করবেন। নতুন আইডিয়া দিলে সেরা আইডিয়ার জন্য পুরস্কার আছে!</p>
+<label>আপনার নাম</label><input id="fbName" placeholder="নাম লিখুন">
+<label>মোবাইল নম্বর</label><input id="fbPhone" placeholder="01XXXXXXXXX" inputmode="tel" autocomplete="tel">
+<label>ধরন</label>
+<select id="fbType"><option>অভিযোগ</option><option>পরামর্শ</option><option>নতুন আইডিয়া</option><option>নতুন পণ্য চাই</option></select>
+<label>আপনার বার্তা</label><textarea id="fbMsg" rows="4" placeholder="এখানে লিখুন…"></textarea>
+<button class="primary" style="width:100%" onclick="sendFeedback()">পাঠান</button>
+<p id="fbOut" class="small"></p>
+</section>
 </div>
 
 <div id="tab-packages" style="display:none">
@@ -296,18 +295,7 @@ h1{font-size:26px}
 <section><h2>📋 আমার অর্ডার</h2><p class="small">লগইন করলে আপনার অর্ডারগুলো সেভ থাকবে — ফোন বদলালেও দেখা যাবে। লগইন ছাড়াও পণ্য দেখা ও অর্ডার করা যাবে।</p><div id="customerBox" class="adminbox"></div><div id="myPoints" class="small"></div><div id="mySubs"></div><div id="myOrders"></div></section>
 </div>
 
-<div id="tab-feedback" style="display:none">
-<section class="adminbox"><h2>💬 মতামত</h2>
-<p>আপনার অভিযোগ, পরামর্শ বা নতুন আইডিয়া জানান — অ্যাডমিন দেখে সমাধান করবেন। নতুন আইডিয়া দিলে সেরা আইডিয়ার জন্য পুরস্কার আছে!</p>
-<label>আপনার নাম</label><input id="fbName" placeholder="নাম লিখুন">
-<label>মোবাইল নম্বর</label><input id="fbPhone" placeholder="01XXXXXXXXX" inputmode="tel" autocomplete="tel">
-<label>ধরন</label>
-<select id="fbType"><option>অভিযোগ</option><option>পরামর্শ</option><option>নতুন আইডিয়া</option><option>নতুন পণ্য চাই</option></select>
-<label>আপনার বার্তা</label><textarea id="fbMsg" rows="4" placeholder="এখানে লিখুন…"></textarea>
-<button class="primary" style="width:100%" onclick="sendFeedback()">পাঠান</button>
-<p id="fbOut" class="small"></p>
-</section>
-</div>
+
 
 
 
@@ -441,13 +429,12 @@ function showTab(t){
   var oldTab=curTab;
   if(t!==oldTab && !__inPop) __histPush("tab", t, oldTab);
   curTab=t;
-  ["shop","packages","cart","orders","feedback"].forEach(function(x){
+  ["shop","packages","cart","orders"].forEach(function(x){
     document.getElementById("tab-"+x).style.display = (x===t)?"block":"none";
     var nb=document.getElementById("nav-"+x); if(nb) nb.classList.toggle("on", x===t);
   });
   if(t==="cart") renderCart();
   if(t==="orders") renderMyOrders();
-  if(t==="feedback") renderFeedback();
   logVisit("tab", t);
 }
 function setView(v){ view=v; document.getElementById("vGrid").classList.toggle("on",v==="grid"); document.getElementById("vList").classList.toggle("on",v==="list"); renderShop(); }
@@ -574,9 +561,8 @@ function renderShop(){
     if(!q){ sug.style.display="flex"; sug.innerHTML=["চাল","তেল","চিনি","ডাল","সাবান"].map(function(s){ return '<button class="chip" onclick="setSearch(\''+s+'\')">🔍 '+s+'</button>'; }).join(""); }
     else { sug.style.display="none"; }
   }
-  document.getElementById("shopTitle").textContent=DATA.shop||"মাসিক বাজার";
-  document.getElementById("companyTitle").textContent=DATA.company||"নীড়";
-  document.getElementById("heroCount").textContent=bn(groupList().length)+"টি পণ্য • "+bn(DATA.packages.length)+"টি প্যাকেজ • WhatsApp-এ অর্ডার";
+  document.getElementById("shopTitle").textContent=(DATA.shop||"মাসিক বাজার")+" ("+(DATA.company||"নীড়")+")";
+  renderFeedback();
   var lh=document.getElementById("loginHint");
   if(lh){ lh.innerHTML = getCustomer()? "" : '<div class="note">🔑 <b>দাম দেখতে লগইন করুন</b> — এখন শুধু পণ্যের নাম আর ব্র্যান্ড দেখা যাচ্ছে। <button class="primary" style="padding:8px 14px" onclick="showTab(\'orders\')">লগইন করুন</button></div>'; }
   function qScore(gid){ var n=groupName(gid); if(n===q) return 0; if(n.indexOf(q)===0) return 1; if(n.indexOf(q)>=0) return 2; return 3; }
@@ -1474,7 +1460,7 @@ async function aiReply(q){
   }
   /* --- offers --- */
   if(/(অফার|ছাড়|ডিসকাউন্ট|সস্তা|কম দাম)/.test(text)){
-    return "এখন কোনো ছাড় চলছে না, তবে 'নতুন আইডিয়া দিন, পুরস্কার জিতুন' চলছে — সেরা আইডিয়ার জন্য পুরস্কার আছে! উপরের 📝 মতামত বোতামে আপনার আইডিয়া লিখুন।";
+    return "এখন কোনো ছাড় চলছে না, তবে 'নতুন আইডিয়া দিন, পুরস্কার জিতুন' চলছে — সেরা আইডিয়ার জন্য পুরস্কার আছে! পেজের নিচে মতামত ফরমে আপনার আইডিয়া লিখুন।";
   }
   /* --- reorder --- */
   if(/(আবার অর্ডার|আবার চাই|আগের অর্ডার|পুনরায় অর্ডার)/.test(text)){
@@ -1486,7 +1472,7 @@ async function aiReply(q){
   }
   /* --- complaint / suggestion / idea --- */
   if(/(অভিযোগ|পরামর্শ|আইডিয়া|আইডিয়া|মতামত|সাজেশন)/.test(text)){
-    return "আপনার অভিযোগ, পরামর্শ বা নতুন আইডিয়া জানাতে উপরের 📝 মতামত বোতামে লিখুন — অ্যাডমিন দেখে সমাধান করবেন। সেরা আইডিয়ার জন্য পুরস্কারও আছে! 🎁<br><button class=\"primary\" onclick=\"showTab(\'feedback\');toggleChat(false)\">মতামত লিখুন →</button>";
+    return "আপনার অভিযোগ, পরামর্শ বা নতুন আইডিয়া জানাতে পেজের নিচের মতামত ফরমে লিখুন — অ্যাডমিন দেখে সমাধান করবেন। সেরা আইডিয়ার জন্য পুরস্কারও আছে! 🎁<br><button class=\"primary\" onclick=\"document.getElementById('fbBox').scrollIntoView();toggleChat(false)\">মতামত লিখুন →</button>";
   }
   /* --- my order / order status --- */
   if(text.indexOf("আমার অর্ডার")>=0 || /(অর্ডার.*(কেমন|খবর|স্ট্যাটাস|অবস্থা))/.test(text) || /MB-[A-Z0-9]{6}/i.test(text)){
