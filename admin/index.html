@@ -355,6 +355,8 @@ section h2{color:#6d28d9}
 <p id="draftInfo" class="small"></p>
 <label>GitHub টোকেন (শুধু এই ফোনে থাকবে, কাউকে দেবেন না)</label>
 <input id="ghToken" type="password" placeholder="github_pat_… বা ghp_…" onchange="saveToken()">
+<label style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="autoPubBox" style="width:auto;height:auto" checked onchange="setAutoPub(this.checked)"> স্বয়ংক্রিয় প্রকাশ — এডিট করলেই কিছুক্ষণ পর নিজে নিজে প্রকাশ হবে</label>
+<p class="small">টোকেন বসানো থাকলেই স্বয়ংক্রিয় প্রকাশ কাজ করবে। বন্ধ করতে চাইলে টিক উঠিয়ে দিন।</p>
 <div class="warn"><b>টোকেন বানাতে:</b> GitHub-এ গিয়ে Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token → Repository access: Only select repositories → <b>mashikbazar</b> বেছে → Permissions: Contents-এ <b>Read and write</b> দিন → Generate। টোকেনটা একবারই দেখায়, কপি করে এখানে বসান।</div>
 <button class="gold" onclick="publish()">✅ প্রকাশ করুন (GitHub-এ পাঠান)</button>
 <button class="primary" onclick="downloadJson()">⬇️ products.json ডাউনলোড করুন</button>
@@ -807,7 +809,7 @@ function loadDraft(){
   DRAFT=JSON.parse(JSON.stringify(DATA));
 }
 function draftMaxId(){ var m=0; (DRAFT&&DRAFT.products||[]).forEach(function(p){ if(p.id>m) m=p.id; }); return m; }
-function saveDraft(){ localStorage.setItem("mb-draft", JSON.stringify(DRAFT)); try{ var m=draftMaxId(); var w=parseInt(localStorage.getItem("mb-draft-maxid")||"0",10)||0; if(m>w) localStorage.setItem("mb-draft-maxid", String(m)); }catch(e){} updateDraftInfo(); updateAdminStats(); }
+function saveDraft(){ localStorage.setItem("mb-draft", JSON.stringify(DRAFT)); try{ var m=draftMaxId(); var w=parseInt(localStorage.getItem("mb-draft-maxid")||"0",10)||0; if(m>w) localStorage.setItem("mb-draft-maxid", String(m)); }catch(e){} updateDraftInfo(); updateAdminStats(); scheduleAutoPublish(); }
 function mergeNewProducts(){
   if(!DRAFT || !DATA || !DATA.products) return;
   var wm=0; try{ wm=parseInt(localStorage.getItem("mb-draft-maxid")||"0",10)||0; }catch(e){}
@@ -824,6 +826,7 @@ function mergeNewPackages(){
   if(added) saveDraft();
 }
 function updateDraftInfo(){
+  var ap=document.getElementById("autoPubBox"); if(ap) ap.checked=autoPubEnabled();
   var el=document.getElementById("draftInfo"); if(!el) return;
   var same = JSON.stringify(DRAFT)===JSON.stringify(DATA);
   el.textContent = same ? "কোনো অপ্রকাশিত বদল নেই।" : "⚠️ অপ্রকাশিত বদল আছে — প্রকাশ করলে কাস্টমাররা দেখবে।";
@@ -1692,11 +1695,18 @@ function downloadJson(){
   var blob=new Blob([JSON.stringify(DRAFT,null,2)], {type:"application/json"});
   var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="products.json"; a.click();
 }
-async function publish(){
+var __pubTimer=null, __publishing=false;
+function hasGhToken(){ try{ var v=(document.getElementById("ghToken")||{value:""}).value||""; if(v.trim()) return true; return !!((localStorage.getItem("mb-gh-token")||"").trim()); }catch(e){ return false; } }
+function autoPubEnabled(){ try{ return localStorage.getItem("mb-autopub")!=="0"; }catch(e){ return true; } }
+function setAutoPub(on){ try{ localStorage.setItem("mb-autopub", on?"1":"0"); }catch(e){} if(!on && __pubTimer){ clearTimeout(__pubTimer); __pubTimer=null; } var el=document.getElementById("autoPubBox"); if(el) el.checked=!!on; }
+function scheduleAutoPublish(){ if(!autoPubEnabled() || !hasGhToken()) return; if(__pubTimer) clearTimeout(__pubTimer); __pubTimer=setTimeout(function(){ __pubTimer=null; publish(true); }, 8000); }
+async function publish(auto){
   var msg=document.getElementById("pubMsg");
   var token=(document.getElementById("ghToken").value||"").trim();
-  if(!token){ msg.textContent="প্রথমে GitHub টোকেন বসান (ওপরে দেখুন)।"; return; }
-  msg.textContent="প্রকাশ করা হচ্ছে…";
+  if(!token){ if(!auto && msg) msg.textContent="প্রথমে GitHub টোকেন বসান (ওপরে দেখুন)।"; return false; }
+  if(__publishing) return false; __publishing=true;
+  if(JSON.stringify(DRAFT)===JSON.stringify(DATA)){ __publishing=false; if(msg) msg.textContent="কোনো অপ্রকাশিত বদল নেই।"; return true; }
+  if(msg) msg.textContent=auto?"স্বয়ংক্রিয়ভাবে প্রকাশ করা হচ্ছে…":"প্রকাশ করা হচ্ছে…";
   try{
     var getRes=await fetch("https://api.github.com/repos/mashikbazzar/mashikbazar/contents/products.json", {headers:{Authorization:"Bearer "+token, Accept:"application/vnd.github+json"}});
     if(!getRes.ok) throw new Error("GitHub থেকে পুরনো ফাইল পড়া যায়নি ("+getRes.status+") — টোকেনে Contents Read/Write আছে কি না দেখুন।");
@@ -1708,9 +1718,11 @@ async function publish(){
     localStorage.removeItem("mb-draft");
     renderAdminProducts(); renderAdminPackages(); updateDraftInfo();
     await pushWholesaleToSupabase();
-    msg.textContent="✅ প্রকাশ হয়েছে! ১–৩ মিনিট পর কাস্টমাররা নতুন দাম দেখবে। পাইকারি দামও ডেটাবেসে গেছে।";
+    if(msg) msg.textContent="✅ প্রকাশ হয়েছে! ১–৩ মিনিট পর কাস্টমাররা নতুন দাম দেখবে। পাইকারি দামও ডেটাবেসে গেছে।";
+    __publishing=false; return true;
   }catch(e){
-    msg.textContent="❌ "+e.message+" — টোকেন ঠিক আছে কি না দেখুন, অথবা ডাউনলোড করে GitHub app দিয়ে আপলোড করুন।";
+    if(msg) msg.textContent="❌ "+e.message+" — টোকেন ঠিক আছে কি না দেখুন, অথবা ডাউনলোড করে GitHub app দিয়ে আপলোড করুন।";
+    __publishing=false; return false;
   }
 }
 
