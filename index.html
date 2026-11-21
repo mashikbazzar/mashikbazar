@@ -233,7 +233,6 @@ footer{text-align:center;color:#6b7280;padding:16px 16px 90px;font-size:13px}
 </div>
 <div class="viewtoggle"><button id="vtList" class="on" onclick="showProducts()">🛒 পণ্য তালিকা</button><button id="vtDaily" onclick="showDaily()">🌅 দৈনন্দিন ব্যবহারিক পণ্য</button></div>
 <div id="loginHint"></div>
-<div id="usuals"></div>
 <div id="specials"></div>
 <div id="list"></div>
 <div class="prizebanner" onclick="document.getElementById('fbBox').scrollIntoView({behavior:'smooth'})">💡 <b>নতুন আইডিয়া দিন, পুরস্কার জিতুন!</b><span>আমাদের সেবা কেমন? অ্যাপটি কেমন হলে আপনি আরও ভালোভাবে ব্যবহার করতে পারতেন? আপনার আইডিয়া জানান — সেরা আইডিয়ার জন্য থাকছে পুরস্কার!</span></div>
@@ -643,7 +642,6 @@ function renderShop(){
     el.className="";
     var dgs=dailyOrder();
     el.innerHTML=('<p class="small">🌅 দৈনন্দিন ব্যবহারিক পণ্য — মোট '+bn(dgs.length)+'টি পণ্য</p>'+dgs.map(function(gid,i){ return listRowHtml(gid,i); }).join(""))||"<p>কোনো পণ্য পাওয়া যায়নি।</p>";
-    var u2=document.getElementById("usuals"); if(u2) u2.innerHTML="";
     var s2=document.getElementById("specials"); if(s2) s2.innerHTML="";
   } else if(catView){
     el.className="";
@@ -651,17 +649,16 @@ function renderShop(){
     DATA.products.forEach(function(p){ if(!seenN[p.name]){ seenN[p.name]=true; cc[p.category]=(cc[p.category]||0)+1; } });
     var cats=CATS.filter(function(c){ return cc[c]; });
     el.innerHTML=cats.map(function(c){ return '<button class="catrow" onclick="pickCat(\''+c+'\')"><span class="catem">'+(CAT_EMOJI[c]||"🛒")+'</span><span class="catname">'+c+'</span><span class="catcount">'+bn(cc[c])+'টি পণ্য</span><span class="catarrow">›</span></button>'; }).join("")||"<p>কোনো ক্যাটাগরি পাওয়া যায়নি।</p>";
-    var u2=document.getElementById("usuals"); if(u2) u2.innerHTML="";
     var s2=document.getElementById("specials"); if(s2) s2.innerHTML="";
   } else {
     var countHtml=q?('<p class="small" style="grid-column:1/-1">🔍 “'+q+'” — '+bn(groups.length)+'টি পণ্য পাওয়া গেছে</p>'):"";
     var catNote=(q&&catGroups.length)?('<p class="small" style="margin:10px 0;grid-column:1/-1">— নিচেরগুলো “'+q+'” ক্যাটাগরির অন্যান্য পণ্য —</p>'):"";
     el.className="";
     el.innerHTML=(countHtml+nameGroups.map(function(gid,i){ return listRowHtml(gid,i); }).join("")+(catGroups.length?(catNote+catGroups.map(function(gid,i){ return listRowHtml(gid,nameGroups.length+i); }).join("")):""))||"<p>কোনো পণ্য পাওয়া যায়নি।</p>";
-    loadUsuals(); loadProductRatings(); renderSpecials();
+    loadProductRatings(); renderSpecials();
   }
   renderPkgs();
-  loadUsuals(); loadProductRatings(); renderSpecials();
+  loadProductRatings(); renderSpecials();
 }
 function pkgCardHtml(pkg){
   var sc=pkg.scale?('<p class="small">📏 '+bn(pkg.scale.min)+'–'+bn(pkg.scale.max)+' '+pkg.scale.unit+' — সংখ্যা দিলেই পরিমাণ বদলাবে</p>'):"";
@@ -923,34 +920,6 @@ function renderSpecials(){
 }
 function toggleSpecials(){ specialsOpen=!specialsOpen; renderSpecials(); }
 var usualsLoaded=false;
-async function loadUsuals(){
-  if(usualsLoaded) return; usualsLoaded=true;
-  var el=document.getElementById("usuals"); if(!el) return;
-  var items=[];
-  var c=getCustomer();
-  if(c && sb){
-    try{ var res=await sb.from("orders").select("items").eq("phone", c.phone||"__none__").order("created_at",{ascending:false}).limit(30);
-      if(res.data) res.data.forEach(function(o){ (o.items||[]).forEach(function(it){ items.push(it); }); });
-    }catch(e){}
-  } else {
-    getOrders().forEach(function(o){ (o.items||[]).forEach(function(it){ items.push(it); }); });
-  }
-  var counts={};
-  items.forEach(function(it){ var k=(it.name||"")+"|"+(it.brand||""); counts[k]={name:it.name, brand:it.brand, n:(counts[k]?counts[k].n:0)+1}; });
-  var top=Object.keys(counts).map(function(k){ return counts[k]; }).sort(function(a,b){ return b.n-a.n; }).slice(0,6);
-  var rows=[];
-  top.forEach(function(t){
-    var p=null;
-    DATA.products.forEach(function(x){ if(x.name===t.name && (x.brand||"")===(t.brand||"")) p=x; });
-    if(!p) DATA.products.forEach(function(x){ if(x.name===t.name) p=x; });
-    if(p) rows.push(p);
-  });
-  if(!rows.length){ el.innerHTML=""; return; }
-  el.innerHTML='<h3 style="margin:12px 0 6px">🔁 আপনি সাধারণত কেনেন</h3><div style="display:flex;gap:8px;flex-wrap:wrap">'+rows.map(function(p){
-    return '<span style="background:#fff;border:1px solid #e8e8e8;border-radius:999px;padding:6px 10px">'+p.name+(p.brand?(' ('+p.brand+')'):"")+' <button class="add" style="padding:4px 10px" onclick="addUsual('+p.id+')">➕ যোগ করুন</button></span>';
-  }).join("")+'</div>';
-}
-function addUsual(id){ var p=findProduct(id); if(!p) return; cart[id]=Math.round(((cart[id]||0)+1)*100)/100; saveCart(); renderCart(); updateCartBar(); }
 var promo=null;
 function promoDiscount(sub){ if(!promo) return 0; var d=0; if(promo.discount_type==="percent") d=Math.round(sub*(promo.discount_value||0)/100); else d=Math.round(promo.discount_value||0); return Math.min(sub, Math.max(0, d)); }
 async function applyPromo(){
