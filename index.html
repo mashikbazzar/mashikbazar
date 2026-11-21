@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>মাসিক বাজার — নীড়</title>
-<meta name="description" content="মাসিক বাজার — ১৩৩টি পণ্য, ২–৮ জনের পরিবার প্যাকেজ। দামসহ অর্ডার করুন, WhatsApp-এ পাঠান।">
+<meta name="description" content="মাসিক বাজার — ২৫৯টি পণ্য, ২–৮ জনের পরিবার প্যাকেজ। দামসহ অর্ডার করুন, WhatsApp-এ পাঠান।">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#ffffff">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -351,7 +351,7 @@ footer{text-align:center;color:#6b7280;padding:16px 16px 90px;font-size:13px}
 <button id="nav-orders" onclick="showTab('orders')"><span class="navic">📋</span><span class="navlb">আমার অর্ডার</span></button>
 </nav>
 
-<footer>পুরো মাসের বাজার একসাথে আপনার দরজায়<br>মাসিক বাজার • নীড়<br>WhatsApp: 01631421995 • অর্ডার যাবে WhatsApp-এ</footer>
+<footer>পুরো মাসের বাজার একসাথে আপনার দরজায়<br><b id="footCounts" style="color:#374151">🛒 ২৫৯টি পণ্য • ৪১৬টি ব্র্যান্ড</b><br>মাসিক বাজার • নীড়<br>WhatsApp: 01631421995 • অর্ডার যাবে WhatsApp-এ</footer>
 
 <script>
 var SB_URL="https://iucgavgdpbvjnxmnuqce.supabase.co";
@@ -620,6 +620,7 @@ function renderShop(){
   var nc=document.getElementById("nav-cats"); if(nc) nc.classList.toggle("on", curTab==="shop" && catView);
   var ns2=document.getElementById("nav-shop"); if(ns2) ns2.classList.toggle("on", curTab==="shop" && !catView);
   document.getElementById("shopTitle").textContent=(DATA.company||"নীড়")+" • "+(DATA.shop||"মাসিক বাজার");
+  var fc=document.getElementById("footCounts"); if(fc) fc.textContent="🛒 "+bn(groupList().length)+"টি পণ্য • "+bn(DATA.products.length)+"টি ব্র্যান্ড";
   renderFeedback();
   var lh=document.getElementById("loginHint");
   if(lh){ lh.innerHTML = getCustomer()? "" : '<div class="note">🔑 <b>দাম দেখতে লগইন করুন</b> — এখন শুধু পণ্যের নাম আর ব্র্যান্ড দেখা যাচ্ছে। <button class="primary" style="padding:8px 14px" onclick="showTab(\'orders\')">লগইন করুন</button></div>'; }
