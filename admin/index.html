@@ -809,7 +809,7 @@ function loadDraft(){
   DRAFT=JSON.parse(JSON.stringify(DATA));
 }
 function draftMaxId(){ var m=0; (DRAFT&&DRAFT.products||[]).forEach(function(p){ if(p.id>m) m=p.id; }); return m; }
-function saveDraft(){ localStorage.setItem("mb-draft", JSON.stringify(DRAFT)); try{ var m=draftMaxId(); var w=parseInt(localStorage.getItem("mb-draft-maxid")||"0",10)||0; if(m>w) localStorage.setItem("mb-draft-maxid", String(m)); }catch(e){} updateDraftInfo(); updateAdminStats(); scheduleAutoPublish(); }
+function saveDraft(){ localStorage.setItem("mb-draft", JSON.stringify(DRAFT)); try{ var m=draftMaxId(); var w=parseInt(localStorage.getItem("mb-draft-maxid")||"0",10)||0; if(m>w) localStorage.setItem("mb-draft-maxid", String(m)); }catch(e){} updateDraftInfo(); updateAdminStats(); scheduleAutoPublish(); if(__publishing) __dirtyDuringPublish=true; }
 function mergeNewProducts(){
   if(!DRAFT || !DATA || !DATA.products) return;
   var wm=0; try{ wm=parseInt(localStorage.getItem("mb-draft-maxid")||"0",10)||0; }catch(e){}
@@ -1695,34 +1695,37 @@ function downloadJson(){
   var blob=new Blob([JSON.stringify(DRAFT,null,2)], {type:"application/json"});
   var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="products.json"; a.click();
 }
-var __pubTimer=null, __publishing=false;
+var __pubTimer=null, __publishing=false, __dirtyDuringPublish=false;
+function __pubDone(){ __publishing=false; if(__dirtyDuringPublish){ __dirtyDuringPublish=false; scheduleAutoPublish(); } }
 function hasGhToken(){ try{ var v=(document.getElementById("ghToken")||{value:""}).value||""; if(v.trim()) return true; return !!((localStorage.getItem("mb-gh-token")||"").trim()); }catch(e){ return false; } }
 function autoPubEnabled(){ try{ return localStorage.getItem("mb-autopub")!=="0"; }catch(e){ return true; } }
 function setAutoPub(on){ try{ localStorage.setItem("mb-autopub", on?"1":"0"); }catch(e){} if(!on && __pubTimer){ clearTimeout(__pubTimer); __pubTimer=null; } var el=document.getElementById("autoPubBox"); if(el) el.checked=!!on; }
-function scheduleAutoPublish(){ if(!autoPubEnabled() || !hasGhToken()) return; if(__pubTimer) clearTimeout(__pubTimer); __pubTimer=setTimeout(function(){ __pubTimer=null; publish(true); }, 8000); }
+function scheduleAutoPublish(){ if(!autoPubEnabled() || !hasGhToken()) return; if(__pubTimer) clearTimeout(__pubTimer); __pubTimer=setTimeout(function(){ __pubTimer=null; publish(true); }, 2500); }
 async function publish(auto){
   var msg=document.getElementById("pubMsg");
+  var snap=null;
   var token=(document.getElementById("ghToken").value||"").trim();
   if(!token){ if(!auto && msg) msg.textContent="প্রথমে GitHub টোকেন বসান (ওপরে দেখুন)।"; return false; }
-  if(__publishing) return false; __publishing=true;
-  if(JSON.stringify(DRAFT)===JSON.stringify(DATA)){ __publishing=false; if(msg) msg.textContent="কোনো অপ্রকাশিত বদল নেই।"; return true; }
+  if(__publishing){ __dirtyDuringPublish=true; return false; } __publishing=true;
+  if(JSON.stringify(DRAFT)===JSON.stringify(DATA)){ __pubDone(); if(msg) msg.textContent="কোনো অপ্রকাশিত বদল নেই।"; return true; }
   if(msg) msg.textContent=auto?"স্বয়ংক্রিয়ভাবে প্রকাশ করা হচ্ছে…":"প্রকাশ করা হচ্ছে…";
   try{
     var getRes=await fetch("https://api.github.com/repos/mashikbazzar/mashikbazar/contents/products.json", {headers:{Authorization:"Bearer "+token, Accept:"application/vnd.github+json"}});
     if(!getRes.ok) throw new Error("GitHub থেকে পুরনো ফাইল পড়া যায়নি ("+getRes.status+") — টোকেনে Contents Read/Write আছে কি না দেখুন।");
     var getJson=await getRes.json();
     var content=btoa(unescape(encodeURIComponent(JSON.stringify(DRAFT,null,2))));
+    snap=JSON.parse(JSON.stringify(DRAFT));
     var putRes=await fetch("https://api.github.com/repos/mashikbazzar/mashikbazar/contents/products.json", {method:"PUT", headers:{Authorization:"Bearer "+token, Accept:"application/vnd.github+json", "Content-Type":"application/json"}, body: JSON.stringify({message:"Admin: update products/prices/packages", content: content, sha: getJson.sha, branch:"main"})});
     if(!putRes.ok){ var t=await putRes.text(); throw new Error("প্রকাশ হয়নি ("+putRes.status+"): "+t.slice(0,200)); }
-    DATA=JSON.parse(JSON.stringify(DRAFT));
-    localStorage.removeItem("mb-draft");
+    DATA=snap;
+    if(JSON.stringify(DRAFT)===JSON.stringify(snap)) localStorage.removeItem("mb-draft");
     renderAdminProducts(); renderAdminPackages(); updateDraftInfo();
-    await pushWholesaleToSupabase();
+    await pushWholesaleToSupabase(snap);
     if(msg) msg.textContent="✅ প্রকাশ হয়েছে! ১–৩ মিনিট পর কাস্টমাররা নতুন দাম দেখবে। পাইকারি দামও ডেটাবেসে গেছে।";
-    __publishing=false; return true;
+    __pubDone(); return true;
   }catch(e){
     if(msg) msg.textContent="❌ "+e.message+" — টোকেন ঠিক আছে কি না দেখুন, অথবা ডাউনলোড করে GitHub app দিয়ে আপলোড করুন।";
-    __publishing=false; return false;
+    __pubDone(); return false;
   }
 }
 
@@ -2344,9 +2347,10 @@ async function rejectSupplierPrice(id){
   await sb.from("supplier_prices").update({status:"rejected"}).eq("id", id);
   loadSupplierPrices();
 }
-async function pushWholesaleToSupabase(){
-  if(!sb || !DRAFT) return;
-  var rows=DRAFT.products.map(function(p){ return {id:p.id, wholesale_price:p.wholesale_price||0}; });
+async function pushWholesaleToSupabase(src){
+  if(!sb) return;
+  var srcD=src||DRAFT; if(!srcD) return;
+  var rows=srcD.products.map(function(p){ return {id:p.id, wholesale_price:p.wholesale_price||0}; });
   for(var i=0;i<rows.length;i+=50){
     await sb.from("products").upsert(rows.slice(i,i+50), {onConflict:"id"});
   }
