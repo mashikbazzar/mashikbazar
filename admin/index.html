@@ -821,6 +821,33 @@ function mergeNewProducts(){
   DATA.products.forEach(function(p){ if(p.id>wm && !have[p.id]){ DRAFT.products.push(JSON.parse(JSON.stringify(p))); added=true; } });
   if(added) saveDraft();
 }
+function repairMissingProducts(){
+  if(!DATA || !DATA.products || !DRAFT || !DRAFT.products) return;
+  var have={}; DRAFT.products.forEach(function(p){ have[p.name]=true; });
+  var maxId=0; DRAFT.products.forEach(function(p){ if(p.id>maxId) maxId=p.id; });
+  var added=[];
+  DATA.products.forEach(function(p){
+    if(have[p.name]) return;
+    var np=JSON.parse(JSON.stringify(p));
+    var taken=false; DRAFT.products.forEach(function(x){ if(x.id===np.id) taken=true; });
+    if(taken){ maxId++; np.id=maxId; }
+    DRAFT.products.push(np); have[p.name]=true; added.push(np);
+  });
+  if(!added.length) return;
+  if(DRAFT.daily_order && DATA.daily_order){
+    var byId={}; DATA.products.forEach(function(p){ byId[p.id]=p; });
+    var byName={}; DRAFT.products.forEach(function(p){ byName[p.name]=p.id; });
+    var canon=[];
+    DATA.daily_order.forEach(function(gid){ var dp=byId[gid]; if(dp && byName[dp.name]!=null) canon.push(byName[dp.name]); });
+    added.forEach(function(np){
+      if(!np.daily) return;
+      if(DRAFT.daily_order.indexOf(np.id)>=0) return;
+      var ci=canon.indexOf(np.id); var insertAt=0;
+      for(var i=ci-1;i>=0;i--){ var k=DRAFT.daily_order.indexOf(canon[i]); if(k>=0){ insertAt=k+1; break; } }
+      DRAFT.daily_order.splice(insertAt, 0, np.id);
+    });
+  }
+}
 function mergeNewPackages(){
   if(!DRAFT || !DATA || !DATA.packages) return;
   var have={}; DRAFT.packages.forEach(function(p){ have[p.id]=true; });
@@ -928,7 +955,7 @@ function orderProfit(o){
   return Math.round(pr);
 }
 function openAdmin(){
-  loadDraft(); mergeNewProducts(); mergeNewPackages(); ensureDailyOrder(); fixOldRiceName(); loadWholesale(); if(DRAFT){ recalcPackages(DRAFT); saveDraft(); }
+  loadDraft(); mergeNewProducts(); mergeNewPackages(); fixOldRiceName(); repairMissingProducts(); ensureDailyOrder(); loadWholesale(); if(DRAFT){ recalcPackages(DRAFT); saveDraft(); }
   document.getElementById("pinBox").style.display="none";
   document.getElementById("sShop").value=DRAFT.shop||"";
   document.getElementById("sCompany").value=DRAFT.company||"";
@@ -2423,7 +2450,7 @@ async function changePin(){
   }catch(e){ msg.textContent="ইন্টারনেট চেক করুন, আবার চেষ্টা করুন।"; }
 }
 
-fetch("../products.json", {cache:"no-store"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(j && j.products && j.packages && j.packages.length>=FALLBACK.packages.length){ DATA=j; if(DRAFT){ mergeNewProducts(); mergeNewPackages(); } ensureDailyOrder(); fixOldRiceName(); } }).catch(function(){});
+fetch("../products.json", {cache:"no-store"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(j && j.products && j.packages && j.packages.length>=FALLBACK.packages.length){ DATA=j; if(DRAFT){ mergeNewProducts(); mergeNewPackages(); } fixOldRiceName(); repairMissingProducts(); ensureDailyOrder(); } }).catch(function(){});
 renderAdmin();
 showInstallBanner();
 </script>
