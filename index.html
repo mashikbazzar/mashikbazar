@@ -1714,7 +1714,20 @@ showInstallBanner();
 </script>
 
 <script>
-fetch("products.json?v=3", {cache:"no-store"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(j && j.products && j.packages && j.packages.length>=FALLBACK.packages.length){ DATA=j; } renderShop(); renderCart(); }).catch(function(){ renderShop(); renderCart(); });
+function validStore(j){ return !!(j && j.products && j.products.length>0 && j.packages && j.packages.length>=FALLBACK.packages.length); }
+function loadLiveData(){
+  var pjP=fetch("products.json?v=3", {cache:"no-store"}).then(function(r){ return r.ok?r.json():null; }).catch(function(){ return null; });
+  var sbP=Promise.resolve(null);
+  try{ if(sb){ sbP=Promise.resolve(sb.from("admin_draft").select("data").eq("id","main")).then(function(res){ var r=res&&res.data; return (r && r.length && validStore(r[0].data)) ? r[0].data : null; }).catch(function(){ return null; }); } }catch(e){ sbP=Promise.resolve(null); }
+  return Promise.all([pjP, sbP]).then(function(ab){ var pj=ab[0], dr=ab[1]; var pick=null;
+    if(validStore(dr) && validStore(pj)){ pick=((dr._rev||0)>=(pj._rev||0))?dr:pj; }
+    else if(validStore(dr)){ pick=dr; }
+    else if(validStore(pj)){ pick=pj; }
+    if(pick) DATA=pick;
+    renderShop(); renderCart();
+  }).catch(function(){ renderShop(); renderCart(); });
+}
+loadLiveData();
 renderShop(); renderCart(); loadBulkTiers(); try{ var lc=JSON.parse(localStorage.getItem("mb-last-coupon")||"null"); if(lc){ var eb=document.getElementById("earnedCoupon"); if(eb){ eb.style.display="block"; eb.innerHTML="🎉 <b>আপনার কুপন:</b> "+lc.text+" — কোড: <b>"+lc.code+"</b> <button class=\"ghost\" onclick=\"dismissEarnedCoupon()\">✕</button>"; } } }catch(e){}
 renderChatChips(); initFabDrag(); flushPendingFeedback();
 logVisit("open","");

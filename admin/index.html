@@ -809,7 +809,10 @@ function loadDraft(){
   DRAFT=JSON.parse(JSON.stringify(DATA));
 }
 function draftMaxId(){ var m=0; (DRAFT&&DRAFT.products||[]).forEach(function(p){ if(p.id>m) m=p.id; }); return m; }
-function saveDraft(){ localStorage.setItem("mb-draft", JSON.stringify(DRAFT)); try{ var m=draftMaxId(); var w=parseInt(localStorage.getItem("mb-draft-maxid")||"0",10)||0; if(m>w) localStorage.setItem("mb-draft-maxid", String(m)); }catch(e){} updateDraftInfo(); updateAdminStats(); scheduleAutoPublish(); if(__publishing) __dirtyDuringPublish=true; }
+var __lastSavedDraftJson="";
+function draftEqData(){ try{ var a=JSON.parse(JSON.stringify(DRAFT)); var b=JSON.parse(JSON.stringify(DATA)); delete a._rev; delete b._rev; return JSON.stringify(a)===JSON.stringify(b); }catch(e){ return false; } }
+function syncDraftToSupabase(){ try{ if(!sb || !DRAFT) return; var clean=JSON.parse(JSON.stringify(DRAFT)); clean.products.forEach(function(p){ p.wholesale_price=0; }); var q=sb.from("admin_draft").upsert({id:"main", data:clean, updated_at:new Date().toISOString()}, {onConflict:"id"}); if(q && q.then) q.then(function(){}).catch(function(){}); }catch(e){} }
+function saveDraft(){ var j=JSON.stringify(DRAFT); if(j!==__lastSavedDraftJson){ DRAFT._rev=Date.now(); j=JSON.stringify(DRAFT); __lastSavedDraftJson=j; syncDraftToSupabase(); } localStorage.setItem("mb-draft", j); try{ var m=draftMaxId(); var w=parseInt(localStorage.getItem("mb-draft-maxid")||"0",10)||0; if(m>w) localStorage.setItem("mb-draft-maxid", String(m)); }catch(e){} updateDraftInfo(); updateAdminStats(); scheduleAutoPublish(); if(__publishing) __dirtyDuringPublish=true; }
 function mergeNewProducts(){
   if(!DRAFT || !DATA || !DATA.products) return;
   var wm=0; try{ wm=parseInt(localStorage.getItem("mb-draft-maxid")||"0",10)||0; }catch(e){}
@@ -828,7 +831,7 @@ function mergeNewPackages(){
 function updateDraftInfo(){
   var ap=document.getElementById("autoPubBox"); if(ap) ap.checked=autoPubEnabled();
   var el=document.getElementById("draftInfo"); if(!el) return;
-  var same = JSON.stringify(DRAFT)===JSON.stringify(DATA);
+  var same = draftEqData();
   el.textContent = same ? "কোনো অপ্রকাশিত বদল নেই।" : "⚠️ অপ্রকাশিত বদল আছে — প্রকাশ করলে কাস্টমাররা দেখবে।";
 }
 function updateAdminStats(){
@@ -1707,7 +1710,7 @@ async function publish(auto){
   var token=(document.getElementById("ghToken").value||"").trim();
   if(!token){ if(!auto && msg) msg.textContent="প্রথমে GitHub টোকেন বসান (ওপরে দেখুন)।"; return false; }
   if(__publishing){ __dirtyDuringPublish=true; return false; } __publishing=true;
-  if(JSON.stringify(DRAFT)===JSON.stringify(DATA)){ __pubDone(); if(msg) msg.textContent="কোনো অপ্রকাশিত বদল নেই।"; return true; }
+  if(draftEqData()){ __pubDone(); if(msg) msg.textContent="কোনো অপ্রকাশিত বদল নেই।"; return true; }
   if(msg) msg.textContent=auto?"স্বয়ংক্রিয়ভাবে প্রকাশ করা হচ্ছে…":"প্রকাশ করা হচ্ছে…";
   try{
     var getRes=await fetch("https://api.github.com/repos/mashikbazzar/mashikbazar/contents/products.json", {headers:{Authorization:"Bearer "+token, Accept:"application/vnd.github+json"}});
