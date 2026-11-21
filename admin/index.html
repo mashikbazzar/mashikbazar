@@ -1379,11 +1379,30 @@ function setGroupSpecial(gid, on){
 }
 function dailyOrderIds(){ if(!DRAFT) return []; if(!Array.isArray(DRAFT.daily_order)) return []; return DRAFT.daily_order; }
 function isDailyGid(gid){ return dailyOrderIds().indexOf(gid)>=0; }
-function ensureDailyOrder(){
-  if(!DRAFT || !DRAFT.products) return [];
-  if(Array.isArray(DRAFT.daily_order)) return DRAFT.daily_order;
+function flagSeedOrder(){
   var seen={}, out=[];
   DRAFT.products.forEach(function(p){ if(p.daily && !seen[p.name]){ seen[p.name]=true; out.push(p.id); } });
+  return out;
+}
+function ensureDailyOrder(){
+  if(!DRAFT || !DRAFT.products) return [];
+  var canon=(typeof DATA!=="undefined" && DATA && Array.isArray(DATA.daily_order) && DATA.daily_order.length)?DATA.daily_order:null;
+  var have={}; DRAFT.products.forEach(function(p){ have[p.id]=true; });
+  if(Array.isArray(DRAFT.daily_order)){
+    if(canon){
+      var flag=flagSeedOrder();
+      if(DRAFT.daily_order.length===flag.length && DRAFT.daily_order.every(function(id,i){ return id===flag[i]; })){
+        var fixed=canon.filter(function(id){ return have[id]; });
+        if(fixed.length){ DRAFT.daily_order=fixed; saveDraft(); return fixed; }
+      }
+    }
+    return DRAFT.daily_order;
+  }
+  if(canon){
+    var seeded=canon.filter(function(id){ return have[id]; });
+    if(seeded.length){ DRAFT.daily_order=seeded; saveDraft(); return seeded; }
+  }
+  var out=flagSeedOrder();
   DRAFT.daily_order=out; saveDraft(); return out;
 }
 function dailyGroups(){
