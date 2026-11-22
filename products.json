@@ -2,7 +2,7 @@
   "shop": "মাসিক বাজার",
   "company": "নীড়",
   "whatsapp": "01631421995",
-  "delivery_fee_taka": 0,
+  "delivery_fee_taka": 50,
   "show_prices": true,
   "margin_pct": 0,
   "products": [
@@ -7967,7 +7967,7 @@
           "product_id": 130,
           "name": "ডিম",
           "brand": "",
-          "qty_label": "৮ ডজন",
+          "qty_label": "৮ হালি",
           "qty_multiplier": 8.0,
           "line_total_taka": 1240
         },
@@ -8225,7 +8225,7 @@
           "product_id": 130,
           "name": "ডিম",
           "brand": "",
-          "qty_label": "৪ ডজন",
+          "qty_label": "৪ হালি",
           "qty_multiplier": 4.0,
           "line_total_taka": 620
         }
