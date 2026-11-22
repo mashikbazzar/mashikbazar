@@ -105,7 +105,7 @@ h1{margin:0;font-size:21px;font-weight:800;color:#111827;white-space:nowrap;over
 .qty{display:flex;gap:6px;align-items:center;justify-content:center}.qty b{min-width:28px;text-align:center}
 .qty button{width:44px;height:44px;font-size:22px;border-radius:12px;border:1px solid #d1d5db;background:#fff;color:#374151;cursor:pointer}
 .listrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#fff;border-bottom:1px solid #f0f0f0;padding:12px 0}
-.prow{display:flex;gap:12px;align-items:flex-start;flex-wrap:nowrap;background:#fff;border-bottom:1px solid #f0f0f0;padding:12px 0;min-height:64px}
+.prow{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;background:#fff;border-bottom:1px solid #f0f0f0;padding:12px 0;min-height:64px}
 .psno{flex:none;width:26px;font-size:15px;font-weight:700;color:#374151;padding-top:2px}
 .pleft{flex:1;min-width:0}
 .pleft .pname{font-weight:600;font-size:16px;color:#111827;line-height:1.7}
@@ -1895,7 +1895,7 @@ function doInstall(){
 if("serviceWorker" in navigator){ window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
 showInstallBanner();
 // ---- in-app update: new version prompt (v56) ----
-var APP_VER_NUM=65;
+var APP_VER_NUM=66;
 var PENDING_VER=0;
 function showUpdateBanner(){ var b=document.getElementById("updateBanner"); if(b) b.style.display="block"; }
 function dismissUpdate(){ var b=document.getElementById("updateBanner"); if(b) b.style.display="none"; try{ sessionStorage.setItem("mb-upd-dismissed", String(PENDING_VER)); }catch(e){} }
