@@ -1693,8 +1693,8 @@ function renderAdminPackages(){
     el.innerHTML=DRAFT.packages.map(function(pkg){
       var act=pkg.items.filter(function(it){ return it.active!==false; });
       var inact=pkg.items.length-act.length;
-      return '<div class="pkg" style="cursor:pointer" onclick="openAdminPackage('+pkg.id+')"><h3>'+esc(pkg.name)+'</h3><p>'+(pkg.tagline||"")+'</p>'+(pkg.kind==="occasion"?'<p class="small">🎉 অনুষ্ঠানের প্যাকেজ</p>':(pkg.kind==="expat"?'<p class="small">✈️ প্রবাসী পরিবার</p>':""))+(pkg.scale?('<p class="small">📏 ভিত্তি: '+bn(pkg.scale.base)+' '+pkg.scale.unit+' • '+bn(pkg.scale.min)+'–'+bn(pkg.scale.max)+'</p>'):"")+'<p class="small">'+bn(act.length)+'টি পণ্য'+(inact?(' • '+bn(inact)+'টি নিস্ক্রিয়'):'')+'</p><p class="total">আনুমানিক মোট: ৳'+bn(pkgTotal(pkg))+'</p><button class="add" onclick="event.stopPropagation();openAdminPackage('+pkg.id+')">📦 প্যাকেজটি খুলুন</button></div>';
-    }).join("")+'<button class="gold" style="width:100%" onclick="addPackage()">➕ নতুন প্যাকেজ</button>';
+      return '<div class="pkg" style="cursor:pointer" onclick="openAdminPackage('+pkg.id+')"><h3>'+esc(pkg.name)+'</h3><p>'+(pkg.tagline||"")+'</p>'+(pkg.kind==="occasion"?'<p class="small">🎉 অনুষ্ঠানের প্যাকেজ</p>':(pkg.kind==="expat"?'<p class="small">✈️ প্রবাসী পরিবার</p>':(pkg.kind==="combo"?'<p class="small">🎁 কম্বো প্যাকেজ</p>':"")))+(pkg.scale?('<p class="small">📏 ভিত্তি: '+bn(pkg.scale.base)+' '+pkg.scale.unit+' • '+bn(pkg.scale.min)+'–'+bn(pkg.scale.max)+'</p>'):"")+'<p class="small">'+bn(act.length)+'টি পণ্য'+(inact?(' • '+bn(inact)+'টি নিস্ক্রিয়'):'')+'</p><p class="total">আনুমানিক মোট: ৳'+bn(pkgTotal(pkg))+'</p><button class="add" onclick="event.stopPropagation();openAdminPackage('+pkg.id+')">📦 প্যাকেজটি খুলুন</button></div>';
+    }).join("")+addPkgFormHtml();
     return;
   }
   var pkg=null; DRAFT.packages.forEach(function(p){ if(p.id===openPkgId) pkg=p; });
@@ -1702,8 +1702,8 @@ function renderAdminPackages(){
   el.innerHTML='<button class="ghost" onclick="closeAdminPackage()">← সব প্যাকেজ</button>'
     +'<button class="primary" style="width:100%;margin:8px 0" onclick="savePkgNow(this)">💾 সংরক্ষণ করুন</button>'
     +'<div class="pkg"><label>প্যাকেজের নাম</label><input value="'+pkg.name.replace(/"/g,"&quot;")+'" onchange="editPackage('+pkg.id+',\'name\',this.value)"><label>ট্যাগলাইন</label><input value="'+(pkg.tagline||"").replace(/"/g,"&quot;")+'" onchange="editPackage('+pkg.id+',\'tagline\',this.value)">'
-    +'<label>ধরন</label><select onchange="editPkgKind('+pkg.id+',this.value)"><option value="family"'+(pkg.kind!=="occasion"&&pkg.kind!=="expat"?" selected":"")+'>পরিবার প্যাকেজ</option><option value="occasion"'+(pkg.kind==="occasion"?" selected":"")+'>অনুষ্ঠানের প্যাকেজ (বিয়ে/সিন্নি)</option><option value="expat"'+(pkg.kind==="expat"?" selected":"")+'>প্রবাসী পরিবার</option></select>'
-    +'<div'+(pkg.kind==="family"||!pkg.kind?' style="display:none"':"")+'>'
+    +'<label>ধরন</label><select onchange="editPkgKind('+pkg.id+',this.value)"><option value="family"'+(pkg.kind!=="occasion"&&pkg.kind!=="expat"&&pkg.kind!=="combo"?" selected":"")+'>পরিবার প্যাকেজ</option><option value="occasion"'+(pkg.kind==="occasion"?" selected":"")+'>অনুষ্ঠানের প্যাকেজ (বিয়ে/সিন্নি)</option><option value="expat"'+(pkg.kind==="expat"?" selected":"")+'>প্রবাসী পরিবার</option><option value="combo"'+(pkg.kind==="combo"?" selected":"")+'>কম্বো প্যাকেজ</option></select>'
+    +'<div'+(pkg.kind==="family"||pkg.kind==="combo"||!pkg.kind?' style="display:none"':"")+'>'
     +'<p class="small">📏 কাস্টমার এই সংখ্যা বদলে প্রতিটি পণ্যের পরিমাণ বদলাতে পারবে। নিচের পরিমাণগুলো ভিত্তি সংখ্যার জন্য।</p>'
     +'<label>ভিত্তি সংখ্যা</label><input type="number" value="'+(pkg.scale?pkg.scale.base:"")+'" onchange="editPkgScale('+pkg.id+',\'base\',this.value)">'
     +'<label>সর্বনিম্ন</label><input type="number" value="'+(pkg.scale?pkg.scale.min:"")+'" onchange="editPkgScale('+pkg.id+',\'min\',this.value)">'
@@ -1722,7 +1722,7 @@ function renderAdminPackages(){
 function editPackage(id, field, val){ DRAFT.packages.forEach(function(p){ if(p.id===id) p[field]=val; }); saveDraft(); }
 function editPkgKind(id, kind){
   DRAFT.packages.forEach(function(p){ if(p.id!==id) return; p.kind=kind;
-    if(kind==="family"){ p.scale=null; }
+    if(kind==="family"||kind==="combo"){ p.scale=null; }
     else if(!p.scale){ p.scale={base:(kind==="occasion"?100:4),min:(kind==="occasion"?100:2),max:(kind==="occasion"?600:12),step:(kind==="occasion"?50:1),unit:(kind==="occasion"?"অতিথি":"সদস্য")}; }
   });
   saveDraft(); renderAdminPackages();
@@ -1778,11 +1778,50 @@ function delPackage(id){
   pendingDelPkg=id; renderAdminPackages();
   pendingDelPkgTimer=setTimeout(function(){ pendingDelPkg=null; renderAdminPackages(); }, 4000);
 }
-function addPackage(){
+var addPkgFormKind=null;
+function showAddPkgForm(kind){ addPkgFormKind=(kind==="combo"||kind==="occasion"||kind==="expat")?kind:"family"; renderAdminPackages(); var n=document.getElementById("newPkgName"); if(n) n.focus(); }
+function hideAddPkgForm(){ addPkgFormKind=null; renderAdminPackages(); }
+function addPackage(){ showAddPkgForm("family"); }
+function addComboPackage(){ showAddPkgForm("combo"); }
+function newPkgKindChanged(kind){
+  var row=document.getElementById("newPkgSizeRow"); if(row) row.style.display=(kind==="combo")?"none":"block";
+  var lab=document.getElementById("newPkgSizeLabel"); if(lab) lab.textContent=(kind==="occasion")?"অতিথি সংখ্যা (ভিত্তি)":"সদস্য সংখ্যা";
+  var inp=document.getElementById("newPkgSize"); if(inp) inp.value=(kind==="occasion")?100:4;
+}
+function createPackageFromForm(){
+  var nameEl=document.getElementById("newPkgName"); var name=nameEl?(nameEl.value||"").trim():"";
+  var msg=document.getElementById("newPkgMsg");
+  if(!name){ if(msg) msg.textContent="প্যাকেজের নাম লিখুন।"; if(nameEl) nameEl.focus(); return; }
+  var tagEl=document.getElementById("newPkgTagline"); var tagline=tagEl?(tagEl.value||"").trim():"";
+  var kindEl=document.getElementById("newPkgKind"); var kind=kindEl?kindEl.value:"family";
+  if(kind!=="family"&&kind!=="occasion"&&kind!=="expat"&&kind!=="combo") kind="family";
+  var sizeEl=document.getElementById("newPkgSize"); var size=parseInt(sizeEl?sizeEl.value:"",10);
+  if(isNaN(size)||size<=0) size=(kind==="occasion"?100:4);
   var maxId=0; DRAFT.packages.forEach(function(p){ if(p.id>maxId) maxId=p.id; });
-  var name=prompt("নতুন প্যাকেজের নাম লিখুন (যেমন: ৯ জনের পরিবার প্যাকেজ):"); if(!name) return;
-  DRAFT.packages.push({id:maxId+1, name:name, tagline:"", estimated_total_taka:0, items:[]});
-  saveDraft(); renderAdminPackages();
+  var np={id:maxId+1, name:name, tagline:tagline, kind:kind, size:(kind==="combo"?0:size), estimated_total_taka:0, items:[], scale:null};
+  if(kind==="occasion"){ np.scale={base:size,min:100,max:600,step:50,unit:"অতিথি"}; }
+  else if(kind==="expat"){ np.scale={base:size,min:2,max:12,step:1,unit:"সদস্য"}; }
+  DRAFT.packages.push(np);
+  addPkgFormKind=null;
+  saveDraft();
+  openAdminPackage(np.id);
+}
+function addPkgFormHtml(){
+  var buttons='<button class="gold" style="width:100%" onclick="addPackage()">➕ নতুন প্যাকেজ</button><button class="gold" style="width:100%;margin-top:8px" onclick="addComboPackage()">🎁 নতুন কম্বো প্যাকেজ</button>';
+  if(addPkgFormKind===null) return buttons;
+  var k=addPkgFormKind;
+  var opt=function(v,t){ return '<option value="'+v+'"'+(k===v?' selected':'')+'>'+t+'</option>'; };
+  return buttons+'<div class="pkg" style="border:2px solid #d4a017"><h3>নতুন প্যাকেজ</h3>'
+    +'<label>প্যাকেজের নাম</label><input id="newPkgName" placeholder="যেমন: ঈদের কম্বো প্যাকেজ">'
+    +'<label>ট্যাগলাইন</label><input id="newPkgTagline" placeholder="ছোট বর্ণনা (ঐচ্ছিক)">'
+    +'<label>ধরন</label><select id="newPkgKind" onchange="newPkgKindChanged(this.value)">'+opt("family","পরিবার প্যাকেজ")+opt("occasion","অনুষ্ঠানের প্যাকেজ (বিয়ে/সিন্নি)")+opt("expat","প্রবাসী পরিবার")+opt("combo","কম্বো প্যাকেজ")+'</select>'
+    +'<div id="newPkgSizeRow"'+(k==="combo"?' style="display:none"':"")+'>'
+    +'<label id="newPkgSizeLabel">'+(k==="occasion"?"অতিথি সংখ্যা (ভিত্তি)":"সদস্য সংখ্যা")+'</label><input id="newPkgSize" type="number" value="'+(k==="occasion"?100:4)+'">'
+    +'</div>'
+    +(k==="combo"?'<p class="small">কম্বো প্যাকেজের পরিমাণ নির্দিষ্ট থাকে — সদস্য সংখ্যা বদলালে পরিমাণ বদলায় না।</p>':'')
+    +'<button class="primary" style="width:100%" onclick="createPackageFromForm()">✅ প্যাকেজ তৈরি করুন</button>'
+    +'<button class="ghost" style="width:100%;margin-top:8px" onclick="hideAddPkgForm()">বাতিল</button>'
+    +'<p class="small" id="newPkgMsg"></p></div>';
 }
 function downloadJson(){
   var blob=new Blob([JSON.stringify(DRAFT,null,2)], {type:"application/json"});
