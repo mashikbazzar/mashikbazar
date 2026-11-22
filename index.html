@@ -173,6 +173,8 @@ input,textarea,select{width:100%;padding:11px;font-size:16px;border:1px solid #9
 .pkgtabs{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
 .pkgtab{flex:1 1 30%;background:#eef2f9;border:1px solid #c3d2e8;border-radius:12px;padding:10px 6px;font-size:15px;font-weight:700;color:#0a2a5e;cursor:pointer;text-align:center}
 .pkgtab .small{display:block;font-weight:400}
+.pkgtab.on{background:#0a2a5e;color:#fff;border-color:#0a2a5e}
+.pkgmain{font-size:14px;padding:12px 4px}
 .pkggrp{font-size:13px;font-weight:700;color:#374151;background:#f3f4f6;border-radius:8px;padding:6px 10px;margin:12px 0 0}
 .pkgrow{display:flex;align-items:center;gap:8px;height:64px;border-bottom:1px solid #f3f4f6;position:relative}
 .pkgrow .psno{flex:none;width:26px;font-size:15px;font-weight:700;color:#374151;text-align:center}
@@ -276,6 +278,7 @@ footer{text-align:center;color:#6b7280;padding:16px 16px 90px;font-size:13px}
 <section><h2>📦 প্যাকেজ — পরিবার, কম্বো ও অনুষ্ঠান</h2>
 <p class="small">ট্যাবে চাপ দিলেই প্যাকেজের ভেতরের পণ্য দেখা যাবে। প্যাকেজে কোনো পণ্য না চাইলে মুছে দিন, পরিমাণ কমান-বাড়ান, নতুন পণ্য যোগ করুন — এটা শুধু আপনার প্যাকেজে বদলাবে, দোকানের আসল প্যাকেজ একই থাকবে।</p>
 <div id="pkgs"></div></section>
+<section class="adminbox" id="pkgHowto" style="margin-top:12px"><h3>অর্ডার করবেন কীভাবে</h3><p><b>১.</b> প্যাকেজ বেছে নিন &nbsp;→&nbsp; <b>২.</b> কার্টে যোগ করুন &nbsp;→&nbsp; <b>৩.</b> WhatsApp-এ পাঠান</p><p class="small">প্যাকেজের ভেতরে পণ্য কমানো-বাড়ানো বা মুছে দেওয়া যাবে — শুধু আপনার প্যাকেজে বদলাবে। প্রশ্ন থাকলে WhatsApp করুন <b>01631421995</b>।</p></section>
 <div id="pkgDetail" style="display:none" class="adminbox">
 <h3 id="pkgDetailTitle"></h3>
 <div id="pkgScaleBox" style="display:none;margin:10px 0;padding:10px;background:#eef2f9;border-radius:10px">
@@ -691,13 +694,24 @@ function pkgTabName(p){
   if(p.name.indexOf("প্রবাসী")>=0) return "প্রবাসী";
   return p.name;
 }
+var pkgMainTab="family";
+function setPkgMainTab(t){ pkgMainTab=t; renderPkgs(); }
 function renderPkgs(){
   var fam=DATA.packages.filter(function(p){ return p.kind==="family"||!p.kind; }).sort(function(a,b){ return (a.size||0)-(b.size||0); });
   var occ=DATA.packages.filter(function(p){ return p.kind==="occasion"||p.kind==="expat"; });
   var combos=DATA.packages.filter(function(p){ return p.kind==="combo"; });
-  var tabs=fam.concat(occ).map(function(p){ return '<button class="pkgtab" onclick="openPkgDetail('+p.id+')">'+pkgTabName(p)+'<span class="small">'+bn(pkgActiveItems(p).length)+'টি পণ্য'+(canSeePrices()?(' • ৳'+bn(pkgTotal(p))):"")+'</span></button>'; }).join("");
-  var h='<div class="pkgtabs">'+tabs+'</div>';
-  if(combos.length) h+='<h3 style="margin:18px 0 8px">🎁 কম্বো প্যাকেজ</h3><p class="small">ছোট বান্ডিল — দরকারি কয়েকটি পণ্য একসাথে। ট্যাপ করলে ভেতরের পণ্য দেখা যাবে, কমানো-বাড়ানোও যাবে।</p>'+combos.map(pkgCardHtml).join("");
+  var famTabs=fam.map(function(p){ return '<button class="pkgtab" onclick="openPkgDetail('+p.id+')">'+pkgTabName(p)+'<span class="small">'+bn(pkgActiveItems(p).length)+'টি পণ্য'+(canSeePrices()?(' • ৳'+bn(pkgTotal(p))):"")+'</span></button>'; }).join("");
+  var h='<div class="pkgtabs">'
+    +'<button class="pkgtab pkgmain'+(pkgMainTab==="family"?" on":"")+'" onclick="setPkgMainTab(\'family\')">👨‍👩‍👧 পরিবারের প্যাকেজ</button>'
+    +'<button class="pkgtab pkgmain'+(pkgMainTab==="combo"?" on":"")+'" onclick="setPkgMainTab(\'combo\')">🎁 কম্বো প্যাকেজ</button>'
+    +'<button class="pkgtab pkgmain'+(pkgMainTab==="occasion"?" on":"")+'" onclick="setPkgMainTab(\'occasion\')">🎉 অনুষ্ঠান প্যাকেজ</button></div>';
+  if(pkgMainTab==="combo"){
+    h+='<p class="small">ছোট বান্ডিল — দরকারি কয়েকটি পণ্য একসাথে। ট্যাপ করলে ভেতরের পণ্য দেখা যাবে, কমানো-বাড়ানোও যাবে।</p>'+combos.map(pkgCardHtml).join("");
+  } else if(pkgMainTab==="occasion"){
+    h+='<p class="small">বিয়ে, সিন্নি ও প্রবাসী পরিবারের জন্য বিশেষ বাজার। ট্যাপ করলে ভেতরের পণ্য দেখা যাবে, অতিথি/সদস্য সংখ্যা দিলেই পরিমাণ বদলাবে।</p>'+occ.map(pkgCardHtml).join("");
+  } else {
+    h+='<div class="pkgtabs">'+famTabs+'</div>';
+  }
   document.getElementById("pkgs").innerHTML=h;
 }
 function scaleQtyLabel(label,factor){
@@ -1747,7 +1761,7 @@ function doInstall(){
 if("serviceWorker" in navigator){ window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
 showInstallBanner();
 // ---- in-app update: new version prompt (v56) ----
-var APP_VER_NUM=58;
+var APP_VER_NUM=59;
 var PENDING_VER=0;
 function showUpdateBanner(){ var b=document.getElementById("updateBanner"); if(b) b.style.display="block"; }
 function dismissUpdate(){ var b=document.getElementById("updateBanner"); if(b) b.style.display="none"; try{ sessionStorage.setItem("mb-upd-dismissed", String(PENDING_VER)); }catch(e){} }
