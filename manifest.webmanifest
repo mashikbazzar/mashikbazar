@@ -1,26 +1,26 @@
 {
   "name": "মাসিক বাজার",
   "short_name": "মাসিক বাজার",
-  "description": "মাসিক বাজার — ১৬৮টি পণ্য, ৭টি পরিবার প্যাকেজ। WhatsApp-এ অর্ডার করুন।",
+  "description": "মাসিক বাজার — ২৬০টি পণ্য, ১০টি প্যাকেজ। WhatsApp-এ অর্ডার করুন।",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#065f46",
-  "theme_color": "#065f46",
+  "background_color": "#0a2a5e",
+  "theme_color": "#0a2a5e",
   "icons": [
     {
-      "src": "icon-192.png?v=2",
+      "src": "icon-192.png?v=3",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icon-512.png?v=2",
+      "src": "icon-512.png?v=3",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icon-512.png?v=2",
+      "src": "icon-512.png?v=3",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
