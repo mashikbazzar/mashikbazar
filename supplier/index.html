@@ -130,6 +130,7 @@ Chrome-এর ⋮ মেনুতে 'Add to Home screen' না দেখাল
 
 <div class="card">
 <h3>📋 আমার পাঠানো দাম</h3>
+<p class="small">অ্যাডমিন আপনার দামের বিপরীতে পাল্টা দাম পাঠালে সেটা এখানেই দেখা যাবে — ✅ মানলাম বা ✕ মানলাম না চাপ দিয়ে জানাবেন।</p>
 <div id="mySubs"></div>
 </div>
 
@@ -180,7 +181,7 @@ async function login(){
   showApp();
   if(isNew){ var hn=document.getElementById("helloNote"); if(hn) hn.textContent="✅ নিবন্ধন হয়েছে — অ্যাডমিন আপনাকে দেখতে পাবে। দাম পাঠাতে নিচের তালিকা থেকে পণ্য বেছে নিন।"; }
 }
-function logout(){ localStorage.removeItem("mb-supplier"); supplier=null; document.getElementById("supName").value=""; document.getElementById("supPhone").value=""; document.getElementById("supCode").value=""; document.getElementById("loginMsg").textContent=""; document.getElementById("appBox").style.display="none"; document.getElementById("loginBox").style.display="block"; }
+function logout(){ localStorage.removeItem("mb-supplier"); supplier=null; document.getElementById("q").value=""; document.getElementById("supName").value=""; document.getElementById("supPhone").value=""; document.getElementById("supCode").value=""; document.getElementById("loginMsg").textContent=""; document.getElementById("appBox").style.display="none"; document.getElementById("loginBox").style.display="block"; }
 async function showApp(){
   if(sb && supplier){
     try{
@@ -278,6 +279,17 @@ function renderProducts(){
     if(g.name.indexOf(q)>=0||g.category.indexOf(q)>=0) return true;
     return g.variants.some(function(v){ return (v.brand||"").indexOf(q)>=0; });
   });
+  if(q){
+    list.sort(function(a,b){
+      function rank(g){
+        if(g.name===q) return 0;
+        if(g.name.indexOf(q)===0) return 1;
+        if(g.name.indexOf(q)>=0) return 2;
+        return 3;
+      }
+      return rank(a)-rank(b);
+    });
+  }
   document.getElementById("supTabAll").className=(supTab==="all")?"primary":"ghost";
   document.getElementById("supTabCat").className=(supTab==="cat")?"primary":"ghost";
   var chips=document.getElementById("catChips");
