@@ -308,7 +308,7 @@ section h2{color:#6d28d9}
 <div class="adminbox" style="margin-bottom:10px">
 <b>👁️ কাস্টমারের দাম</b> — <span id="priceVisLabel"></span>
 <button class="primary" onclick="togglePrices()">এক ক্লিকে বদলান</button>
-<p class="small">চালু থাকলে লগইন করা কাস্টমার দাম দেখবে; বন্ধ থাকলে কেউ দাম দেখবে না। লগইন ছাড়া কেউ দাম দেখতে পায় না।</p>
+<p class="small">চালু থাকলে সবাই দাম দেখবে — লগইন ছাড়াও; বন্ধ থাকলে কেউ দাম দেখবে না।</p>
 </div>
 </div>
 <input id="adminQ" placeholder="পণ্য খুঁজুন…" oninput="renderAdminProducts()">
@@ -337,7 +337,8 @@ section h2{color:#6d28d9}
 <label>কোম্পানির নাম</label><input id="sCompany" onchange="saveSettings()">
 <label>WhatsApp নম্বর (অর্ডার যাবে)</label><input id="sWa" onchange="saveSettings()">
 <label>ডেলিভারি চার্জ (টাকা) — ০ মানে ফ্রি</label><input id="sFee" type="number" min="0" onchange="saveSettings()">
-<p class="small">বদলালেই খসড়ায় সেভ হয়। কাস্টমার দেখবে শুধু <b>প্রকাশ</b> করার পর।</p>
+<label>Facebook পেজের লিংক</label><input id="sFb" onchange="saveSettings()" placeholder="https://facebook.com/...">
+<p class="small">বদলালেই সংরক্ষণ হয় আর কাস্টমারের কাছে কয়েক সেকেন্ডে লাইভ যায়। প্রকাশ শুধু অফলাইন ব্যাকআপ ফাইল আপডেট করে।</p>
 <h3 style="margin-top:18px">🎟️ কুপন কোড</h3>
 <p class="small">কাস্টমার কার্টে এই কোড লিখলে ছাড় পাবে। কোড বন্ধ করতে চাইলে "বন্ধ করুন" চাপুন — মুছে ফেলার দরকার নেই।</p>
 <label>কোড (বড় অক্ষরে লিখুন)</label><input id="cpCode" placeholder="যেমন: MASIK10">
@@ -370,7 +371,7 @@ section h2{color:#6d28d9}
 <button class="gold" onclick="publish()">✅ প্রকাশ করুন (GitHub-এ পাঠান)</button>
 <button class="primary" onclick="downloadJson()">⬇️ products.json ডাউনলোড করুন</button>
 <p id="pubMsg" class="small"></p>
-<p class="small">টোকেন ছাড়া উপায়: ডাউনলোড করা products.json ফাইলটা GitHub app দিয়ে রিপোতে গিয়ে আপলোড করে পুরনো products.json-এর জায়গায় বসান। প্রকাশের ১–৩ মিনিট পর কাস্টমাররা নতুন দাম দেখবে।</p>
+<p class="small">টোকেন ছাড়া উপায়: ডাউনলোড করা products.json ফাইলটা GitHub app দিয়ে রিপোতে গিয়ে আপলোড করে পুরনো products.json-এর জায়গায় বসান। আপনার বদলগুলো কাস্টমারের কাছে অটো-সিঙ্কে আগেই লাইভ — প্রকাশ শুধু অফলাইন ব্যাকআপ ফাইল আপডেট করে।</p>
 <button class="danger" onclick="lockAdmin()">অ্যাডমিন বন্ধ করুন</button>
 </div>
 
@@ -404,7 +405,7 @@ section h2{color:#6d28d9}
 
 <div id="admin-supplier" class="adminbox" style="display:none">
 <h3>🏪 পাইকারি দোকানদারের পাঠানো দাম</h3>
-<p class="small">দোকানদার দাম পাঠালে এখানে আসবে। <b>৪ ধাপে দাম ঠিক করুন:</b><br>১. নিচে প্রতিটা পণ্যের দাম দেখুন — 🟢 সবচেয়ে কম দাম সবুজে, 🔴 সবচেয়ে বেশি লালে চেনা যাবে। কোন দোকান কত ধরেছে, নামসহ দেখা যাবে।<br>২. যেটা নিতে চান, তার নিচে <b>খুচরা দাম</b> লিখুন — টাকায় লিখতে পারেন, বা <b>লাভের %</b> লিখতে পারেন (০% মানে কেনা দামে)। নিচের ছোট বোতামে ০/২/৪/৮/১০/১৩% এক চাপে বসে। তারপর <b>✅ এই দাম বসান</b> চাপুন — পাইকারি আর খুচরা দুটো দাম একসাথে বসবে।<br>৩. নিচে লাভের হার % লিখে <b>সব খুচরা দাম বসান</b> চাপুন — কাস্টমারের দাম হিসাব হয়ে যাবে।<br>৪. <b>🚀 প্রকাশ</b> ট্যাবে গিয়ে প্রকাশ করুন — তবেই কাস্টমার নতুন দাম দেখবে।</p>
+<p class="small">দোকানদার দাম পাঠালে এখানে আসবে। <b>৪ ধাপে দাম ঠিক করুন:</b><br>১. নিচে প্রতিটা পণ্যের দাম দেখুন — 🟢 সবচেয়ে কম দাম সবুজে, 🔴 সবচেয়ে বেশি লালে চেনা যাবে। কোন দোকান কত ধরেছে, নামসহ দেখা যাবে।<br>২. যেটা নিতে চান, তার নিচে <b>খুচরা দাম</b> লিখুন — টাকায় লিখতে পারেন, বা <b>লাভের %</b> লিখতে পারেন (০% মানে কেনা দামে)। নিচের ছোট বোতামে ০/২/৪/৮/১০/১৩% এক চাপে বসে। তারপর <b>✅ এই দাম বসান</b> চাপুন — পাইকারি আর খুচরা দুটো দাম একসাথে বসবে।<br>৩. নিচে লাভের হার % লিখে <b>সব খুচরা দাম বসান</b> চাপুন — কাস্টমারের দাম হিসাব হয়ে যাবে।<br>৪. দাম বসালেই কাস্টমারের কাছে কয়েক সেকেন্ডে লাইভ যাবে — আলাদা করে প্রকাশ করতে হবে না।</p>
 <p class="small">💬 দাম বেশি মনে হলে পাল্টা দাম পাঠান, 🧾 ক্রয় আদেশ বানিয়ে ছাপাতে পারেন, আর দোকানদারকে ⭐ রেটিং দিতে পারেন।</p>
 <div class="card" style="background:#eff6ff"><b>⚙️ পাইকারি থেকে খুচরা দাম বসান</b><div style="display:flex;gap:8px;margin-top:8px;align-items:center"><input id="marginPct3" type="number" min="0" placeholder="লাভের হার % (যেমন: ১০)" style="flex:1" onchange="syncRowPctInputs(parseFloat(this.value)||0)"><button class="gold" onclick="applyMargin3(this)">সব খুচরা দাম বসান</button></div><p class="small">খুচরা দাম = পাইকারি × (১০০+লাভ%) ÷ ১০০। যেমন: পাইকারি ৳১০০ আর লাভ ১০% হলে খুচরা ৳১১০। যাদের পাইকারি দাম নেই, তাদের দাম বদলাবে না।</p></div>
 <button class="primary" onclick="loadSupplierPrices()">🔄 রিফ্রেশ করুন</button>
@@ -741,7 +742,7 @@ function doInstall(){
   var ua=navigator.userAgent||"";
   var app = /WhatsApp/i.test(ua) ? "WhatsApp" : (/FBAN|FBAV/i.test(ua) ? "Messenger / Facebook" : (/imo/i.test(ua) ? "IMO" : "এই অ্যাপ"));
   steps.style.display="block";
-  steps.innerHTML="<b>"+app+"-এর ভেতরে সরাসরি ইনস্টল হয় না — ২টা ধাপ:</b><br>১. ওপরে <b>⋮</b> (বা <b>•••</b>) চাপুন → <b>Open in Chrome</b> / <b>ব্রাউজারে খুলুন</b> চাপুন।<br>২. Chrome খুললে আবার <b>⋮</b> চাপুন → <b>Add to Home screen</b> → <b>Add</b> চাপুন।<br>ব্যস — মাসিক বাজার অ্যাপ ফোনের হোম স্ক্রিনে চলে আসবে, তারপর থেকে ওখান থেকেই পণ্য দেখে অর্ডার করা যাবে।";
+  steps.innerHTML="<b>"+app+"-এর ভেতরে সরাসরি ইনস্টল হয় না — ২টা ধাপ:</b><br>১. ওপরে <b>⋮</b> (বা <b>•••</b>) চাপুন → <b>Open in Chrome</b> / <b>ব্রাউজারে খুলুন</b> চাপুন।<br>২. Chrome খুললে আবার <b>⋮</b> চাপুন → <b>Add to Home screen</b> → <b>Add</b> চাপুন।<br>ব্যস — নীড় অ্যাডমিন অ্যাপ ফোনের হোম স্ক্রিনে চলে আসবে, তারপর থেকে ওখান থেকেই অর্ডার, দাম আর পণ্য দেখে দোকান চালাতে পারবেন।";
 }
 if("serviceWorker" in navigator){ window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
 showInstallBanner();
@@ -796,7 +797,7 @@ function doInstall(){
   var ua=navigator.userAgent||"";
   var app = /WhatsApp/i.test(ua) ? "WhatsApp" : (/FBAN|FBAV/i.test(ua) ? "Messenger / Facebook" : (/imo/i.test(ua) ? "IMO" : "এই অ্যাপ"));
   steps.style.display="block";
-  steps.innerHTML="<b>"+app+"-এর ভেতরে সরাসরি ইনস্টল হয় না — ২টা ধাপ:</b><br>১. ওপরে <b>⋮</b> (বা <b>•••</b>) চাপুন → <b>Open in Chrome</b> / <b>ব্রাউজারে খুলুন</b> চাপুন।<br>২. Chrome খুললে আবার <b>⋮</b> চাপুন → <b>Add to Home screen</b> → <b>Add</b> চাপুন।<br>ব্যস — নীড় অ্যাডমিন অ্যাপ ফোনের হোম স্ক্রিনে চলে আসবে, তারপর থেকে ওখান থেকেই পণ্য দেখে অর্ডার করা যাবে।";
+  steps.innerHTML="<b>"+app+"-এর ভেতরে সরাসরি ইনস্টল হয় না — ২টা ধাপ:</b><br>১. ওপরে <b>⋮</b> (বা <b>•••</b>) চাপুন → <b>Open in Chrome</b> / <b>ব্রাউজারে খুলুন</b> চাপুন।<br>২. Chrome খুললে আবার <b>⋮</b> চাপুন → <b>Add to Home screen</b> → <b>Add</b> চাপুন।<br>ব্যস — নীড় অ্যাডমিন অ্যাপ ফোনের হোম স্ক্রিনে চলে আসবে, তারপর থেকে ওখান থেকেই অর্ডার, দাম আর পণ্য দেখে দোকান চালাতে পারবেন।";
 }
 if("serviceWorker" in navigator){ window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
 
@@ -869,7 +870,7 @@ function updateDraftInfo(){
   var ap=document.getElementById("autoPubBox"); if(ap) ap.checked=autoPubEnabled();
   var el=document.getElementById("draftInfo"); if(!el) return;
   var same = draftEqData();
-  el.textContent = same ? "কোনো অপ্রকাশিত বদল নেই।" : "⚠️ অপ্রকাশিত বদল আছে — প্রকাশ করলে কাস্টমাররা দেখবে।";
+  el.textContent = same ? "কোনো অপ্রকাশিত বদল নেই — সবকিছু কাস্টমারের কাছে লাইভ।" : "✅ এই বদলগুলো কাস্টমারের কাছে ইতিমধ্যে লাইভ (কয়েক সেকেন্ডে অটো-সিঙ্ক হয়)। প্রকাশ শুধু অফলাইন ব্যাকআপ ফাইল (products.json) আপডেট করে।";
 }
 function updateAdminStats(){
   if(!DRAFT) return;
@@ -974,7 +975,8 @@ function orderItemsText(items){
   }).join("<br>");
 }
 function orderProfit(o){
-  if(o.bulk_total!=null && o.bulk_total!==""){ var sub=(o.subtotal!=null?+o.subtotal:+o.total); return Math.round(sub-(+o.bulk_total)); }
+  var disc=(+o.points_discount||0)+(+o.coupon_discount||0);
+  if(o.bulk_total!=null && o.bulk_total!==""){ var sub=(o.subtotal!=null?+o.subtotal:+o.total); return Math.round(sub-(+o.bulk_total)-disc); }
   var pr=0;
   (o.items||[]).forEach(function(it){
     var pp=findProdForItem(it, DRAFT) || findProdForItem(it, DATA);
@@ -982,7 +984,7 @@ function orderProfit(o){
     if(!pp || !w) return; // কেনা দাম জানা নেই — পুরো বিক্রি দামকে লাভ ধরা যাবে না
     pr+=(((it.price!=null?it.price:(pp?pp.price_taka:0))-w)*(+it.qty||0));
   });
-  return Math.round(pr);
+  return Math.round(pr-disc);
 }
 function orderProfitCovered(o){
   var cov=0, tot=0;
@@ -1012,6 +1014,7 @@ async function openAdmin(){
   document.getElementById("sCompany").value=DRAFT.company||"";
   document.getElementById("sWa").value=DRAFT.whatsapp||"";
   document.getElementById("sFee").value=DRAFT.delivery_fee_taka||0;
+  var __fb=document.getElementById("sFb"); if(__fb) __fb.value=DRAFT.facebook_url||"";
   document.getElementById("ghToken").value=localStorage.getItem("mb-gh-token")||"";
   document.getElementById("marginPct").value=DRAFT.margin_pct||"";
   updatePriceVisLabel();
@@ -1101,11 +1104,11 @@ async function loadDashboard(){
   var el=document.getElementById("dashBox"); if(!el) return;
   if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
   el.innerHTML="<p>আসছে…</p>";
-  var res=await sb.from("orders").select("*").order("created_at",{ascending:false}).limit(100);
+  var res=await sb.from("orders").select("*").order("created_at",{ascending:false}).limit(500);
   if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
   var rows=res.data||[];
   var total=0, nNew=0, nOpen=0;
-  rows.forEach(function(o){ total+=+(o.total||0); if(o.status==="New Order") nNew++; if(o.status!=="Delivered"&&o.status!=="Cancelled") nOpen++; });
+  rows.forEach(function(o){ if(o.status!=="Cancelled") total+=+(o.total||0); if(o.status==="New Order") nNew++; if(o.status!=="Delivered"&&o.status!=="Cancelled") nOpen++; });
   setTabBadge("dashboard", nNew);
   var fb=await sb.from("feedback").select("id",{count:"exact",head:true}).eq("status","new");
   var nFb=(fb&&!fb.error&&fb.count!=null)?fb.count:0;
@@ -1154,7 +1157,7 @@ async function loadSubs(){
   var el=document.getElementById("subsList"); if(!el) return;
   if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
   el.innerHTML="<p>আসছে…</p>";
-  var res=await sb.from("subscriptions").select("*").order("created_at",{ascending:false}).limit(100);
+  var res=await sb.from("subscriptions").select("*").order("created_at",{ascending:false}).limit(500);
   if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
   var rows=res.data||[];
   var nAct=rows.filter(function(r){ return r.status==="active"; }).length;
@@ -1169,20 +1172,29 @@ async function loadSubs(){
     var btns="";
     if(r.status==="active") btns='<button class="ghost" onclick="setSubStatusAdmin(\''+r.id+'\',\'paused\')">⏸️ থামান</button>';
     else if(r.status==="paused") btns='<button class="primary" onclick="setSubStatusAdmin(\''+r.id+'\',\'active\')">▶️ চালু করুন</button>';
-    if(r.status!=="cancelled") btns+=' <button class="danger" onclick="setSubStatusAdmin(\''+r.id+'\',\'cancelled\')">✕ বাতিল</button>';
+    if(r.status!=="cancelled") btns+=' <button class="danger" onclick="cancelSubAdmin(\''+r.id+'\',this)">✕ বাতিল</button>';
     return '<div class="ordercard"><b>'+r.package_name+'</b> — '+r.delivery_day+'<br>'+(r.customer_name||"")+' • '+(r.customer_phone||"")+'<br>'+(stTxt[r.status]||r.status)+' • '+d.toLocaleDateString("bn-BD")+'<br><a class="primary" style="display:inline-block;padding:8px 12px;text-decoration:none" href="'+wa+'" target="_blank">💬 WhatsApp-এ নিশ্চিত করুন</a> '+btns+'</div>';
   }).join("");
 }
+var pendingCancelSub=null, pendingCancelSubTimer=null;
+function cancelSubAdmin(id, btn){
+  if(pendingCancelSub===id){ clearTimeout(pendingCancelSubTimer); pendingCancelSub=null; setSubStatusAdmin(id,"cancelled"); return; }
+  if(pendingCancelSubTimer) clearTimeout(pendingCancelSubTimer);
+  pendingCancelSub=id;
+  if(btn){ btn.textContent="নিশ্চিত?"; }
+  pendingCancelSubTimer=setTimeout(function(){ pendingCancelSub=null; loadSubs(); }, 4000);
+}
 async function setSubStatusAdmin(id,status){
   if(!sb) return;
-  await sb.from("subscriptions").update({status:status}).eq("id",id);
+  var res=await sb.from("subscriptions").update({status:status}).eq("id",id);
+  if(res.error){ alert("হয়নি: "+res.error.message+" — আবার চেষ্টা করুন।"); return; }
   loadSubs();
 }
 async function loadCoupons(){
   var el=document.getElementById("couponList"); if(!el) return;
   if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
   el.innerHTML="<p>আসছে…</p>";
-  var res=await sb.from("coupons").select("*").order("created_at",{ascending:false}).limit(100);
+  var res=await sb.from("coupons").select("*").order("created_at",{ascending:false}).limit(500);
   if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
   var rows=res.data||[];
   if(!rows.length){ el.innerHTML="<p>এখনো কোনো কুপন নেই।</p>"; return; }
@@ -1209,7 +1221,8 @@ async function addCoupon(){
 }
 async function toggleCoupon(id, active){
   if(!sb) return;
-  await sb.from("coupons").update({active:active}).eq("id", id);
+  var res=await sb.from("coupons").update({active:active}).eq("id", id);
+  if(res.error){ alert("হয়নি: "+res.error.message+" — আবার চেষ্টা করুন।"); return; }
   loadCoupons();
 }
 async function loadBulkTiers(){
@@ -1275,7 +1288,7 @@ async function loadFeedback(){
   var el=document.getElementById("feedbackList"); if(!el) return;
   if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
   el.innerHTML="<p>আসছে…</p>";
-  var res=await sb.from("feedback").select("*").order("created_at",{ascending:false}).limit(100);
+  var res=await sb.from("feedback").select("*").order("created_at",{ascending:false}).limit(500);
   if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
   var rows=res.data||[];
   if(!rows.length){ setTabBadge("feedback",0); el.innerHTML="<p>এখনো কোনো অভিযোগ বা পরামর্শ আসেনি।</p>"; return; }
@@ -1291,22 +1304,28 @@ async function loadFeedback(){
 }
 async function markFeedbackDone(id){
   if(!sb) return;
-  await sb.from("feedback").update({status:"done"}).eq("id",id);
+  var res=await sb.from("feedback").update({status:"done"}).eq("id",id);
+  if(res.error){ alert("হয়নি: "+res.error.message+" — আবার চেষ্টা করুন।"); return; }
   loadFeedback();
+}
+function deriveFeedbackProductName(msg){
+  var stop={"চাই":1,"দাম":1,"কত":1,"পাওয়া":1,"যাবে":1,"লাগবে":1,"দিন":1,"দেন":1,"আছে":1,"কি":1,"কিনতে":1,"চাইছি":1,"প্লিজ":1,"একটু":1,"আমাকে":1,"আমার":1,"এনে":1,"দেবেন":1,"দিবেন":1,"হবে":1,"নতুন":1,"পণ্য":1};
+  var words=(msg||"").replace(/[?!.।,;:"'()]/g," ").split(/\s+/).filter(function(w){ return w; });
+  var kept=words.filter(function(w){ return !stop[w]; }).slice(0,3);
+  if(!kept.length) kept=words.slice(0,3);
+  return kept.join(" ")||"নতুন পণ্য";
 }
 async function addProductFromFeedback(id){
   var r=(window.__fbRows||{})[id]; if(!r) return;
-  var name=(r.message||"").trim();
+  var name=deriveFeedbackProductName(r.message||"");
   if(!name){ alert("পণ্যের নাম পাওয়া যায়নি।"); return; }
   var maxId=0; DRAFT.products.forEach(function(p){ if(p.id>maxId) maxId=p.id; });
-  var newP={id:maxId+1, name:name, brand:"", category:"অন্যান্য", unit:"পিস", price_taka:0, wholesale_price:0, daily:false};
-  DRAFT.products.unshift(newP);
-  saveDraft();
-  if(sb) await sb.from("feedback").update({status:"done"}).eq("id", id);
-  editGroupId=newP.id;
+  __pendingProduct={id:maxId+1, name:name, brand:"", category:"অন্যান্য", unit:"পিস", price_taka:0, wholesale_price:0, daily:false};
+  __pendingFeedbackId=id;
+  editGroupId=__pendingProduct.id;
   showAdminTab("products");
   renderAdminProducts();
-  alert("✅ \""+name+"\" পণ্য হিসেবে যোগ হয়েছে — দাম আর একক বসিয়ে প্রকাশ করুন।");
+  alert("নাম ঠিক করে দাম বসান — নাম আর দাম (০-এর বেশি) বসালেই \""+name+"\" সংরক্ষণ হবে। এখনো সংরক্ষণ হয়নি, মতামতটাও খোলা আছে।");
 }
 var pendingDelFb=null;
 function delFeedback(btn,id){
@@ -1319,9 +1338,10 @@ function saveSettings(){
   DRAFT.company=document.getElementById("sCompany").value;
   DRAFT.whatsapp=document.getElementById("sWa").value;
   DRAFT.delivery_fee_taka=parseInt(document.getElementById("sFee").value||"0",10)||0;
+  var fbEl=document.getElementById("sFb"); if(fbEl) DRAFT.facebook_url=(fbEl.value||"").trim();
   saveDraft();
 }
-function updatePriceVisLabel(){ var el=document.getElementById("priceVisLabel"); if(!el) return; el.textContent=(DRAFT.show_prices!==false)?"দেখানো হচ্ছে (লগইন করা কাস্টমার দাম দেখবে)":"লুকানো আছে (কেউ দাম দেখবে না)"; }
+function updatePriceVisLabel(){ var el=document.getElementById("priceVisLabel"); if(!el) return; el.textContent=(DRAFT.show_prices!==false)?"দেখানো হচ্ছে (সবাই দাম দেখবে — লগইন ছাড়াও)":"লুকানো আছে (কেউ দাম দেখবে না)"; }
 function togglePrices(){ if(!DRAFT) return; DRAFT.show_prices=(DRAFT.show_prices===false)?true:false; saveDraft(); updatePriceVisLabel(); }
 function togglePriceTools(){
   var t=document.getElementById("priceTools"); if(!t) return;
@@ -1337,16 +1357,17 @@ function applyMargin(btn){
   DRAFT.products.forEach(function(p){ var w=p.wholesale_price||0; if(w>0){ p.price_taka=Math.round(w*(1+pct/100)); n++; } });
   DRAFT.margin_pct=pct;
   recalcPackages(DRAFT); saveDraft(); renderAdminProducts(); renderAdminPackages();
-  alert("হয়ে গেছে — "+bn(n)+"টি পণ্যের খুচরা দাম বসানো হয়েছে ("+bn(pct)+"% লাভে)। যাদের পাইকারি দাম নেই, তাদের দাম বদলায়নি। প্রকাশ করলে কাস্টমার নতুন দাম দেখবে।");
+  alert("হয়ে গেছে — "+bn(n)+"টি পণ্যের খুচরা দাম বসানো হয়েছে ("+bn(pct)+"% লাভে)। যাদের পাইকারি দাম নেই, তাদের দাম বদলায়নি। দাম কাস্টমারের কাছে ইতিমধ্যে লাইভ — প্রকাশ শুধু অফলাইন ব্যাকআপ ফাইল আপডেট করে।");
 }
 function saveToken(){ localStorage.setItem("mb-gh-token", document.getElementById("ghToken").value.trim()); }
 var draggedId=null;
-function groupNameA(gid){ var p=null; DRAFT.products.forEach(function(x){ if(x.id===gid) p=x; }); return p?p.name:""; }
+function groupNameA(gid){ if(__pendingProduct && __pendingProduct.id===gid) return __pendingProduct.name; var p=null; DRAFT.products.forEach(function(x){ if(x.id===gid) p=x; }); return p?p.name:""; }
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 var editGroupId=null;
 var adminProdCat="সব";
 function adminGroups(){
   var map={}, out=[];
+  var pg=pendingProductGroup(); if(pg){ out.push(pg); map[pg.name]=pg; }
   DRAFT.products.forEach(function(p){
     if(!map[p.name]){ map[p.name]={gid:p.id, name:p.name, category:p.category, vars:[]}; out.push(map[p.name]); }
     map[p.name].vars.push(p);
@@ -1393,6 +1414,11 @@ function setAdminProdCat(c){ adminProdCat=c; renderAdminProducts(); }
 function openGroupEdit(gid){ editGroupId=gid; renderAdminProducts(); }
 function closeGroupEdit(){
   if(editGroupId!==null){
+    if(__pendingProduct && __pendingProduct.id===editGroupId){
+      if(!(__pendingProduct.name||"").trim() || !(__pendingProduct.price_taka>0)){ discardPendingProduct(); renderAdminProducts(); return; }
+      maybeCommitPendingProduct();
+      editGroupId=null; renderAdminProducts(); return;
+    }
     var name=groupNameA(editGroupId);
     if(!name){ var id=editGroupId; editGroupId=null; doDelProduct(id); return; }
   }
@@ -1408,7 +1434,7 @@ function renderPriceList(){
     return true;
   });
   var h='<div class="chips">'+["সব"].concat(CATS).map(function(c){ return '<button class="chip'+(adminProdCat===c?' on':'')+'" onclick="setAdminProdCat(\''+c+'\')">'+c+'</button>'; }).join("")+'</div>';
-  h+='<p class="small">মোট '+bn(groups.length)+'টি পণ্য • '+bn(DRAFT.products.length)+'টি ব্র্যান্ড। দাম লিখলেই সাথে সাথে সংরক্ষণ হবে — আলাদা করে সংরক্ষণ করতে হবে না। শেষে প্রকাশ ট্যাবে গিয়ে প্রকাশ করলেই কাস্টমার নতুন দাম দেখবে।</p>';
+  h+='<p class="small">মোট '+bn(groups.length)+'টি পণ্য • '+bn(DRAFT.products.length)+'টি ব্র্যান্ড। দাম লিখলেই সাথে সাথে সংরক্ষণ হবে আর কাস্টমারের কাছে কয়েক সেকেন্ডে লাইভ যাবে — আলাদা করে প্রকাশ করতে হবে না।</p>';
   h+='<div class="card" style="background:#eff6ff"><b>⚙️ মার্জিন দিয়ে খুচরা দাম বসান</b><div style="display:flex;gap:8px;margin-top:8px;align-items:center"><input id="marginPct2" type="number" min="0" placeholder="লাভের হার % (যেমন: ১০)" style="flex:1"><button class="gold" onclick="applyMargin2()">সব খুচরা দাম বসান</button></div><p class="small">পাইকারি দাম থেকে খুচরা দাম হিসাব হবে (পাইকারি × (১০০+লাভ%) ÷ ১০০)। যাদের পাইকারি দাম নেই, তাদের দাম বদলাবে না।</p></div>';
   h+=list.map(function(g){
     return '<div class="agroup"><b>'+esc(g.name)+'</b>'+(g.vars.some(function(v){ return v.special; })?' ⭐':'')+(isDailyGid(g.gid)?' 🌅':'')+' <span class="pcat">'+esc(g.category)+'</span>'
@@ -1428,7 +1454,7 @@ function applyMargin2(){
   DRAFT.products.forEach(function(p){ var w=p.wholesale_price||0; if(w>0){ p.price_taka=Math.round(w*(1+pct/100)); n++; } });
   DRAFT.margin_pct=pct;
   recalcPackages(DRAFT); saveDraft(); renderAdminProducts(); renderAdminPackages();
-  alert("হয়ে গেছে — "+bn(n)+"টি পণ্যের খুচরা দাম বসানো হয়েছে ("+bn(pct)+"% লাভে)। যাদের পাইকারি দাম নেই, তাদের দাম বদলায়নি। প্রকাশ করলে কাস্টমার নতুন দাম দেখবে।");
+  alert("হয়ে গেছে — "+bn(n)+"টি পণ্যের খুচরা দাম বসানো হয়েছে ("+bn(pct)+"% লাভে)। যাদের পাইকারি দাম নেই, তাদের দাম বদলায়নি। দাম কাস্টমারের কাছে ইতিমধ্যে লাইভ — প্রকাশ শুধু অফলাইন ব্যাকআপ ফাইল আপডেট করে।");
 }
 function applyMargin3(btn){
   if(btn && !btn.dataset.armed){ btn.dataset.armed="1"; btn.dataset.origText=btn.textContent; btn.textContent="⚠️ নিশ্চিত? সব দাম বদলাবে"; setTimeout(function(){ if(btn.isConnected){ delete btn.dataset.armed; btn.textContent=btn.dataset.origText; } }, 5000); return; }
@@ -1438,12 +1464,12 @@ function applyMargin3(btn){
   DRAFT.products.forEach(function(p){ var w=p.wholesale_price||0; if(w>0){ p.price_taka=Math.round(w*(1+pct/100)); n++; } });
   DRAFT.margin_pct=pct;
   recalcPackages(DRAFT); saveDraft(); renderAdminProducts(); renderAdminPackages(); loadSupplierPrices();
-  alert("হয়ে গেছে — "+bn(n)+"টি পণ্যের খুচরা দাম বসানো হয়েছে ("+bn(pct)+"% লাভে)। যাদের পাইকারি দাম নেই, তাদের দাম বদলায়নি। প্রকাশ করলে কাস্টমার নতুন দাম দেখবে।");
+  alert("হয়ে গেছে — "+bn(n)+"টি পণ্যের খুচরা দাম বসানো হয়েছে ("+bn(pct)+"% লাভে)। যাদের পাইকারি দাম নেই, তাদের দাম বদলায়নি। দাম কাস্টমারের কাছে ইতিমধ্যে লাইভ — প্রকাশ শুধু অফলাইন ব্যাকআপ ফাইল আপডেট করে।");
 }
 function renderGroupEdit(g){
   var h='<button class="ghost" onclick="closeGroupEdit()">← পণ্যের তালিকা</button>';
   h+='<h3>✏️ '+esc(g.name||"নতুন পণ্য")+'</h3>';
-  h+='<p class="small">যা বদলাবেন, তা সাথে সাথে সংরক্ষণ হবে। শেষে প্রকাশ ট্যাবে গিয়ে প্রকাশ করলেই কাস্টমার নতুন তথ্য দেখবে।</p>';
+  h+='<p class="small">যা বদলাবেন, তা সাথে সাথে সংরক্ষণ হবে আর কাস্টমারের কাছে কয়েক সেকেন্ডে লাইভ যাবে।</p>';
   h+='<label>পণ্যের নাম</label><input value="'+esc(g.name)+'" onchange="renameGroup('+g.gid+',this.value)" placeholder="যেমন: সয়াবিন তেল">';
   h+='<label>ক্যাটাগরি</label><select onchange="setGroupCategory('+g.gid+',this.value)">'+CATS.map(function(c){ return '<option '+(c===g.category?'selected':'')+'>'+c+'</option>'; }).join("")+'</select>';
   h+='<label style="display:flex;gap:8px;align-items:center;margin:10px 0"><input type="checkbox" style="width:auto;height:auto" '+(g.vars.some(function(v){ return v.special; })?'checked':'')+' onchange="setGroupSpecial('+g.gid+',this.checked)"> ⭐ স্পেশাল আইটেম হিসেবে দেখান (কাস্টমার অ্যাপে সবার ওপরে দেখাবে)</label>';
@@ -1467,16 +1493,25 @@ function renderGroupEdit(g){
   return h;
 }
 function renameGroup(gid, newName){
+  if(__pendingProduct && __pendingProduct.id===gid){
+    if(!newName) return;
+    __pendingProduct.name=newName;
+    if(maybeCommitPendingProduct()) return;
+    renderAdminProducts();
+    return;
+  }
   var old=groupNameA(gid); if(!old||!newName||newName===old) return;
   DRAFT.products.forEach(function(p){ if(p.name===old) p.name=newName; });
   recalcPackages(DRAFT); saveDraft(); renderAdminProducts(); renderAdminPackages();
 }
 function setGroupCategory(gid, cat){
+  if(__pendingProduct && __pendingProduct.id===gid){ __pendingProduct.category=cat; renderAdminProducts(); return; }
   var name=groupNameA(gid); if(!name) return;
   DRAFT.products.forEach(function(p){ if(p.name===name) p.category=cat; });
   recalcPackages(DRAFT); saveDraft(); renderAdminProducts();
 }
 function setGroupSpecial(gid, on){
+  if(__pendingProduct && __pendingProduct.id===gid){ __pendingProduct.special=!!on; return; }
   var name=groupNameA(gid); if(!name) return;
   DRAFT.products.forEach(function(p){ if(p.name===name) p.special=!!on; });
   saveDraft(); renderAdminProducts();
@@ -1556,7 +1591,7 @@ function renderDailyList(){
   h+=gs.map(function(g,i){
     return '<div class="listrow dailyrow" data-gid="'+g.gid+'"><div class="n"><span class="dailyno">'+bn(i+1)+'.</span> <b class="dailyname" onpointerdown="dailyPressStart(event,'+g.gid+')">'+esc(g.name)+'</b><br><span class="small">'+esc(g.category)+'</span></div><div style="display:flex;gap:6px;align-items:center"><button class="ghost" onclick="moveDaily('+g.gid+',-1)">↑</button><button class="ghost" onclick="moveDaily('+g.gid+',1)">↓</button><button class="ghost" onclick="removeDaily('+g.gid+')">✕</button></div></div>';
   }).join("")||"<p>তালিকা খালি — ওপরে থেকে পণ্য যোগ করুন।</p>";
-  h+='<p class="small">নাম চেপে ধরে (লং-প্রেস) টেনে উপরে-নিচে নিলেও সিরিয়াল বদলাবে। বদলালেই সংরক্ষণ হবে — শেষে প্রকাশ ট্যাবে গিয়ে প্রকাশ করলেই কাস্টমার নতুন সিরিয়াল দেখবে।</p>';
+  h+='<p class="small">নাম চেপে ধরে (লং-প্রেস) টেনে উপরে-নিচে নিলেও সিরিয়াল বদলাবে। বদলালেই সংরক্ষণ হবে আর কাস্টমারের কাছে কয়েক সেকেন্ডে লাইভ যাবে।</p>';
   el.innerHTML=h;
 }
 var _dp=null;
@@ -1606,6 +1641,7 @@ function addVariant(gid){
 }
 var pendingDelGroup=null, pendingDelGroupTimer=null;
 function delGroup(gid){
+  if(__pendingProduct && __pendingProduct.id===gid){ discardPendingProduct(); renderAdminProducts(); return; }
   if(pendingDelGroup===gid){ clearTimeout(pendingDelGroupTimer); pendingDelGroup=null; doDelGroup(gid); return; }
   if(pendingDelGroupTimer) clearTimeout(pendingDelGroupTimer);
   pendingDelGroup=gid; renderAdminProducts();
@@ -1661,6 +1697,12 @@ function moveProduct(id,d){
 }
 function markWsManual(id, val){ try{ var m=JSON.parse(localStorage.getItem("mb-ws-manual")||"{}"); m[id]=val; localStorage.setItem("mb-ws-manual", JSON.stringify(m)); }catch(e){} }
 function editProduct(id, field, val){
+  if(__pendingProduct && __pendingProduct.id===id){
+    __pendingProduct[field]=(field==="price_taka"||field==="wholesale_price"||field==="stock_qty")?(parseInt(val,10)||0):val;
+    if(maybeCommitPendingProduct()) return;
+    renderAdminPackages();
+    return;
+  }
   DRAFT.products.forEach(function(p){ if(p.id===id){ p[field]=(field==="price_taka"||field==="wholesale_price"||field==="stock_qty")?(parseInt(val,10)||0):val; } });
   recalcPackages(DRAFT); if(field==="wholesale_price") markWsManual(id, +val||0);
   saveDraft(); renderAdminPackages();
@@ -1677,12 +1719,33 @@ function doDelProduct(id){
   DRAFT.packages.forEach(function(pkg){ pkg.items=pkg.items.filter(function(it){ return it.product_id!==id; }); });
   recalcPackages(DRAFT); saveDraft(); renderAdminProducts(); renderAdminPackages();
 }
+var __pendingProduct=null;
+var __pendingFeedbackId=null;
+function pendingProductGroup(){
+  if(!__pendingProduct || editGroupId!==__pendingProduct.id) return null;
+  var p=__pendingProduct;
+  if(p.name && DRAFT.products.some(function(x){ return x.name===p.name; })) return null;
+  return {gid:p.id, name:p.name, category:p.category, vars:[p]};
+}
+function maybeCommitPendingProduct(){
+  var p=__pendingProduct; if(!p) return false;
+  if(!(p.name||"").trim() || !(p.price_taka>0)) return false;
+  DRAFT.products.unshift(p);
+  __pendingProduct=null;
+  var fbId=__pendingFeedbackId; __pendingFeedbackId=null;
+  saveDraft();
+  if(fbId && sb){ try{ var q=sb.from("feedback").update({status:"done"}).eq("id", fbId); if(q && q.then) q.then(function(){}).catch(function(){}); }catch(e){} }
+  renderAdminProducts();
+  return true;
+}
+function discardPendingProduct(){
+  __pendingProduct=null; __pendingFeedbackId=null; editGroupId=null;
+}
 function addProduct(){
   var maxId=0; DRAFT.products.forEach(function(p){ if(p.id>maxId) maxId=p.id; });
-  var newP={id:maxId+1, name:"", brand:"", category:"অন্যান্য", unit:"কেজি", price_taka:0, wholesale_price:0, daily:false};
-  DRAFT.products.unshift(newP);
-  saveDraft();
-  editGroupId=newP.id;
+  __pendingProduct={id:maxId+1, name:"", brand:"", category:"অন্যান্য", unit:"কেজি", price_taka:0, wholesale_price:0, daily:false};
+  __pendingFeedbackId=null;
+  editGroupId=__pendingProduct.id;
   renderAdminProducts();
   var inp=document.querySelector('#adminProducts input');
   if(inp) inp.focus();
@@ -1857,15 +1920,17 @@ async function publish(auto){
     var getRes=await fetch("https://api.github.com/repos/mashikbazzar/mashikbazar/contents/products.json", {headers:{Authorization:"Bearer "+token, Accept:"application/vnd.github+json"}});
     if(!getRes.ok) throw new Error("GitHub থেকে পুরনো ফাইল পড়া যায়নি ("+getRes.status+") — টোকেনে Contents Read/Write আছে কি না দেখুন।");
     var getJson=await getRes.json();
-    var content=btoa(unescape(encodeURIComponent(JSON.stringify(DRAFT,null,2))));
+    var cleanPub=JSON.parse(JSON.stringify(DRAFT));
+    cleanPub.products.forEach(function(p){ p.wholesale_price=0; });
+    var content=btoa(unescape(encodeURIComponent(JSON.stringify(cleanPub,null,2))));
     snap=JSON.parse(JSON.stringify(DRAFT));
     var putRes=await fetch("https://api.github.com/repos/mashikbazzar/mashikbazar/contents/products.json", {method:"PUT", headers:{Authorization:"Bearer "+token, Accept:"application/vnd.github+json", "Content-Type":"application/json"}, body: JSON.stringify({message:"Admin: update products/prices/packages", content: content, sha: getJson.sha, branch:"main"})});
     if(!putRes.ok){ var t=await putRes.text(); throw new Error("প্রকাশ হয়নি ("+putRes.status+"): "+t.slice(0,200)); }
     DATA=snap;
     if(JSON.stringify(DRAFT)===JSON.stringify(snap)) localStorage.removeItem("mb-draft");
     renderAdminProducts(); renderAdminPackages(); updateDraftInfo();
-    await pushWholesaleToSupabase(snap);
-    if(msg) msg.textContent="✅ প্রকাশ হয়েছে! ১–৩ মিনিট পর কাস্টমাররা নতুন দাম দেখবে। পাইকারি দামও ডেটাবেসে গেছে।";
+    var __pushOk=await pushWholesaleToSupabase(snap);
+    if(msg) msg.textContent=__pushOk?"✅ প্রকাশ হয়েছে — অফলাইন ব্যাকআপ ফাইল আপডেট হয়েছে (পাইকারি দাম ছাড়া)। আপনার বদলগুলো কাস্টমারের কাছে আগেই লাইভ ছিল। পাইকারি দামও ডেটাবেসে গেছে।":"✅ প্রকাশ হয়েছে — অফলাইন ব্যাকআপ ফাইল আপডেট হয়েছে (পাইকারি দাম ছাড়া)। তবে পাইকারি দাম ডেটাবেসে পাঠানো যায়নি — ইন্টারনেট চেক করে আবার প্রকাশ করুন।";
     __pubDone(); return true;
   }catch(e){
     if(msg) msg.textContent="❌ "+e.message+" — টোকেন ঠিক আছে কি না দেখুন, অথবা ডাউনলোড করে GitHub app দিয়ে আপলোড করুন।";
@@ -1948,7 +2013,7 @@ async function loadAdminOrders(){
   if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
   await loadWholesale();
   el.innerHTML="<p>আসছে…</p>";
-  var res = await sb.from("orders").select("*").order("created_at", {ascending:false}).limit(50);
+  var res = await sb.from("orders").select("*").order("created_at", {ascending:false}).limit(500);
   if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
   var rows=res.data||[];
   if(adminOrderCount===null){ adminOrderCount=rows.length; updateAdminStats(); }
@@ -1990,20 +2055,33 @@ async function setAdminOrderStatus(id, status){
   if(!sb) return;
   var o=adminOrdersById[id]||null;
   var old=o?o.status:"";
+  var doStock=o && status==="Confirmed" && old!=="Confirmed" && !o.stock_deducted;
+  var doPoints=o && status==="Delivered" && old!=="Delivered" && !o.points_awarded;
+  var doRestore=o && status==="Cancelled" && old!=="Cancelled" && o.stock_deducted;
+  if(doStock) o.stock_deducted=true;
+  if(doPoints) o.points_awarded=true;
+  if(doRestore) o.stock_deducted=false;
   var res=await sb.from("orders").update({status:status}).eq("id", id);
-  if(res.error){ alert("হয়নি: "+res.error.message); return; }
+  if(res.error){
+    if(doStock) o.stock_deducted=false;
+    if(doPoints) o.points_awarded=false;
+    if(doRestore) o.stock_deducted=true;
+    alert("হয়নি: "+res.error.message); return;
+  }
   if(o) o.status=status;
-  if(o && status==="Confirmed" && old!=="Confirmed" && !o.stock_deducted){
+  if(doStock){
     deductStockForOrder(o);
     sb.from("orders").update({stock_deducted:true}).eq("id", id).then(function(){});
-    o.stock_deducted=true;
   }
-  if(o && status==="Delivered" && old!=="Delivered" && !o.points_awarded){
+  if(doRestore){
+    restoreStockForOrder(o);
+    sb.from("orders").update({stock_deducted:false}).eq("id", id).then(function(){});
+  }
+  if(doPoints){
     var earned=Math.floor((+o.total||0)/100);
     if(earned>0 && o.phone){
       awardPoints(o.phone, earned);
       sb.from("orders").update({points_awarded:true}).eq("id", id).then(function(){});
-      o.points_awarded=true;
     }
   }
   loadAdminOrders();
@@ -2011,10 +2089,32 @@ async function setAdminOrderStatus(id, status){
 function deductStockForOrder(o){
   if(!DRAFT) return;
   var changed=false;
+  var rec=[];
   (o.items||[]).forEach(function(it){
     var p=findProdForItem(it, DRAFT);
-    if(p && (p.stock_qty||0)>0){ p.stock_qty=Math.max(0, Math.round(((p.stock_qty||0)-(+it.qty||0))*100)/100); changed=true; }
+    if(p && (p.stock_qty||0)>0){ var cut=Math.min(p.stock_qty||0, +it.qty||0); p.stock_qty=Math.max(0, Math.round(((p.stock_qty||0)-cut)*100)/100); changed=true; rec.push({id:p.id, qty:cut}); }
   });
+  if(rec.length){ try{ var m=JSON.parse(localStorage.getItem("mb-stock-deducted")||"{}"); m[o.id||o.order_no||""]=rec; localStorage.setItem("mb-stock-deducted", JSON.stringify(m)); }catch(e){} o._deductedItems=rec; }
+  if(changed) saveDraft();
+}
+function restoreStockForOrder(o){
+  if(!DRAFT) return;
+  var rec=o._deductedItems||null;
+  if(!rec){ try{ var m=JSON.parse(localStorage.getItem("mb-stock-deducted")||"{}"); rec=m[o.id||o.order_no||""]||null; }catch(e){} }
+  var changed=false;
+  if(rec && rec.length){
+    rec.forEach(function(r){
+      var p=null; DRAFT.products.forEach(function(x){ if(x.id===r.id) p=x; });
+      if(p){ p.stock_qty=Math.round((((p.stock_qty||0)+(+r.qty||0))*100)/100); changed=true; }
+    });
+    try{ var m2=JSON.parse(localStorage.getItem("mb-stock-deducted")||"{}"); delete m2[o.id||o.order_no||""]; localStorage.setItem("mb-stock-deducted", JSON.stringify(m2)); }catch(e){}
+    o._deductedItems=null;
+  } else {
+    (o.items||[]).forEach(function(it){
+      var p=findProdForItem(it, DRAFT);
+      if(p && (p.stock_qty||0)>0){ p.stock_qty=Math.round((((p.stock_qty||0)+(+it.qty||0))*100)/100); changed=true; }
+    });
+  }
   if(changed) saveDraft();
 }
 async function awardPoints(phone, earned){
@@ -2034,7 +2134,7 @@ async function togglePaymentStatus(id){
   var s=payState(o);
   var next=s==="paid"?"unpaid":(s==="advance_paid"?"paid":(((o.advance_amount||0)>0)?"advance_paid":"paid"));
   var res=await sb.from("orders").update({payment_status:next}).eq("id", id);
-  if(!res.error){ o.payment_status=next; loadAdminOrders(); }
+  if(!res.error){ o.payment_status=next; loadAdminOrders(); } else { alert("হয়নি: "+res.error.message+" — আবার চেষ্টা করুন।"); }
 }
 var __plannerHtml="";
 function printPlanner(){
@@ -2077,7 +2177,7 @@ async function loadAnalytics(){
   if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
   await loadWholesale();
   el.innerHTML="<p>হিসাব করা হচ্ছে…</p>";
-  var res=await sb.from("orders").select("*").order("created_at",{ascending:false}).limit(500);
+  var res=await sb.from("orders").select("*").order("created_at",{ascending:false}).limit(1000);
   if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
   var rows=res.data||[];
   window.__analyticsRows=rows;
@@ -2188,6 +2288,14 @@ async function loadSupplierPrices(){
     }
   }catch(e){}
   try{
+    var rj=await sb.from("supplier_prices").select("*").eq("status","rejected").order("created_at",{ascending:false}).limit(20);
+    var rrows=(rj&&rj.data)||[];
+    window.__spRows=window.__spRows||{}; rrows.forEach(function(r){ window.__spRows[r.id]=r; });
+    if(rrows.length){
+      el.innerHTML+='<h3 style="margin-top:18px">❌ বাতিল করা দাম</h3><p class="small">বাতিল করা দাম মুছে যায়নি — আবার পেন্ডিং করলে এখান থেকে বসানো যাবে।</p>'+rrows.map(function(r){ var d=new Date(r.created_at); return '<div class="listrow"><div class="n"><b>'+esc(r.product_name||"")+'</b> '+(r.brand?esc(r.brand):"")+' — <b>৳'+bn(r.price||0)+'</b><br><span class="small">'+esc(r.supplier_name||"")+' • '+d.toLocaleDateString("bn-BD")+'</span></div><button class="gold" onclick="restoreSupplierPrice(\''+r.id+'\')">↩️ আবার পেন্ডিং করুন</button></div>'; }).join("");
+    }
+  }catch(e){}
+  try{
     var lowBox=document.getElementById("lowStockPO");
     if(lowBox && DRAFT){
       var low=DRAFT.products.filter(function(p){ return (p.stock_qty||0)>0 && (p.stock_qty||0)<=5; });
@@ -2207,20 +2315,19 @@ async function loadSupplierPrices(){
 }
 async function applySupplierPrice(id, productId, productName, brand, unit, price){
   if(!sb) return;
+  if(!(price>0)){ alert("পাইকারি দাম ঠিক নেই।"); return; }
   clearWsManual(productId);
   if(productId){
-    var upd={};
-    if(price>0) upd.wholesale_price=price;
-    if(productName) upd.name=productName;
-    if(brand!==undefined) upd.brand=brand||"";
-    if(unit) upd.unit=unit;
-    await sb.from("products").update(upd).eq("id", productId);
-    var applyLocal=function(p){ if(price>0) p.wholesale_price=price; if(productName) p.name=productName; if(brand!==undefined) p.brand=brand||""; if(unit) p.unit=unit; };
+    var upd={wholesale_price:price};
+    var r1=await sb.from("products").update(upd).eq("id", productId);
+    if(r1.error){ alert("হয়নি: পাইকারি দাম বসানো যায়নি ("+r1.error.message+") — আবার চেষ্টা করুন।"); return; }
+    var applyLocal=function(p){ p.wholesale_price=price; };
     DATA.products.forEach(function(p){ if(p.id===productId) applyLocal(p); });
     if(DRAFT) DRAFT.products.forEach(function(p){ if(p.id===productId) applyLocal(p); });
   }
-  await sb.from("supplier_prices").update({status:"applied"}).eq("id", id);
-  alert("বসানো হয়েছে: "+productName+" — পাইকারি দাম ৳"+price+"। নাম/ব্র্যান্ড/একক বদলে থাকলে তা কাস্টমার দেখবে প্রকাশ করার পর।");
+  var r2=await sb.from("supplier_prices").update({status:"applied"}).eq("id", id);
+  if(r2.error){ alert("হয়নি: 'বসানো হয়েছে' চিহ্ন দেওয়া যায়নি ("+r2.error.message+") — দামটি পেন্ডিং তালিকাতেই থাকবে।"); return; }
+  alert("বসানো হয়েছে: "+productName+" — পাইকারি দাম ৳"+price+"। নাম/ব্র্যান্ড/একক বদলানো হয়নি।");
   loadSupplierPrices(); renderAdminProducts();
 }
 var __rowPctCustom={};
@@ -2259,15 +2366,14 @@ async function applyRowPrices(id, productId, productName, brand, unit, wsPrice){
   if(!(rt>0)){ alert("খুচরা দাম লিখুন — ০-এর বেশি হতে হবে।"); return; }
   var upd={};
   upd.wholesale_price=wsPrice; upd.selling_price=rt;
-  if(productName) upd.name=productName;
-  if(brand!==undefined) upd.brand=brand||"";
-  if(unit) upd.unit=unit;
-  await sb.from("products").update(upd).eq("id", productId);
-  var applyLocal=function(p){ p.wholesale_price=wsPrice; p.price_taka=rt; if(productName) p.name=productName; if(brand!==undefined) p.brand=brand||""; if(unit) p.unit=unit; };
+  var r1=await sb.from("products").update(upd).eq("id", productId);
+  if(r1.error){ alert("হয়নি: পণ্যের দাম বসানো যায়নি ("+r1.error.message+") — দামটি পেন্ডিং তালিকাতেই আছে, আবার চেষ্টা করুন।"); return; }
+  var applyLocal=function(p){ p.wholesale_price=wsPrice; p.price_taka=rt; };
   DATA.products.forEach(function(p){ if(p.id===productId) applyLocal(p); });
   if(DRAFT){ DRAFT.products.forEach(function(p){ if(p.id===productId) applyLocal(p); }); recalcPackages(DRAFT); saveDraft(); }
-  await sb.from("supplier_prices").update({status:"applied"}).eq("id", id);
-  alert("বসানো হয়েছে: "+productName+" — পাইকারি ৳"+wsPrice+" • খুচরা ৳"+rt+" ("+pct+"% লাভে)। প্রকাশ করলে কাস্টমার নতুন দাম দেখবে।");
+  var r2=await sb.from("supplier_prices").update({status:"applied"}).eq("id", id);
+  if(r2.error){ alert("হয়নি: 'বসানো হয়েছে' চিহ্ন দেওয়া যায়নি ("+r2.error.message+") — দামটি পেন্ডিং তালিকাতেই থাকবে, আবার চেষ্টা করুন।"); return; }
+  alert("বসানো হয়েছে: "+productName+" — পাইকারি ৳"+wsPrice+" • খুচরা ৳"+rt+" ("+pct+"% লাভে)। নাম/ব্র্যান্ড/একক বদলানো হয়নি। নতুন দাম কাস্টমারের কাছে ইতিমধ্যে লাইভ।");
   loadSupplierPrices(); renderAdminProducts(); renderAdminPackages();
 }
 async function sendCounter(id){
@@ -2275,7 +2381,8 @@ async function sendCounter(id){
   var inp=document.getElementById("ct-"+id);
   var val=inp? parseFloat(inp.value)||0 : 0;
   if(!val||val<=0){ alert("পাল্টা দাম লিখুন।"); return; }
-  await sb.from("supplier_prices").update({counter_price:val, counter_status:"pending"}).eq("id", id);
+  var cres=await sb.from("supplier_prices").update({counter_price:val, counter_status:"pending"}).eq("id", id);
+  if(cres.error){ alert("হয়নি: "+cres.error.message+" — আবার চেষ্টা করুন।"); return; }
   loadSupplierPrices();
 }
 async function createPO(id){
@@ -2430,7 +2537,7 @@ async function loadCustomers(){
   var el=document.getElementById("customerList"); if(!el) return;
   if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
   el.innerHTML="<p>আসছে…</p>";
-  var res=await sb.from("customers").select("*").order("created_at",{ascending:false}).limit(100);
+  var res=await sb.from("customers").select("*").order("created_at",{ascending:false}).limit(500);
   if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
   var rows=res.data||[];
   if(!rows.length){ el.innerHTML="<p>এখনো কেউ লগইন করেনি।</p>"; return; }
@@ -2478,7 +2585,7 @@ async function loadVisitors(){
   var el=document.getElementById("visitorBox"); if(!el) return;
   if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
   el.innerHTML="<p>হিসাব করা হচ্ছে…</p>";
-  var res=await sb.from("visits").select("*").order("created_at",{ascending:false}).limit(200);
+  var res=await sb.from("visits").select("*").order("created_at",{ascending:false}).limit(500);
   if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
   var rows=res.data||[];
   var today=new Date().toLocaleDateString("bn-BD");
@@ -2497,18 +2604,29 @@ async function loadVisitors(){
 }
 async function rejectSupplierPrice(id){
   if(!sb) return;
-  await sb.from("supplier_prices").update({status:"rejected"}).eq("id", id);
+  var res=await sb.from("supplier_prices").update({status:"rejected"}).eq("id", id);
+  if(res.error){ alert("হয়নি: "+res.error.message+" — আবার চেষ্টা করুন।"); return; }
+  loadSupplierPrices();
+}
+async function restoreSupplierPrice(id){
+  if(!sb) return;
+  var res=await sb.from("supplier_prices").update({status:"pending"}).eq("id", id);
+  if(res.error){ alert("হয়নি: "+res.error.message+" — আবার চেষ্টা করুন।"); return; }
   loadSupplierPrices();
 }
 function clearWsManual(id){ try{ if(id===undefined){ localStorage.removeItem("mb-ws-manual"); } else { var m=JSON.parse(localStorage.getItem("mb-ws-manual")||"{}"); delete m[id]; localStorage.setItem("mb-ws-manual", JSON.stringify(m)); } }catch(e){} }
 async function pushWholesaleToSupabase(src){
-  if(!sb) return;
-  var srcD=src||DRAFT; if(!srcD) return;
+  if(!sb) return false;
+  var srcD=src||DRAFT; if(!srcD) return false;
   var rows=srcD.products.map(function(p){ return {id:p.id, wholesale_price:p.wholesale_price||0}; });
-  for(var i=0;i<rows.length;i+=50){
-    await sb.from("products").upsert(rows.slice(i,i+50), {onConflict:"id"});
-  }
+  try{
+    for(var i=0;i<rows.length;i+=50){
+      var r=await sb.from("products").upsert(rows.slice(i,i+50), {onConflict:"id"});
+      if(r && r.error){ alert("হয়নি: পাইকারি দাম ডেটাবেসে যায়নি ("+r.error.message+") — আবার চেষ্টা করুন।"); return false; }
+    }
+  }catch(e){ alert("হয়নি: পাইকারি দাম ডেটাবেসে যায়নি — ইন্টারনেট চেক করে আবার চেষ্টা করুন।"); return false; }
   clearWsManual();
+  return true;
 }
 
 function showSetup(){
