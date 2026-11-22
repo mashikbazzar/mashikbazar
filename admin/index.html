@@ -92,7 +92,10 @@ button.ghost{background:#fff;border:1px solid #065f46;color:#065f46;border-radiu
 .statgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
 .stat{background:#e8f5ee;border-radius:12px;padding:10px;text-align:center}
 .stat b{font-size:22px;color:#065f46;display:block}
-.admintabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.admintabs{display:flex;flex-direction:column;gap:0;margin:10px 0}
+.navsec{font-size:12px;font-weight:700;color:#6b7280;margin:12px 2px 4px;letter-spacing:.4px}
+.navrow{display:flex;gap:6px;flex-wrap:wrap}
+.navrow button{flex:1 1 auto;min-width:110px;white-space:normal;line-height:1.35;padding:10px 8px}
 .admintabs button{flex:1;padding:10px;border:1px solid #065f46;background:#fff;color:#065f46;border-radius:10px;font-size:15px;cursor:pointer;min-width:70px}
 .admintabs button.on{background:#065f46;color:#fff}
 .dragrow{cursor:grab;border:2px dashed transparent}
@@ -261,20 +264,26 @@ section h2{color:#6d28d9}
 <div class="stat"><b id="stOrders">—</b>টি অর্ডার</div>
 </div>
 <div class="admintabs">
-<button id="atab-dashboard" class="on" onclick="showAdminTab('dashboard')">📊 ড্যাশবোর্ড</button>
-<button id="atab-products" onclick="showAdminTab('products')">🛍️ পণ্য</button>
+<div class="navsec">📋 আজকের কাজ</div>
+<div class="navrow"><button id="atab-dashboard" class="on" onclick="showAdminTab('dashboard')">📊 ড্যাশবোর্ড</button>
+<button id="atab-orders" onclick="showAdminTab('orders')">📋 অর্ডার</button></div>
+<div class="navsec">🛒 কেনাকাটা</div>
+<div class="navrow"><button id="atab-supplier" onclick="showAdminTab('supplier')">🏪 পাইকারি দাম</button></div>
+<div class="navsec">🛍️ পণ্য</div>
+<div class="navrow"><button id="atab-products" onclick="showAdminTab('products')">🛍️ পণ্য</button>
 <button id="atab-daily" onclick="showAdminTab('daily')">🌅 দৈনন্দিন পণ্য</button>
-<button id="atab-packages" onclick="showAdminTab('packages')">📦 প্যাকেজ</button>
-<button id="atab-settings" onclick="showAdminTab('settings')">⚙️ সেটিংস</button>
-<button id="atab-publish" onclick="showAdminTab('publish')">🚀 প্রকাশ</button>
-<button id="atab-orders" onclick="showAdminTab('orders')">📋 অর্ডার</button>
+<button id="atab-packages" onclick="showAdminTab('packages')">📦 প্যাকেজ</button></div>
+<div class="navsec">👥 গ্রাহক</div>
+<div class="navrow"><button id="atab-customers" onclick="showAdminTab('customers')">👥 কাস্টমার</button>
 <button id="atab-subs" onclick="showAdminTab('subs')">📅 সাবস্ক্রিপশন</button>
-<button id="atab-profit" onclick="showAdminTab('profit')">💰 লাভ-লস</button>
-<button id="atab-analytics" onclick="showAdminTab('analytics')">📊 হিসাব</button>
-<button id="atab-supplier" onclick="showAdminTab('supplier')">🏪 পাইকারি দাম</button>
-<button id="atab-customers" onclick="showAdminTab('customers')">👥 কাস্টমার</button>
-<button id="atab-visitors" onclick="showAdminTab('visitors')">📊 ভিজিটর</button>
 <button id="atab-feedback" onclick="showAdminTab('feedback')">💬 অভিযোগ ও পরামর্শ</button>
+<button id="atab-visitors" onclick="showAdminTab('visitors')">📊 ভিজিটর</button></div>
+<div class="navsec">💰 টাকা</div>
+<div class="navrow"><button id="atab-profit" onclick="showAdminTab('profit')">💰 লাভ-লস</button>
+<button id="atab-analytics" onclick="showAdminTab('analytics')">📊 হিসাব</button></div>
+<div class="navsec">⚙️ সেটিংস</div>
+<div class="navrow"><button id="atab-settings" onclick="showAdminTab('settings')">⚙️ সেটিংস</button>
+<button id="atab-publish" onclick="showAdminTab('publish')">🚀 প্রকাশ</button></div>
 </div>
 
 <div id="admin-dashboard" class="adminbox">
@@ -293,7 +302,7 @@ section h2{color:#6d28d9}
 <b>💰 লাভের হার দিয়ে সব দাম একসাথে বসান</b><br>
 <label class="small">লাভের হার (%)</label>
 <input id="marginPct" type="number" min="0" placeholder="যেমন: ১০" style="width:120px;display:inline-block">
-<button class="gold" onclick="applyMargin()">সব পণ্যের খুচরা দাম বসান</button>
+<button class="gold" onclick="applyMargin(this)">সব পণ্যের খুচরা দাম বসান</button>
 <p class="small">পাইকারি দাম আছে এমন সব পণ্যের খুচরা দাম = পাইকারি × (১০০+হার)% হবে (নিকটতম টাকায়)। কোনো পণ্যের দাম আলাদা করে বদলাতে চাইলে নিচে তার ঘরে লিখুন — সেটা আলাদাই থাকবে।</p>
 </div>
 <div class="adminbox" style="margin-bottom:10px">
@@ -397,7 +406,7 @@ section h2{color:#6d28d9}
 <h3>🏪 পাইকারি দোকানদারের পাঠানো দাম</h3>
 <p class="small">দোকানদার দাম পাঠালে এখানে আসবে। <b>৪ ধাপে দাম ঠিক করুন:</b><br>১. নিচে প্রতিটা পণ্যের দাম দেখুন — 🟢 সবচেয়ে কম দাম সবুজে, 🔴 সবচেয়ে বেশি লালে চেনা যাবে। কোন দোকান কত ধরেছে, নামসহ দেখা যাবে।<br>২. যেটা নিতে চান, তার নিচে <b>খুচরা দাম</b> লিখুন — টাকায় লিখতে পারেন, বা <b>লাভের %</b> লিখতে পারেন (০% মানে কেনা দামে)। নিচের ছোট বোতামে ০/২/৪/৮/১০/১৩% এক চাপে বসে। তারপর <b>✅ এই দাম বসান</b> চাপুন — পাইকারি আর খুচরা দুটো দাম একসাথে বসবে।<br>৩. নিচে লাভের হার % লিখে <b>সব খুচরা দাম বসান</b> চাপুন — কাস্টমারের দাম হিসাব হয়ে যাবে।<br>৪. <b>🚀 প্রকাশ</b> ট্যাবে গিয়ে প্রকাশ করুন — তবেই কাস্টমার নতুন দাম দেখবে।</p>
 <p class="small">💬 দাম বেশি মনে হলে পাল্টা দাম পাঠান, 🧾 ক্রয় আদেশ বানিয়ে ছাপাতে পারেন, আর দোকানদারকে ⭐ রেটিং দিতে পারেন।</p>
-<div class="card" style="background:#eff6ff"><b>⚙️ পাইকারি থেকে খুচরা দাম বসান</b><div style="display:flex;gap:8px;margin-top:8px;align-items:center"><input id="marginPct3" type="number" min="0" placeholder="লাভের হার % (যেমন: ১০)" style="flex:1" onchange="syncRowPctInputs(parseFloat(this.value)||0)"><button class="gold" onclick="applyMargin3()">সব খুচরা দাম বসান</button></div><p class="small">খুচরা দাম = পাইকারি × (১০০+লাভ%) ÷ ১০০। যেমন: পাইকারি ৳১০০ আর লাভ ১০% হলে খুচরা ৳১১০। যাদের পাইকারি দাম নেই, তাদের দাম বদলাবে না।</p></div>
+<div class="card" style="background:#eff6ff"><b>⚙️ পাইকারি থেকে খুচরা দাম বসান</b><div style="display:flex;gap:8px;margin-top:8px;align-items:center"><input id="marginPct3" type="number" min="0" placeholder="লাভের হার % (যেমন: ১০)" style="flex:1" onchange="syncRowPctInputs(parseFloat(this.value)||0)"><button class="gold" onclick="applyMargin3(this)">সব খুচরা দাম বসান</button></div><p class="small">খুচরা দাম = পাইকারি × (১০০+লাভ%) ÷ ১০০। যেমন: পাইকারি ৳১০০ আর লাভ ১০% হলে খুচরা ৳১১০। যাদের পাইকারি দাম নেই, তাদের দাম বদলাবে না।</p></div>
 <button class="primary" onclick="loadSupplierPrices()">🔄 রিফ্রেশ করুন</button>
 <div id="supplierPrices"></div>
 <div id="lowStockPO"></div>
@@ -944,15 +953,45 @@ function findProdForItem(it, src){
   if(!p){ var nn2=normName(it.name); list.forEach(function(x){ if(x.name===nn2) p=x; }); }
   return p;
 }
+function bnStatusOf(st){ var m={"New Order":"নতুন অর্ডার","Contacted":"যোগাযোগ হয়েছে","Confirmed":"নিশ্চিত","Preparing":"তৈরি হচ্ছে","Out for Delivery":"ডেলিভারিতে","Delivered":"ডেলিভারি সম্পন্ন","Cancelled":"বাতিল"}; return m[st]||st||""; }
+function orderItemsText(items){
+  var m={};
+  (items||[]).forEach(function(it){
+    var nm=normName(it.name||"");
+    var k=nm+"|"+(it.brand||"")+"|"+(it.unit||"");
+    if(!m[k]) m[k]={name:nm, brand:it.brand||"", unit:it.unit||"", qty:0, total:0};
+    m[k].qty+=(+it.qty||0); m[k].total+=(+it.total||0);
+  });
+  return Object.keys(m).map(function(k){
+    var a=m[k];
+    var u=(a.unit||"").trim();
+    var qtxt;
+    if(/^[০-৯0-9]+$/.test(u)) qtxt=u;
+    else if(/গ্রাম|মিলি/.test(u)) qtxt=bn(Math.round(a.qty*100)/100)+" × "+u;
+    else qtxt=bn(Math.round(a.qty*100)/100)+" "+u;
+    return a.name+(a.brand?(" ("+a.brand+")"):"")+" — "+qtxt+(a.total?(" (৳"+bn(a.total)+")"):"");
+  }).join("<br>");
+}
 function orderProfit(o){
   if(o.bulk_total!=null && o.bulk_total!==""){ var sub=(o.subtotal!=null?+o.subtotal:+o.total); return Math.round(sub-(+o.bulk_total)); }
   var pr=0;
   (o.items||[]).forEach(function(it){
     var pp=findProdForItem(it, DRAFT) || findProdForItem(it, DATA);
     var w=pp?(pp.wholesale_price||0):0;
+    if(!pp || !w) return; // কেনা দাম জানা নেই — পুরো বিক্রি দামকে লাভ ধরা যাবে না
     pr+=(((it.price!=null?it.price:(pp?pp.price_taka:0))-w)*(+it.qty||0));
   });
   return Math.round(pr);
+}
+function orderProfitCovered(o){
+  var cov=0, tot=0;
+  (o.items||[]).forEach(function(it){
+    var pp=findProdForItem(it, DRAFT) || findProdForItem(it, DATA);
+    var w=pp?(pp.wholesale_price||0):0;
+    var line=(it.price!=null?it.price:(pp?pp.price_taka:0))*(+it.qty||0);
+    tot+=line; if(pp&&w) cov+=line;
+  });
+  return {covered:Math.round(cov), total:Math.round(tot)};
 }
 function openAdmin(){
   loadDraft(); mergeNewProducts(); mergeNewPackages(); fixOldRiceName(); repairMissingProducts(); ensureDailyOrder(); loadWholesale(); if(DRAFT){ recalcPackages(DRAFT); saveDraft(); }
@@ -1021,23 +1060,28 @@ window.addEventListener("popstate", function(e){
   else { showHome(); }
   __adInPop=false;
 });
-function showAdminTab(t){
+var __tabLastLoad={};
+function showAdminTab(t, force){
+  var isReTap=(t===curAdminTab);
   ["dashboard","products","daily","packages","settings","publish","orders","subs","profit","supplier","customers","visitors","feedback","analytics"].forEach(function(x){
     document.getElementById("admin-"+x).style.display=(x===t)?"block":"none";
     document.getElementById("atab-"+x).classList.toggle("on", x===t);
   });
-  if(t==="dashboard") loadDashboard();
-  if(t==="settings"){ loadCoupons(); loadBulkTiers(); }
+  var fresh=__tabLastLoad[t] && (Date.now()-__tabLastLoad[t])<60000;
+  var doLoad=force || isReTap || !fresh;
+  if(doLoad) __tabLastLoad[t]=Date.now();
+  if(t==="dashboard" && doLoad) loadDashboard();
+  if(t==="settings" && doLoad){ loadCoupons(); loadBulkTiers(); }
   if(t==="products") loadProductRatingsAdmin();
   if(t==="daily") renderDailyList();
-  if(t==="analytics") loadAnalytics();
-  if(t==="orders") loadAdminOrders();
-  if(t==="subs") loadSubs();
-  if(t==="profit") loadProfit();
-  if(t==="supplier"){ loadSupplierPrices(); loadSuppliers(); loadBulkPOs(); }
-  if(t==="customers") loadCustomers();
-  if(t==="visitors") loadVisitors();
-  if(t==="feedback") loadFeedback();
+  if(t==="analytics" && doLoad) loadAnalytics();
+  if(t==="orders" && doLoad) loadAdminOrders();
+  if(t==="subs" && doLoad) loadSubs();
+  if(t==="profit" && doLoad) loadProfit();
+  if(t==="supplier" && doLoad){ loadSupplierPrices(); loadSuppliers(); loadBulkPOs(); }
+  if(t==="customers" && doLoad) loadCustomers();
+  if(t==="visitors" && doLoad) loadVisitors();
+  if(t==="feedback" && doLoad) loadFeedback();
   if(t!==curAdminTab && !__adInPop) __adPush("tab", t);
   curAdminTab=t;
 }
@@ -1203,6 +1247,18 @@ async function deleteBulkTier(id){
   if(res.error){ alert("হয়নি: "+res.error.message); return; }
   loadBulkTiers();
 }
+function fbMsgCell(r){
+  var msg=r.message||"";
+  if(msg.length<=120) return esc(msg);
+  return '<span class="fbmsg">'+esc(msg.slice(0,120))+'…</span> <button class="ghost" onclick="toggleFbMsg(this,\''+r.id+'\')">আরও পড়ুন</button>';
+}
+function toggleFbMsg(btn, id){
+  var r=(window.__fbRows||{})[id]; if(!r) return;
+  var span=btn.parentElement.querySelector(".fbmsg");
+  if(!span) return;
+  if(btn.dataset.expanded){ span.textContent=(r.message||"").slice(0,120)+"…"; btn.textContent="আরও পড়ুন"; delete btn.dataset.expanded; }
+  else { span.textContent=r.message||""; btn.textContent="কম দেখান"; btn.dataset.expanded="1"; }
+}
 async function loadFeedback(){
   var el=document.getElementById("feedbackList"); if(!el) return;
   if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
@@ -1218,7 +1274,7 @@ async function loadFeedback(){
   el.innerHTML='<div class="statgrid"><div class="stat"><b>'+bn(rows.length)+'</b>টি বার্তা</div><div class="stat"><b>'+bn(nNew)+'</b>টি নতুন</div></div>'+rows.map(function(r){
     var d=new Date(r.created_at);
     var done=r.status==="done";
-    return '<div class="ordercard" style="'+(done?"opacity:.65":"")+'">'+(typeEmoji[r.type]||"💬")+' <b>'+esc(r.type||"মতামত")+'</b> '+(done?"✅ সমাধান হয়েছে":"🆕 নতুন")+'<br><b>'+esc(r.name||"কাস্টমার")+'</b> • 📱 <a href="tel:'+(r.phone||"")+'">'+(r.phone||"—")+'</a><br>'+esc(r.message||"")+'<br><span class="small">'+d.toLocaleString("bn-BD")+'</span><br>'+(done?"":'<button class="primary" onclick="markFeedbackDone(\''+r.id+'\')">✅ সমাধান হয়েছে</button> ')+(r.type==="নতুন পণ্য চাই"&&!done?'<button class="gold" onclick="addProductFromFeedback(\''+r.id+'\')">➕ পণ্য হিসেবে যোগ করুন</button> ':"")+'<button class="danger" onclick="delFeedback(this,\''+r.id+'\')">🗑️ মুছুন</button></div>';
+    return '<div class="ordercard" style="'+(done?"opacity:.65":"")+'">'+(typeEmoji[r.type]||"💬")+' <b>'+esc(r.type||"মতামত")+'</b> '+(done?"✅ সমাধান হয়েছে":"🆕 নতুন")+'<br><b>'+esc(r.name||"কাস্টমার")+'</b> • 📱 <a href="tel:'+(r.phone||"")+'">'+(r.phone||"—")+'</a><br>'+fbMsgCell(r)+'<br><span class="small">'+d.toLocaleString("bn-BD")+'</span><br>'+(done?"":'<button class="primary" onclick="markFeedbackDone(\''+r.id+'\')">✅ সমাধান হয়েছে</button> ')+(r.type==="নতুন পণ্য চাই"&&!done?'<button class="gold" onclick="addProductFromFeedback(\''+r.id+'\')">➕ পণ্য হিসেবে যোগ করুন</button> ':"")+'<button class="danger" onclick="delFeedback(this,\''+r.id+'\')">🗑️ মুছুন</button></div>';
   }).join("");
 }
 async function markFeedbackDone(id){
@@ -1261,7 +1317,8 @@ function togglePriceTools(){
   t.style.display=open?"none":"block";
   var b=document.getElementById("priceToolsBtn"); if(b) b.textContent=open?"⚙️ দামের সেটিংস দেখান":"⚙️ দামের সেটিংস লুকান";
 }
-function applyMargin(){
+function applyMargin(btn){
+  if(btn && !btn.dataset.armed){ btn.dataset.armed="1"; btn.dataset.origText=btn.textContent; btn.textContent="⚠️ নিশ্চিত? সব দাম বদলাবে"; setTimeout(function(){ if(btn.isConnected){ delete btn.dataset.armed; btn.textContent=btn.dataset.origText; } }, 5000); return; }
   var pct=parseFloat(document.getElementById("marginPct").value)||0;
   if(pct<=0){ alert("লাভের হার লিখুন — যেমন: ১০"); return; }
   var n=0;
@@ -1286,6 +1343,7 @@ function adminGroups(){
 }
 var priceListMode=false;
 function togglePriceList(){ priceListMode=!priceListMode; var b=document.getElementById("priceListBtn"); if(b) b.textContent=priceListMode?"📋 পণ্যের তালিকা":"💰 দামের তালিকা"; renderAdminProducts(); }
+var CAT_EMOJI={"চাল ও আটা":"🍚","তেল ও ঘি":"🫙","ডাল ও চিনি":"🫘","মসলা":"🌶️","সাবান ও পরিষ্কারক":"🧼","ব্যক্তিগত যত্ন":"🧴","চা ও পানীয়":"☕","দুধ ও দুগ্ধজাত":"🥛","শিশু খাদ্য":"🍼","নাস্তা":"🍪","ঘরোয়া সামগ্রী":"🏠","অন্যান্য":"🛒"};
 function renderAdminProducts(){
   if(priceListMode){ renderPriceList(); return; }
   var el=document.getElementById("adminProducts"); if(!el) return;
@@ -1305,7 +1363,7 @@ function renderAdminProducts(){
     return true;
   });
   var h='<div class="chips">'+["সব"].concat(CATS).map(function(c){ return '<button class="chip'+(adminProdCat===c?' on':'')+'" onclick="setAdminProdCat(\''+c+'\')">'+c+'</button>'; }).join("")+'</div>';
-  h+='<p class="small">মোট '+bn(groups.length)+'টি পণ্য • '+bn(DRAFT.products.length)+'টি ব্র্যান্ড — বদলাতে পণ্যের কার্ডে চাপ দিন।</p>';
+  h+='<p class="small">মোট '+bn(groups.length)+'টি পণ্য • '+bn(DRAFT.products.length)+'টি ব্র্যান্ড — বদলাতে পণ্যের কার্ডে চাপ দিন।'+((q||adminProdCat!=="সব")?(' এই তালিকায় '+bn(list.length)+'টি দেখাচ্ছে।'):"")+'</p>';
   var gidByName={}; groups.forEach(function(g){ gidByName[g.name]=g.gid; });
   var lowStock=DRAFT.products.filter(function(p){ return (p.stock_qty||0)>0 && (p.stock_qty||0)<=5; });
   if(lowStock.length){
@@ -1314,8 +1372,8 @@ function renderAdminProducts(){
     }).join("")+'</div>';
   }
   h+=list.map(function(g){
-    var brands=g.vars.map(function(v){ var b=(v.brand||"").trim(); return '<div class="brandrow">'+(b?'<span class="bname">'+esc(b)+'</span>':'<span class="bunit">/ '+esc(v.unit||"")+'</span>')+'<span class="bprices"><span class="pr">খুচরা ৳'+bn(v.price_taka||0)+'</span><span class="pw">পাইকারি ৳'+bn(v.wholesale_price||0)+'</span></span></div>'; }).join("");
-    return '<div class="pcard" onclick="openGroupEdit('+g.gid+')"><div><b>'+esc(g.name)+'</b>'+(g.vars.some(function(v){ return v.special; })?' ⭐':'')+(isDailyGid(g.gid)?' 🌅':'')+'<span class="pcat">'+esc(g.category)+'</span></div><div class="pbrands">'+brands+'</div><div class="pacts"><button class="primary" onclick="event.stopPropagation();openGroupEdit('+g.gid+')">✏️ বদলান</button><button class="ghost" onclick="event.stopPropagation();moveGroup('+g.gid+',-1)">↑ ওপরে</button><button class="ghost" onclick="event.stopPropagation();moveGroup('+g.gid+',1)">↓ নিচে</button></div></div>';
+    var brands=g.vars.map(function(v){ var b=(v.brand||"").trim(); return '<div class="brandrow">'+(b?'<span class="bname">'+esc(b)+'</span>':'<span class="bunit">ব্র্যান্ড ছাড়া • '+esc(v.unit||"")+'</span>')+'<span class="bprices"><span class="pr">খুচরা ৳'+bn(v.price_taka||0)+'</span><span class="pw">পাইকারি ৳'+bn(v.wholesale_price||0)+'</span></span></div>'; }).join("");
+    return '<div class="pcard" onclick="openGroupEdit('+g.gid+')"><div>'+(CAT_EMOJI[g.category]||"🛒")+' <b>'+esc(g.name)+'</b>'+(g.vars.some(function(v){ return v.special; })?' ⭐':'')+(isDailyGid(g.gid)?' 🌅':'')+' <span class="pcat">• '+esc(g.category)+'</span></div><div class="pbrands">'+brands+'</div><div class="pacts"><button class="primary" onclick="event.stopPropagation();openGroupEdit('+g.gid+')">✏️ বদলান</button><button class="ghost" onclick="event.stopPropagation();moveGroup('+g.gid+',-1)">↑ ওপরে</button><button class="ghost" onclick="event.stopPropagation();moveGroup('+g.gid+',1)">↓ নিচে</button></div></div>';
   }).join("")||"<p>কোনো পণ্য পাওয়া যায়নি।</p>";
   el.innerHTML=h;
 }
@@ -1360,7 +1418,8 @@ function applyMargin2(){
   recalcPackages(DRAFT); saveDraft(); renderAdminProducts(); renderAdminPackages();
   alert("হয়ে গেছে — "+bn(n)+"টি পণ্যের খুচরা দাম বসানো হয়েছে ("+bn(pct)+"% লাভে)। যাদের পাইকারি দাম নেই, তাদের দাম বদলায়নি। প্রকাশ করলে কাস্টমার নতুন দাম দেখবে।");
 }
-function applyMargin3(){
+function applyMargin3(btn){
+  if(btn && !btn.dataset.armed){ btn.dataset.armed="1"; btn.dataset.origText=btn.textContent; btn.textContent="⚠️ নিশ্চিত? সব দাম বদলাবে"; setTimeout(function(){ if(btn.isConnected){ delete btn.dataset.armed; btn.textContent=btn.dataset.origText; } }, 5000); return; }
   var pct=parseFloat(document.getElementById("marginPct3").value)||0;
   if(pct<=0){ alert("লাভের হার লিখুন — যেমন: ১০"); return; }
   var n=0;
@@ -1588,9 +1647,11 @@ function moveProduct(id,d){
   var t=DRAFT.products[i]; DRAFT.products[i]=DRAFT.products[j]; DRAFT.products[j]=t;
   saveDraft(); renderAdminProducts();
 }
+function markWsManual(id, val){ try{ var m=JSON.parse(localStorage.getItem("mb-ws-manual")||"{}"); m[id]=val; localStorage.setItem("mb-ws-manual", JSON.stringify(m)); }catch(e){} }
 function editProduct(id, field, val){
   DRAFT.products.forEach(function(p){ if(p.id===id){ p[field]=(field==="price_taka"||field==="wholesale_price"||field==="stock_qty")?(parseInt(val,10)||0):val; } });
-  recalcPackages(DRAFT); saveDraft(); renderAdminPackages();
+  recalcPackages(DRAFT); if(field==="wholesale_price") markWsManual(id, +val||0);
+  saveDraft(); renderAdminPackages();
 }
 var pendingDelId=null, pendingDelTimer=null;
 function delProduct(id){
@@ -1625,6 +1686,7 @@ function togglePkgItemActiveById(pkgId, prodId){
   DRAFT.packages.forEach(function(pkg){ if(pkg.id!==pkgId) return; pkg.items.forEach(function(it){ if(it.product_id===prodId) it.active = (it.active===false)? true : false; }); });
   recalcPackages(DRAFT); saveDraft(); renderAdminPackages();
 }
+function savePkgNow(btn){ saveDraft(); if(btn){ var t=btn.textContent; btn.textContent="✅ সংরক্ষণ হয়েছে"; setTimeout(function(){ btn.textContent=t; }, 2500); } }
 function renderAdminPackages(){
   var el=document.getElementById("adminPackages");
   if(openPkgId===null){
@@ -1638,6 +1700,7 @@ function renderAdminPackages(){
   var pkg=null; DRAFT.packages.forEach(function(p){ if(p.id===openPkgId) pkg=p; });
   if(!pkg){ openPkgId=null; renderAdminPackages(); return; }
   el.innerHTML='<button class="ghost" onclick="closeAdminPackage()">← সব প্যাকেজ</button>'
+    +'<button class="primary" style="width:100%;margin:8px 0" onclick="savePkgNow(this)">💾 সংরক্ষণ করুন</button>'
     +'<div class="pkg"><label>প্যাকেজের নাম</label><input value="'+pkg.name.replace(/"/g,"&quot;")+'" onchange="editPackage('+pkg.id+',\'name\',this.value)"><label>ট্যাগলাইন</label><input value="'+(pkg.tagline||"").replace(/"/g,"&quot;")+'" onchange="editPackage('+pkg.id+',\'tagline\',this.value)">'
     +'<label>ধরন</label><select onchange="editPkgKind('+pkg.id+',this.value)"><option value="family"'+(pkg.kind!=="occasion"&&pkg.kind!=="expat"?" selected":"")+'>পরিবার প্যাকেজ</option><option value="occasion"'+(pkg.kind==="occasion"?" selected":"")+'>অনুষ্ঠানের প্যাকেজ (বিয়ে/সিন্নি)</option><option value="expat"'+(pkg.kind==="expat"?" selected":"")+'>প্রবাসী পরিবার</option></select>'
     +'<div'+(pkg.kind==="family"||!pkg.kind?' style="display:none"':"")+'>'
@@ -1650,7 +1713,7 @@ function renderAdminPackages(){
     +'</div>'
     +'<div>'+pkg.items.map(function(it,idx){
         var inactive = it.active===false;
-        return '<div class="listrow"'+(inactive?' style="opacity:.55;background:#f3f4f6"':'')+'><div class="n"><b>'+it.name+'</b> <span style="color:#666">(৳'+bn(it.line_total_taka||0)+')</span>'+(inactive?' <span class="badge rejected">নিস্ক্রিয়</span>':'')+'</div><input style="width:90px" value="'+it.qty_label+'" onchange="editPkgItemQty('+pkg.id+','+idx+',this.value)"><button class="ghost" onclick="togglePkgItemActive('+pkg.id+','+idx+')">'+(inactive?'সক্রিয় করুন':'নিস্ক্রিয়')+'</button><button class="danger" onclick="delPkgItem('+pkg.id+','+idx+')">✕</button></div>';
+        return '<div class="listrow"'+(inactive?' style="opacity:.55;background:#f3f4f6"':'')+'><div class="n"><b>'+it.name+'</b> <span style="color:#666">(৳'+bn(it.line_total_taka||0)+')</span>'+(inactive?' <span class="badge rejected">নিস্ক্রিয়</span>':'')+'</div><input style="width:90px" value="'+it.qty_label+'" onchange="editPkgItemQty('+pkg.id+','+idx+',this.value)"><button class="ghost" onclick="togglePkgItemActive('+pkg.id+','+idx+')">'+(inactive?'▶️ সক্রিয় করুন':'⏸️ নিস্ক্রিয় করুন')+'</button><button class="danger" onclick="delPkgItem('+pkg.id+','+idx+',this)">✕</button></div>';
       }).join("")+'</div>'
     +'<button class="ghost" onclick="togglePkgPicker('+pkg.id+')">➕ পণ্য যোগ করুন (সব পণ্যের তালিকা)</button><div id="pkgPicker'+pkg.id+'">'+(pkgPickerId===pkg.id?renderPkgPicker(pkg.id):"")+'</div>'
     +'<p class="total">আনুমানিক মোট: ৳'+bn(pkgTotal(pkg))+'</p>'
@@ -1677,7 +1740,7 @@ function editPkgItemQty(pkgId, idx, label){
   });
   recalcPackages(DRAFT); saveDraft(); renderAdminPackages();
 }
-function delPkgItem(pkgId, idx){ DRAFT.packages.forEach(function(pkg){ if(pkg.id===pkgId) pkg.items.splice(idx,1); }); recalcPackages(DRAFT); saveDraft(); renderAdminPackages(); }
+function delPkgItem(pkgId, idx, btn){ if(btn && !btn.dataset.armed){ btn.dataset.armed="1"; btn.textContent="নিশ্চিত?"; setTimeout(function(){ if(btn.isConnected){ delete btn.dataset.armed; btn.textContent="✕"; } }, 5000); return; } DRAFT.packages.forEach(function(pkg){ if(pkg.id===pkgId) pkg.items.splice(idx,1); }); recalcPackages(DRAFT); saveDraft(); renderAdminPackages(); }
 var pkgPickerId=null;
 function togglePkgPicker(pkgId){ pkgPickerId=(pkgPickerId===pkgId)?null:pkgId; renderAdminPackages(); }
 function renderPkgPicker(pkgId){
@@ -1766,7 +1829,8 @@ async function loadWholesale(){
   if(res.error || !res.data) return;
   var map={}; res.data.forEach(function(r){ map[r.id]=r.wholesale_price||0; });
   DATA.products.forEach(function(p){ if(map[p.id]!==undefined) p.wholesale_price=map[p.id]; });
-  if(DRAFT) DRAFT.products.forEach(function(p){ if(map[p.id]!==undefined && !p.wholesale_price) p.wholesale_price=map[p.id]; });
+  var manual={}; try{ manual=JSON.parse(localStorage.getItem("mb-ws-manual")||"{}"); }catch(e){ manual={}; }
+  if(DRAFT) DRAFT.products.forEach(function(p){ if(map[p.id]!==undefined && manual[p.id]===undefined) p.wholesale_price=map[p.id]; });
 }
 var adminOrdersById={};
 var adminOrderCount=null;
@@ -1867,8 +1931,8 @@ async function loadAdminOrders(){
     if(["Confirmed","Preparing","Out for Delivery"].indexOf(o.status)>=0){
       onMyWay=' <a class="primary" style="display:inline-block;padding:8px 12px;text-decoration:none" href="https://wa.me/'+ph2+'?text='+encodeURIComponent("আসসালামু আলাইকুম "+(o.customer_name||"")+"! আপনার অর্ডার ("+o.order_no+") রওনা হয়েছে, শীঘ্রই পৌঁছাবে। — মাসিক বাজার")+'" target="_blank">🛵 পথে আছি</a>';
     }
-    var payLine='<br><span class="small">💰 পেমেন্ট: '+esc(o.payment_method||"ক্যাশ অন ডেলিভারি")+' ('+((o.payment_status||"unpaid")==="paid"?"পাওয়া গেছে":"বাকি")+')</span> <button class="ghost" onclick="togglePaymentStatus(\''+o.id+'\')">'+((o.payment_status||"unpaid")==="paid"?"↩️ বাকি করুন":"✅ টাকা পাওয়া গেছে")+'</button>';
-    return '<div class="ordercard"><b>'+o.order_no+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br>'+(o.customer_name||"")+' • '+(o.phone||"")+(o.address?('<br>ঠিকানা: '+esc(o.address)):'')+(o.delivery_day?('<br><span class="small">🚚 ডেলিভারি: '+esc(o.delivery_day)+', '+esc(o.delivery_slot||"")+'</span>'):'')+'<br>'+(o.items||[]).map(function(it){ return it.name+' — '+bn(it.qty)+' '+(it.unit||""); }).join("<br>")+'<br><b>মোট: ৳'+bn(o.total)+' • লাভ: ৳'+bn(orderProfit(o))+'</b>'+(o.bulk_total?('<br><span class="small">📦 বাল্ক কেনা: ৳'+bn(o.bulk_total)+'</span>'):"")+payLine+'<br><label>স্ট্যাটাস</label><select onchange="setAdminOrderStatus(\''+o.id+'\',this.value)">'+statuses.map(function(s){ return '<option value="'+s+'" '+(s===o.status?'selected':'')+'>'+bnStatus[s]+'</option>'; }).join("")+'</select><br><button class="gold" onclick="openMemo(\''+o.id+'\')">🧾 ক্যাশ মেমো</button> <button class="primary" onclick="openBulkSend(\''+o.id+'\')">📤 পাইকারিকে পাঠান</button>'+onMyWay+'</div>';
+    var payLine='<br><span class="small">💰 পেমেন্ট: '+esc(o.payment_method||"ক্যাশ অন ডেলিভারি")+' ('+((o.payment_status||"unpaid")==="paid"?"পাওয়া গেছে":"বাকি")+')</span> <button class="ghost" onclick="togglePaymentStatus(\''+o.id+'\')">'+((o.payment_status||"unpaid")==="paid"?"↩️ বাকি করুন":"💰 টাকা পেয়েছি — চাপ দিন")+'</button>';
+    return '<div class="ordercard"><b>'+o.order_no+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br>'+(o.customer_name||"")+' • '+(o.phone||"")+(o.address?('<br>ঠিকানা: '+esc(o.address)):'')+(o.delivery_day?('<br><span class="small">🚚 ডেলিভারি: '+esc(o.delivery_day)+', '+esc(o.delivery_slot||"")+'</span>'):'')+'<br>'+orderItemsText(o.items)+'<br><b>মোট: ৳'+bn(o.total)+' • লাভ: ৳'+bn(orderProfit(o))+'</b>'+(o.bulk_total?('<br><span class="small">📦 বাল্ক কেনা: ৳'+bn(o.bulk_total)+'</span>'):"")+payLine+'<br><label>স্ট্যাটাস</label><select onchange="setAdminOrderStatus(\''+o.id+'\',this.value)">'+statuses.map(function(s){ return '<option value="'+s+'" '+(s===o.status?'selected':'')+'>'+bnStatus[s]+'</option>'; }).join("")+'</select><br><button class="gold" onclick="openMemo(\''+o.id+'\')">🧾 ক্যাশ মেমো</button> <button class="primary" onclick="openBulkSend(\''+o.id+'\')">📤 পাইকারিকে পাঠান</button>'+onMyWay+'</div>';
   }).join("");
 }
 async function setAdminOrderStatus(id, status){
@@ -1935,7 +1999,8 @@ async function loadProfit(){
   var sales=0, profit=0, byDay={};
   rows.forEach(function(o){ var op=orderProfit(o); sales+=o.total||0; profit+=op; var day=new Date(o.created_at).toLocaleDateString("bn-BD"); if(!byDay[day]) byDay[day]={sales:0,profit:0,n:0}; byDay[day].sales+=o.total||0; byDay[day].profit+=op; byDay[day].n++; });
   var days=Object.keys(byDay).slice(-14).reverse();
-  el.innerHTML='<div class="statgrid"><div class="stat"><b>'+bn(rows.length)+'</b>টি অর্ডার</div><div class="stat"><b>৳'+bn(sales)+'</b>মোট বিক্রি</div><div class="stat"><b>৳'+bn(profit)+'</b>মোট লাভ</div></div>'+days.map(function(d){ return '<div class="listrow"><div class="n"><b>'+d+'</b> — '+bn(byDay[d].n)+'টি অর্ডার</div><b>বিক্রি ৳'+bn(byDay[d].sales)+' • লাভ ৳'+bn(byDay[d].profit)+'</b></div>'; }).join("");
+  var covT=0, covC=0; rows.forEach(function(o){ var cc=orderProfitCovered(o); covT+=cc.total; covC+=cc.covered; });
+  el.innerHTML='<div class="statgrid"><div class="stat"><b>'+bn(rows.length)+'</b>টি অর্ডার</div><div class="stat"><b>৳'+bn(sales)+'</b>মোট বিক্রি</div><div class="stat"><b>৳'+bn(profit)+'</b>মোট লাভ</div></div><p class="small">💡 লাভ শুধু জানা কেনা দামের ওপর হিসাব করা হয়েছে — ৳'+bn(covT)+' বিক্রির মধ্যে ৳'+bn(covC)+'-এর কেনা দাম জানা আছে। যেসব পণ্যের কেনা দাম বসানো হয়নি, সেগুলো লাভে ধরা হয়নি।</p>'+days.map(function(d){ return '<div class="listrow"><div class="n"><b>'+d+'</b> — '+bn(byDay[d].n)+'টি অর্ডার</div><b>বিক্রি ৳'+bn(byDay[d].sales)+' • লাভ ৳'+bn(byDay[d].profit)+'</b></div>'; }).join("");
 }
 async function loadProductRatingsAdmin(){
   var el=document.getElementById("prodRatings"); if(!el) return;
@@ -1971,8 +2036,8 @@ async function loadAnalytics(){
   live.forEach(function(o){ (o.items||[]).forEach(function(it){ var k=normName(it.name)+((it.brand)?(" ("+it.brand+")"):""); if(!byProd[k]) byProd[k]={qty:0,total:0}; byProd[k].qty+=+it.qty||0; byProd[k].total+=+it.total||0; }); });
   var top=Object.keys(byProd).map(function(k){ return {name:k, qty:byProd[k].qty, total:byProd[k].total}; }).sort(function(a,b){ return b.qty-a.qty; }).slice(0,10);
   var byCat={};
-  live.forEach(function(o){ (o.items||[]).forEach(function(it){ var c="—"; DATA.products.forEach(function(p){ if(p.name===normName(it.name)) c=p.category||"—"; }); if(!byCat[c]) byCat[c]=0; byCat[c]+= +it.total||0; }); });
-  var cats=Object.keys(byCat).filter(function(c){ return !(c==="—"&&!byCat[c]); }).sort(function(a,b){ return byCat[b]-byCat[a]; });
+  live.forEach(function(o){ (o.items||[]).forEach(function(it){ var c="অন্যান্য"; DATA.products.forEach(function(p){ if(p.name===normName(it.name)) c=p.category||"অন্যান্য"; }); if(!byCat[c]) byCat[c]=0; byCat[c]+= +it.total||0; }); });
+  var cats=Object.keys(byCat).filter(function(c){ return !(c==="অন্যান্য"&&!byCat[c]); }).sort(function(a,b){ return byCat[b]-byCat[a]; });
   el.innerHTML='<div class="statgrid"><div class="stat"><b>'+bn(live.length)+'</b>টি অর্ডার</div><div class="stat"><b>৳'+bn(sales)+'</b>মোট বিক্রি</div><div class="stat"><b>৳'+bn(profit)+'</b>মোট লাভ</div><div class="stat"><b>৳'+bn(live.length?Math.round(sales/live.length):0)+'</b>গড় অর্ডার</div><div class="stat"><b>'+bn(del.length)+'</b>টি ডেলিভারি সম্পন্ন</div><div class="stat"><b>'+bn(unpaid.length)+'</b>টি পেমেন্ট বাকি</div></div>'
     +'<h3 style="margin-top:14px">📅 শেষ ১৪ দিন</h3>'+days.map(function(d){ return '<div class="listrow"><div class="n"><b>'+d+'</b> — '+bn(byDay[d].n)+'টি অর্ডার</div><b>৳'+bn(byDay[d].sales)+'</b></div>'; }).join("")
     +'<h3 style="margin-top:14px">🏆 সবচেয়ে বেশি বিক্রি হওয়া পণ্য</h3>'+top.map(function(t){ return '<div class="listrow"><div class="n">'+esc(t.name)+'</div><b>'+bn(t.qty)+' • ৳'+bn(t.total)+'</b></div>'; }).join("")
@@ -2086,6 +2151,7 @@ async function loadSupplierPrices(){
 }
 async function applySupplierPrice(id, productId, productName, brand, unit, price){
   if(!sb) return;
+  clearWsManual(productId);
   if(productId){
     var upd={};
     if(price>0) upd.wholesale_price=price;
@@ -2128,6 +2194,7 @@ function syncRowPctInputs(pct){
 }
 async function applyRowPrices(id, productId, productName, brand, unit, wsPrice){
   if(!sb) return;
+  clearWsManual(productId);
   var ri=document.getElementById("rt-"+id), pi=document.getElementById("rp-"+id);
   var rt=ri? (parseFloat(ri.value)||0) : 0;
   var pct=pi? (parseFloat(pi.value)||0) : 0;
@@ -2349,7 +2416,7 @@ async function openCustomerCard(phone, name){
     +'<div class="ordercard"><h3 style="margin:0">📇 '+esc(name||"কাস্টমার")+'</h3>📱 <a href="tel:'+phone+'">'+phone+'</a><br>মোট অর্ডার: <b>'+bn(ords.length)+'</b>টি • মোট খরচ: <b>৳'+bn(total)+'</b> • ⭐ পয়েন্ট: <b>'+bn(pts)+'</b><br>শেষ অর্ডার: '+(ords[0]?new Date(ords[0].created_at).toLocaleDateString("bn-BD"):"—")
     +(subs.length?('<br>📅 সাবস্ক্রিপশন: <b>'+subs.map(function(s){ return s.package_name+" ("+s.delivery_day+")"; }).join(", ")+'</b>'):"<br>📅 সাবস্ক্রিপশন নেই")
     +'<br><a class="primary" style="display:inline-block;padding:8px 12px;text-decoration:none" href="'+wa+'" target="_blank">💬 WhatsApp</a></div>'
-    +(ords.length?('<h3 style="margin-top:14px">📋 অর্ডারের তালিকা</h3>'+ords.map(function(o){ var d=new Date(o.created_at); return '<div class="ordercard"><b>'+o.order_no+'</b> — '+d.toLocaleDateString("bn-BD")+'<br>'+(o.items||[]).map(function(it){ return it.name+' — '+bn(it.qty)+' '+(it.unit||""); }).join("<br>")+'<br><b>মোট: ৳'+bn(o.total)+'</b> • '+(o.status||"")+'</div>'; }).join("")):"<p>এখনো কোনো অর্ডার করেননি।</p>");
+    +(ords.length?('<h3 style="margin-top:14px">📋 অর্ডারের তালিকা</h3>'+ords.map(function(o){ var d=new Date(o.created_at); return '<div class="ordercard"><b>'+o.order_no+'</b> — '+d.toLocaleDateString("bn-BD")+'<br>'+orderItemsText(o.items)+'<br><b>মোট: ৳'+bn(o.total)+'</b> • '+bnStatusOf(o.status)+'</div>'; }).join("")):"<p>এখনো কোনো অর্ডার করেননি।</p>");
 }
 async function loadVisitors(){
   var el=document.getElementById("visitorBox"); if(!el) return;
@@ -2377,6 +2444,7 @@ async function rejectSupplierPrice(id){
   await sb.from("supplier_prices").update({status:"rejected"}).eq("id", id);
   loadSupplierPrices();
 }
+function clearWsManual(id){ try{ if(id===undefined){ localStorage.removeItem("mb-ws-manual"); } else { var m=JSON.parse(localStorage.getItem("mb-ws-manual")||"{}"); delete m[id]; localStorage.setItem("mb-ws-manual", JSON.stringify(m)); } }catch(e){} }
 async function pushWholesaleToSupabase(src){
   if(!sb) return;
   var srcD=src||DRAFT; if(!srcD) return;
@@ -2384,6 +2452,7 @@ async function pushWholesaleToSupabase(src){
   for(var i=0;i<rows.length;i+=50){
     await sb.from("products").upsert(rows.slice(i,i+50), {onConflict:"id"});
   }
+  clearWsManual();
 }
 
 function showSetup(){
