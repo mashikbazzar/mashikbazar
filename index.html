@@ -189,15 +189,17 @@ input,textarea,select{width:100%;padding:11px;font-size:16px;border:1px solid #9
 .pkgrow .ptrash{flex:none;width:24px;height:24px;border:0;background:none;font-size:16px;color:#9ca3af;cursor:pointer;padding:0}
 .pkgnamefull{position:absolute;top:64px;left:30px;z-index:20;background:#111827;color:#fff;font-size:14px;font-weight:600;padding:8px 12px;border-radius:10px;max-width:280px;white-space:normal;line-height:1.5;box-shadow:0 4px 16px rgba(0,0,0,.25)}
 .pkgconfirm{padding:10px;background:#fef3c7;border-radius:10px;margin:6px 0;font-size:14px}
-.cartrow{display:flex;align-items:center;gap:8px;height:64px;border-bottom:1px solid #f3f4f6;position:relative}
+.cartrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;height:auto;min-height:64px;padding:8px 0;border-bottom:1px solid #f3f4f6;position:relative}
 .cartrow .psno{flex:none;width:26px;font-size:15px;font-weight:700;color:#374151;text-align:center}
-.cartrow .pmid{flex:1;min-width:0}
+.cartrow .pmid{flex:1 1 calc(100% - 34px);min-width:0;overflow:hidden}
 .cartrow .cname1{display:flex;align-items:center;gap:6px}
 .cartrow .pname{display:block;font-weight:600;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
 .cartrow .cname1 .pname{flex:1;min-width:0}
 .cartrow .cbrand{flex:none;font-size:12px;color:#6b7280;white-space:nowrap}
 .cartrow .cname1 select{max-width:100px!important;padding:2px 4px!important;font-size:12px!important}
 .cartrow .pqty{font-size:13px;color:#6b7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cartrow .pkgstep{margin-left:auto}
+.cartrow .pkgnamefull{top:100%}
 #tab-cart .cartrow .pkgstep input{width:40px;height:26px;text-align:center;padding:0 2px;font-size:14px;font-weight:700;color:#111827;border:0;background:transparent}
 .cartrow .ltotal{flex:none;width:62px;text-align:right;font-weight:700;font-size:15px}
 .cartrow .ptrash{flex:none;width:24px;height:24px;border:0;background:none;font-size:16px;color:#9ca3af;cursor:pointer;padding:0}
@@ -389,7 +391,7 @@ footer{text-align:center;color:#6b7280;padding:16px 16px 90px;font-size:13px}
 <button id="nav-orders" onclick="showTab('orders')"><span class="navic">📋</span><span class="navlb">আমার অর্ডার</span></button>
 </nav>
 
-<footer>পুরো মাসের বাজার একসাথে আপনার দরজায়<br><b id="footCounts" style="color:#374151">🛒 ২৬০টি পণ্য • ৪২৩টি ব্র্যান্ড</b><br>মাসিক বাজার • নীড়<br>WhatsApp: 01631421995 • অর্ডার যাবে WhatsApp-এ</footer>
+<footer>পুরো মাসের বাজার একসাথে আপনার দরজায়<br><b id="footCounts" style="color:#374151">🛒 ২৬০টি পণ্য • ৪২৩টি ব্র্যান্ড</b><br>মাসিক বাজার • নীড়<br>WhatsApp: 01631421995 • অর্ডার যাবে WhatsApp-এ<br>© ২০২৬ নীড় / মাসিক বাজার — সর্বস্বত্ব সংরক্ষিত</footer>
 
 <script>
 var SB_URL="https://iucgavgdpbvjnxmnuqce.supabase.co";
@@ -412,6 +414,14 @@ function code(){ if(!localStorage.getItem("mb-code")) localStorage.setItem("mb-c
 function getCustomer(){ try{ return JSON.parse(localStorage.getItem("mb-customer")||"null"); }catch(e){ return null; } }
 function canSeePrices(){ return (DATA.show_prices!==false); }
 function setCustomer(c){ if(c) localStorage.setItem("mb-customer", JSON.stringify(c)); else localStorage.removeItem("mb-customer"); }
+/* ---- v64: RPC session (RLS lockdown — no direct table access) ---- */
+function getSessionToken(){ try{ return localStorage.getItem("mb-session-token")||""; }catch(e){ return ""; } }
+function setSessionToken(t){ try{ if(t) localStorage.setItem("mb-session-token", t); else localStorage.removeItem("mb-session-token"); }catch(e){} }
+function rpcData(res){ var d=res&&res.data; if(Array.isArray(d)) return d[0]||null; return d||null; }
+function rpcList(res){ var d=res&&res.data; if(Array.isArray(d)) return d; if(d&&Array.isArray(d.rows)) return d.rows; if(d&&Array.isArray(d.orders)) return d.orders; if(d&&Array.isArray(d.subscriptions)) return d.subscriptions; if(d&&Array.isArray(d.tiers)) return d.tiers; return []; }
+function rpcStatus(d){ if(!d) return ""; return d.status||d.result||(d.ok===true?"ok":"")||""; }
+function rpcInvalidToken(res){ var d=res&&res.data; if(d&&!Array.isArray(d)&&(d.status==="invalid_token"||d.result==="invalid_token")) return true; if(res&&res.error&&/invalid_token/i.test(res.error.message||"")) return true; return false; }
+function onInvalidToken(){ setSessionToken(""); setCustomer(null); renderCustomerBox(); renderMyOrders(); }
 async function sha256hex(str){ try{ var b=await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str)); return Array.from(new Uint8Array(b)).map(function(x){ return ("0"+x.toString(16)).slice(-2); }).join(""); }catch(e){ var h=0; for(var i=0;i<str.length;i++){ h=((h<<5)-h+str.charCodeAt(i))|0; } return "h"+h; } }
 function renderCustomerBox(){
   var box=document.getElementById("customerBox"); if(!box) return;
@@ -433,20 +443,16 @@ async function customerLogin(){
   if(!sb){ msg.textContent="ইন্টারনেট সংযোগ পাওয়া যাচ্ছে না — পরে আবার চেষ্টা করুন।"; return; }
   msg.textContent="হচ্ছে…";
   var isEmail=idv.indexOf("@")>=0;
-  var q=sb.from("customers").select("*").limit(1);
-  var res = isEmail ? await q.eq("email", idv) : await q.eq("phone", idv);
-  if(res.error){ msg.textContent="হয়নি: "+res.error.message; return; }
   var hash=await sha256hex(idv+"|"+pass);
-  var row=(res.data||[])[0];
-  if(row){
-    if(row.password_hash!==hash){ msg.textContent="পাসওয়ার্ড মিলছে না। আবার চেষ্টা করুন।"; return; }
-    await sb.from("customers").update({last_seen:new Date().toISOString()}).eq("id", row.id);
-    setCustomer({id:row.id, name:row.name, phone:row.phone, email:row.email});
-    msg.textContent="লগইন হয়েছে।";
-  } else {
-    msg.textContent="এই নম্বর/ই-মেইলে কোনো অ্যাকাউন্ট পাওয়া যায়নি। নম্বরটি ঠিক আছে কি না দেখুন, অথবা নতুন অ্যাকাউন্ট খুলুন।";
-    return;
-  }
+  var res;
+  try{ res=await sb.rpc("customer_login_verify", {p_login:idv, p_password_hash:hash}); }catch(e){ msg.textContent="হয়নি: "+(e&&e.message?e.message:"আবার চেষ্টা করুন।"); return; }
+  if(res.error){ msg.textContent="হয়নি: "+res.error.message; return; }
+  var d=rpcData(res); var st=rpcStatus(d);
+  if(st==="not_found"){ msg.textContent="অ্যাকাউন্ট পাওয়া যায়নি — নতুন অ্যাকাউন্ট খুলবেন?"; return; }
+  if(st==="wrong" || !d || !d.session_token){ msg.textContent="পাসওয়ার্ড মিলছে না। আবার চেষ্টা করুন।"; return; }
+  setSessionToken(d.session_token||d.token||"");
+  setCustomer({id:d.customer_id||d.id||null, name:d.name||name||"কাস্টমার", phone:d.phone||(isEmail?"":idv), email:d.email||(isEmail?idv:"")});
+  msg.textContent="লগইন হয়েছে।";
   renderCustomerBox(); renderMyOrders(); usualsLoaded=false; renderShop(); renderCart();
 }
 async function customerRegister(){
@@ -458,22 +464,28 @@ async function customerRegister(){
   if(!sb){ msg.textContent="ইন্টারনেট সংযোগ পাওয়া যাচ্ছে না — পরে আবার চেষ্টা করুন।"; return; }
   msg.textContent="হচ্ছে…";
   var isEmail=idv.indexOf("@")>=0;
-  var q=sb.from("customers").select("*").limit(1);
-  var res = isEmail ? await q.eq("email", idv) : await q.eq("phone", idv);
-  if(res.error){ msg.textContent="হয়নি: "+res.error.message; return; }
-  if((res.data||[]).length){ msg.textContent="এই নম্বর/ই-মেইলে অ্যাকাউন্ট আছে — লগইন করুন।"; return; }
   var hash=await sha256hex(idv+"|"+pass);
-  var ins=await sb.from("customers").insert([{name:name||"কাস্টমার", phone:isEmail?"":idv, email:isEmail?idv:"", password_hash:hash, last_seen:new Date().toISOString()}]);
-  if(ins.error){ msg.textContent="নিবন্ধন হয়নি: "+ins.error.message; return; }
-  setCustomer({name:name||"কাস্টমার", phone:isEmail?"":idv, email:isEmail?idv:""});
+  var res;
+  try{ res=await sb.rpc("customer_register", {p_name:name||"কাস্টমার", p_phone:isEmail?"":idv, p_email:isEmail?idv:"", p_password_hash:hash}); }catch(e){ msg.textContent="নিবন্ধন হয়নি: "+(e&&e.message?e.message:"আবার চেষ্টা করুন।"); return; }
+  if(res.error){ msg.textContent="নিবন্ধন হয়নি: "+res.error.message; return; }
+  var d=rpcData(res); var st=rpcStatus(d);
+  if(st==="exists"){ msg.textContent="এই নম্বর/ই-মেইলে অ্যাকাউন্ট আছে — লগইন করুন।"; return; }
+  if(st==="invalid_phone"){ msg.textContent="সঠিক মোবাইল নম্বর (01XXXXXXXXX) বা ই-মেইল দিন।"; return; }
+  if(st!=="ok" || !d || !d.session_token){ msg.textContent="নিবন্ধন হয়নি — আবার চেষ্টা করুন।"; return; }
+  setSessionToken(d.session_token||d.token||"");
+  setCustomer({id:d.customer_id||d.id||null, name:name||"কাস্টমার", phone:isEmail?"":idv, email:isEmail?idv:""});
   msg.textContent="নিবন্ধন ও লগইন হয়েছে।";
   renderCustomerBox(); renderMyOrders(); usualsLoaded=false; renderShop(); renderCart();
 }
-function customerLogout(){ setCustomer(null); usualsLoaded=false; var _fn=document.getElementById("fbName"); if(_fn) _fn.value=""; var _fp=document.getElementById("fbPhone"); if(_fp) _fp.value=""; renderCustomerBox(); renderMyOrders(); renderShop(); renderCart(); }
+function customerLogout(){ setSessionToken(""); setCustomer(null); usualsLoaded=false; var _fn=document.getElementById("fbName"); if(_fn) _fn.value=""; var _fp=document.getElementById("fbPhone"); if(_fp) _fp.value=""; renderCustomerBox(); renderMyOrders(); renderShop(); renderCart(); }
 function reorderByNo(no){
   if(!sb) return;
-  sb.from("orders").select("items").eq("order_no", no).limit(1).then(function(res){
-    var o=(res.data||[])[0]; if(!o) return;
+  var tok=getSessionToken(); if(!tok) return;
+  sb.rpc("customer_list_my_orders", {p_token:tok, p_limit:50, p_offset:0}).then(function(res){
+    if(res.error){ if(rpcInvalidToken(res)) onInvalidToken(); return; }
+    var rows=rpcList(res); var o=null;
+    rows.forEach(function(x){ if(x.order_no===no) o=x; });
+    if(!o) return;
     (o.items||[]).forEach(function(it){ var p=null; for(var _i=0;_i<DATA.products.length;_i++){ var _x=DATA.products[_i]; if(_x.name===it.name && (_x.brand||"")===(it.brand||"")){ p=_x; break; } } if(!p) for(var _j=0;_j<DATA.products.length;_j++){ var _y=DATA.products[_j]; if(_y.name===it.name){ p=_y; break; } } if(p) cart[p.id]=(cart[p.id]||0)+it.qty; });
     saveCart(); renderCart(); showTab("cart");
   });
@@ -483,7 +495,7 @@ function logVisit(ev, detail){
   if(!sb) return;
   try{ if(ev==="open" && sessionStorage.getItem("mb-visit-open")) return; if(ev==="open") sessionStorage.setItem("mb-visit-open","1"); }catch(e){}
   var c=getCustomer();
-  sb.from("visits").insert([{phone:c?c.phone:"", event:ev, detail:detail||""}]).then(function(){});
+  sb.rpc("log_visit", {p_phone:c?c.phone:"", p_event:ev, p_detail:detail||""}).then(function(){}, function(){});
 }
 function waNumber(){ return (DATA.whatsapp||"01631421995").replace(/[^0-9]/g,"").replace(/^0/,"880"); }
 function findProduct(id){ var f=null; DATA.products.forEach(function(x){ if(String(x.id)===String(id)) f=x; }); return f; }
@@ -649,23 +661,33 @@ async function loadMyPoints(){
   var c=getCustomer(); var el=document.getElementById("myPoints");
   if(!c){ __myPoints=0; if(el) el.innerHTML=""; renderCart(); return; }
   if(!sb){ if(el) el.innerHTML=""; return; }
+  var tok=getSessionToken();
+  if(!tok){ __myPoints=0; if(el) el.innerHTML=""; renderCart(); return; }
   try{
-    var res=await sb.from("customers").select("points").eq("phone", c.phone||"__none__").limit(1);
-    __myPoints=(res.data&&res.data[0])? (+res.data[0].points||0) : 0;
+    var res=await sb.rpc("customer_get_profile", {p_token:tok});
+    if(rpcInvalidToken(res)){ onInvalidToken(); return; }
+    var d=rpcData(res);
+    __myPoints=d? (+d.points||0) : 0;
   }catch(e){ __myPoints=0; }
   if(el) el.innerHTML='<b>⭐ আপনার পয়েন্ট: '+bn(__myPoints)+'</b> <span class="small">— প্রতি ৳১০০-র ডেলিভারিতে ১ পয়েন্ট জমে; ৫০ পয়েন্টে ৳৫০ ছাড় পাবেন।</span>';
   renderCart();
-}
-var ratingAvg={}, ratingsLoaded=false;
+}var ratingAvg={}, ratingsLoaded=false;
 async function loadProductRatings(){
   if(ratingsLoaded) return; ratingsLoaded=true;
   if(!sb) return;
   try{
-    var res=await sb.from("product_ratings").select("product_name,stars").limit(1000);
-    var agg={};
-    (res.data||[]).forEach(function(r){ var a=agg[r.product_name]||(agg[r.product_name]={sum:0,n:0}); a.sum+=+r.stars||0; a.n++; });
-    ratingAvg={};
-    Object.keys(agg).forEach(function(k){ ratingAvg[k]={avg:Math.round(agg[k].sum/agg[k].n*10)/10, n:agg[k].n}; });
+    var seen={}, names=[], firstId={};
+    DATA.products.forEach(function(p){ if(!seen[p.name]){ seen[p.name]=true; names.push(p.name); } if(!firstId[p.name]) firstId[p.name]=p.id; });
+    var CH=12;
+    for(var s=0;s<names.length;s+=CH){
+      var chunk=names.slice(s,s+CH);
+      var results=await Promise.all(chunk.map(function(nm){
+        return sb.rpc("customer_get_product_ratings", {p_product_id:firstId[nm]}).then(function(res){ var d=rpcData(res); return {name:nm, d:d}; }).catch(function(){ return {name:nm, d:null}; });
+      }));
+      results.forEach(function(r){
+        if(r.d && (+r.d.count||0)>0){ var av=+(r.d.average_stars!=null?r.d.average_stars:r.d.avg||0); if(av>0) ratingAvg[r.name]={avg:Math.round(av*10)/10, n:+r.d.count||0}; }
+      });
+    }
   }catch(e){}
 }
 function renderShop(){
@@ -927,9 +949,14 @@ async function saveSubscribe(){
   if(!name || phone.length!==11 || phone.indexOf("01")!==0){ msg.textContent="নাম আর সঠিক মোবাইল নম্বর (01XXXXXXXXX) দিন।"; return; }
   if(!sb){ msg.textContent="ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি — পরে আবার চেষ্টা করুন।"; return; }
   msg.textContent="চালু হচ্ছে…";
-  var chk=await sb.from("subscriptions").select("id").eq("customer_phone",phone).eq("package_id",pkg.id).eq("status","active").limit(1);
-  if(chk.data && chk.data.length){ msg.textContent="এই প্যাকেজের সাবস্ক্রিপশন ইতিমধ্যে চালু আছে।"; return; }
-  var res=await sb.from("subscriptions").insert([{customer_phone:phone, customer_name:name, package_id:pkg.id, package_name:pkg.name, delivery_day:day, status:"active"}]);
+  var tok=getSessionToken();
+  if(!tok){ msg.textContent="সেশন শেষ হয়েছে — আবার লগইন করুন।"; return; }
+  var res=await sb.rpc("customer_subscribe", {p_token:tok, p_package_id:pkg.id, p_delivery_day:day});
+  if(res.error){ msg.textContent="হয়নি: "+res.error.message; return; }
+  var _sd=rpcData(res); var _sst=rpcStatus(_sd);
+  if(_sst==="duplicate"){ msg.textContent="এই প্যাকেজের সাবস্ক্রিপশন ইতিমধ্যে চালু আছে।"; return; }
+  if(_sst==="invalid_token"){ msg.textContent="সেশন শেষ হয়েছে — আবার লগইন করুন।"; onInvalidToken(); return; }
+  if(_sst && _sst!=="ok"){ msg.textContent="হয়নি: "+_sst; return; }
   if(res.error){ msg.textContent="হয়নি: "+res.error.message; return; }
   msg.textContent="✅ সাবস্ক্রিপশন চালু হয়েছে! ডেলিভারির আগে দোকান থেকে জানানো হবে।";
   try{ localStorage.setItem("mb-sub-phone", phone); }catch(e){}
@@ -939,15 +966,18 @@ async function saveSubscribe(){
 async function loadMySubs(){
   var el=document.getElementById("mySubs"); if(!el) return;
   var c=getCustomer();
-  var phone=(c&&c.phone)||"";
-  try{ if(!phone) phone=localStorage.getItem("mb-sub-phone")||""; }catch(e){}
-  if(!phone || !sb){ el.innerHTML=""; return; }
-  var res=await sb.from("subscriptions").select("*").eq("customer_phone",phone).order("created_at",{ascending:false}).limit(20);
-  if(res.error || !res.data || !res.data.length){ el.innerHTML=""; return; }
+  if(!c){ el.innerHTML=""; return; }
+  var tok=getSessionToken();
+  if(!tok || !sb){ el.innerHTML=""; return; }
+  var res=await sb.rpc("customer_list_my_subscriptions", {p_token:tok});
+  if(rpcInvalidToken(res)){ onInvalidToken(); return; }
+  if(res.error){ el.innerHTML=""; return; }
+  var rows=rpcList(res);
+  if(!rows.length){ el.innerHTML=""; return; }
   var stTxt={active:"✅ চালু", paused:"⏸️ থামানো", cancelled:"❌ বাতিল"};
   var justStarted="";
   if(window.__subJustStarted){ justStarted='<div class="note" style="background:#dbe4f2;border-radius:10px;padding:10px;margin-bottom:8px">✅ সাবস্ক্রিপশন চালু হয়েছে — '+window.__subJustStarted+'</div>'; window.__subJustStarted=null; }
-  el.innerHTML=justStarted+"<h3>📅 আমার মাসিক সাবস্ক্রিপশন</h3>"+res.data.map(function(s){
+  el.innerHTML=justStarted+"<h3>📅 আমার মাসিক সাবস্ক্রিপশন</h3>"+rows.map(function(s){
     var btn="";
     if(s.status==="active") btn='<button class="ghost" onclick="setSubStatus(\''+s.id+'\',\'paused\')">⏸️ থামান</button>';
     else if(s.status==="paused") btn='<button class="primary" onclick="setSubStatus(\''+s.id+'\',\'active\')">▶️ আবার চালু করুন</button>';
@@ -959,7 +989,9 @@ async function setSubStatus(id,status){
   if(!sb) return;
   var _stTxt={active:"✅ চালু", paused:"⏸️ থামানো", cancelled:"❌ বাতিল"};
   var _el=document.getElementById("substat-"+id); if(_el) _el.textContent=_stTxt[status]||status;
-  await sb.from("subscriptions").update({status:status}).eq("id",id);
+  var tok=getSessionToken(); if(!tok){ onInvalidToken(); return; }
+  var res=await sb.rpc("customer_set_subscription_status", {p_token:tok, p_sub_id:id, p_status:status});
+  if(rpcInvalidToken(res)){ onInvalidToken(); return; }
   loadMySubs();
 }
 function pkgDetailToCart(){
@@ -1058,35 +1090,26 @@ async function applyPromo(){
   if(!code){ m.textContent="কোড লিখুন।"; return; }
   if(!sb){ m.textContent="ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।"; return; }
   m.textContent="দেখা হচ্ছে…";
-  var res=await sb.from("coupons").select("*").eq("code",code).eq("active",true).limit(1);
-  if(res.error || !res.data || !res.data.length){ m.textContent="এই কোডটি পাওয়া যায়নি।"; renderCart(); return; }
-  var cp=res.data[0];
-  if(cp.expires_at && new Date(cp.expires_at)<new Date()){ m.textContent="এই কোডের মেয়াদ শেষ।"; renderCart(); return; }
   var sub=cartTotals().total;
-  if(sub<(cp.min_order||0)){ m.textContent="এই কোডে ন্যূনতম অর্ডার ৳"+bn(cp.min_order||0)+" লাগবে।"; renderCart(); return; }
+  var res;
+  try{ res=await sb.rpc("customer_validate_coupon", {p_code:code, p_subtotal:sub}); }catch(e){ m.textContent="যাচাই করা যায়নি — আবার চেষ্টা করুন।"; renderCart(); return; }
+  if(res.error){ m.textContent="যাচাই করা যায়নি: "+res.error.message; renderCart(); return; }
+  var d=rpcData(res); var st=rpcStatus(d);
+  if(st==="invalid"){ m.textContent="এই কোডটি পাওয়া যায়নি।"; renderCart(); return; }
+  if(st==="expired"){ m.textContent="এই কোডের মেয়াদ শেষ।"; renderCart(); return; }
+  if(st==="inactive"){ m.textContent="এই কোডটি এখন চালু নেই।"; renderCart(); return; }
+  if(st==="min_order_not_met"){ var mo=(d&&d.min_order)||0; m.textContent=mo?("এই কোডে ন্যূনতম অর্ডার ৳"+bn(mo)+" লাগবে।"):"এই কোডে ন্যূনতম অর্ডার পূরণ হয়নি।"; renderCart(); return; }
+  if(st && st!=="ok"){ m.textContent="এই কোডটি পাওয়া যায়নি।"; renderCart(); return; }
+  var cp={code:code, discount_type:(d&&(d.discount_type||d.type))||"fixed", discount_value:(d&&(d.discount_value!=null?d.discount_value:(d.discount_amount!=null?d.discount_amount:0)))||0, min_order:(d&&d.min_order)||0, expires_at:(d&&d.expires_at)||null};
   promo=cp;
-  try{ var lc0=JSON.parse(localStorage.getItem("mb-last-coupon")||"null"); if(lc0 && lc0.code===code){ localStorage.removeItem("mb-last-coupon"); var eb0=document.getElementById("earnedCoupon"); if(eb0) eb0.style.display="none"; } }catch(e){}
   m.textContent="✅ কোড প্রয়োগ হয়েছে — "+(cp.discount_type==="percent"?("ছাড় "+bn(cp.discount_value)+"%"):(cp.discount_type==="free_delivery"?"ফ্রি ডেলিভারি":("ছাড় ৳"+bn(cp.discount_value))));
   renderCart();
 }
 var __bulkTiers=[];
-async function loadBulkTiers(){ if(!sb) return; try{ var res=await sb.from("bulk_discount_tiers").select("*").eq("active",true).order("min_order",{ascending:false}); if(!res.error) __bulkTiers=res.data||[]; }catch(e){} }
+async function loadBulkTiers(){ if(!sb) return; try{ var res=await sb.rpc("customer_get_bulk_tiers"); if(!res.error) __bulkTiers=rpcList(res); }catch(e){} }
 function bestBulkTier(total){ var best=null; (__bulkTiers||[]).forEach(function(t){ if((+t.min_order||0)<=total && (!best || (+t.min_order||0)>(+best.min_order||0))) best=t; }); return best; }
 function bulkCouponText(t){ if(!t) return ""; if(t.discount_type==="free_delivery") return "ফ্রি ডেলিভারি"; if(t.discount_type==="percent") return bn(t.discount_value)+"% ছাড়"; return "৳"+bn(t.discount_value)+" ছাড়"; }
-async function maybeAwardBulkCoupon(orderTotal, orderCode){
-  if(!sb || !orderTotal) return;
-  if(window.__awardedFor===orderCode) return;
-  var t=bestBulkTier(orderTotal); if(!t) return;
-  var code="MB"+Math.random().toString(36).slice(2,8).toUpperCase();
-  var exp=new Date(Date.now()+30*86400000).toISOString();
-  var row={code:code, discount_type:t.discount_type, discount_value:(t.discount_type==="free_delivery"?0:(+t.discount_value||0)), min_order:0, active:true, expires_at:exp, usage_count:0};
-  var res=await sb.from("coupons").insert([row]);
-  if(res.error){ code="MB"+Math.random().toString(36).slice(2,8).toUpperCase(); row.code=code; res=await sb.from("coupons").insert([row]); if(res.error) return; }
-  window.__awardedFor=orderCode;
-  try{ localStorage.setItem("mb-last-coupon", JSON.stringify({code:code, text:bulkCouponText(t), exp:exp})); }catch(e){}
-  var eb=document.getElementById("earnedCoupon");
-  if(eb){ eb.style.display="block"; eb.innerHTML="🎉 <b>বড় অর্ডারের জন্য কুপন পেয়েছেন!</b><br>"+bulkCouponText(t)+" — কোড: <b>"+code+"</b><br><span class=\"small\">পরের অর্ডারে কার্টে এই কোড লিখুন। মেয়াদ ৩০ দিন।</span> <button class=\"ghost\" onclick=\"dismissEarnedCoupon()\">✕</button>"; }
-}
+/* v64: বড় অর্ডারের অটো-কুপন আর কাস্টমার অ্যাপ থেকে বানানো যায় না — RLS লকডাউনে কুপন বানানো শুধু অ্যাডমিন RPC (admin_manage_coupon) দিয়ে; ডিজাইন §2.4-এ কাস্টমারের কুপন বানানোর RPC নেই। customer_get_bulk_tiers শুধু ছাড়ের নিয়ম পড়ে। */
 function dismissEarnedCoupon(){ try{ localStorage.removeItem("mb-last-coupon"); }catch(e){} var eb=document.getElementById("earnedCoupon"); if(eb) eb.style.display="none"; }
 var ALL_SLOTS=["সকাল ৯টা–১২টা","দুপুর ১২টা–৩টা","বিকাল ৩টা–৬টা","সন্ধ্যা ৬টা–৯টা"];
 var SLOT_END=[12,15,18,21];
@@ -1190,9 +1213,18 @@ function saveOrder(){
   var ord={code:code(), date:new Date().toISOString(), name:document.getElementById("cname").value||"", phone:document.getElementById("cphone").value||"", address:(document.getElementById("caddr")||{}).value||"", items:items, custom:customCart.slice(), total:t.total, fee:feeEff, grand:t.total-promoDiscount(t.total)-_pd+feeEff, delivery_day:(document.getElementById("delDay")||{}).value||"", delivery_slot:(document.getElementById("delSlot")||{}).value||"", sub_choice:(document.getElementById("subChoice")||{}).value||"", coupon:promo?promo.code:"", discount:promoDiscount(t.total), payment_method:(document.getElementById("payMethod")||{}).value||"ক্যাশ অন ডেলিভারি", points_used:_pd>0?50:0, points_discount:_pd, advance_pct:advPct(), advance_amount:advAmounts().adv, advance_rest:advAmounts().rest, status:"sent"};
   if(_c){ var list=getOrders(); list.unshift(ord); localStorage.setItem("mb-orders", JSON.stringify(list)); }
   if(sb && _c){
-    var profit=0;
-    ord.items.forEach(function(it){ var pp=null; DATA.products.forEach(function(x){ if(x.name===it.name && (x.brand||"")===(it.brand||"")) pp=x; }); if(!pp) DATA.products.forEach(function(x){ if(x.name===it.name) pp=x; }); if(pp) profit+=(((it.price!=null?it.price:pp.price_taka)-(pp.wholesale_price||0))*it.qty); });
-    sb.from("orders").insert([{order_no:ord.code, customer_name:ord.name, phone:ord.phone, items:ord.items.concat(ord.custom.map(function(c){ return {name:c.name, brand:"", qty:1, unit:c.qty, price:0, total:0}; })), subtotal:ord.total, delivery_fee:ord.fee, total:ord.grand, delivery_day:ord.delivery_day, delivery_slot:ord.delivery_slot, profit:Math.round(profit), status:"New Order", payment_method:ord.payment_method, payment_status:"unpaid", advance_pct:ord.advance_pct, advance_amount:ord.advance_amount, advance_rest:ord.advance_rest, points_used:ord.points_used, points_discount:ord.points_discount, coupon_code:(ord.coupon||null), coupon_discount:(ord.discount||0), address:ord.address}]).then(function(r){ if(r.error){ console.log("order sync failed", r.error.message); return; } if(promo && promo.id){ sb.from("coupons").update({usage_count:(promo.usage_count||0)+1}).eq("id", promo.id).then(function(){}); } if(ord.points_used>0 && _c && _c.phone){ var np=Math.max(0, (__myPoints||0)-ord.points_used); __myPoints=np; sb.from("customers").update({points:np}).eq("phone", _c.phone).then(function(){}); } maybeAwardBulkCoupon(ord.total, ord.code); });
+    var tok=getSessionToken();
+    if(!tok){ console.log("order sync skipped: no session — please log in again"); }
+    else{
+      var _ord={order_no:ord.code, customer_name:ord.name, phone:ord.phone, items:ord.items.concat(ord.custom.map(function(c){ return {name:c.name, brand:"", qty:1, unit:c.qty, price:0, total:0}; })), subtotal:ord.total, delivery_fee:ord.fee, total:ord.grand, delivery_day:ord.delivery_day, delivery_slot:ord.delivery_slot, status:"New Order", payment_method:ord.payment_method, payment_status:"unpaid", advance_pct:ord.advance_pct, advance_amount:ord.advance_amount, advance_rest:ord.advance_rest, points_used:ord.points_used, points_discount:ord.points_discount, coupon_code:(ord.coupon||null), coupon_discount:(ord.discount||0), address:ord.address};
+      sb.rpc("customer_place_order", {p_token:tok, p_order:_ord}).then(function(r){
+        if(r.error){ console.log("order sync failed", r.error.message); return; }
+        var _d=rpcData(r); var _st=rpcStatus(_d);
+        if(_st==="invalid_token"){ console.log("order sync failed: invalid_token"); onInvalidToken(); return; }
+        if(_st && _st!=="ok"){ console.log("order sync failed", _st); return; }
+        if(ord.points_used>0){ __myPoints=Math.max(0, (__myPoints||0)-ord.points_used); }
+      });
+    }
   }
   localStorage.removeItem("mb-code");
   var _pm=document.getElementById("payMethod"); if(_pm) _pm.value="ক্যাশ অন ডেলিভারি";
@@ -1299,10 +1331,16 @@ async function submitRating(key, name, brand){
   if(!pid) DATA.products.forEach(function(x){ if(x.name===name) pid=x.id; });
   var cm=(document.getElementById("rc-"+key)||{}).value||"";
   if(!sb){ alert("ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।"); return; }
-  var res=await sb.from("product_ratings").insert([{product_id:pid, product_name:name, customer_phone:c.phone||"", stars:st, comment:cm}]);
+  var tok=getSessionToken();
+  if(!tok){ alert("সেশন শেষ হয়েছে — আবার লগইন করুন।"); onInvalidToken(); return; }
+  var res=await sb.rpc("customer_submit_rating", {p_token:tok, p_product_id:pid, p_stars:st, p_comment:cm});
   if(res.error){ alert("হয়নি: "+res.error.message); return; }
+  var _rd=rpcData(res); var _rst=rpcStatus(_rd);
+  if(_rst==="invalid_token"){ alert("সেশন শেষ হয়েছে — আবার লগইন করুন।"); onInvalidToken(); return; }
+  if(_rst && _rst!=="ok"){ alert("হয়নি: "+_rst); return; }
   var w=document.getElementById("rw-"+key); if(w) w.innerHTML='<span class="small">✅ রেটিং দেওয়া হয়েছে — ধন্যবাদ!</span>';
-  ratingsLoaded=false; loadProductRatings(); renderShop();
+  try{ var rr=await sb.rpc("customer_get_product_ratings", {p_product_id:pid}); var rrd=rpcData(rr); if(rrd && (+rrd.count||0)>0){ var av=+(rrd.average_stars!=null?rrd.average_stars:rrd.avg||0); if(av>0) ratingAvg[name]={avg:Math.round(av*10)/10, n:+rrd.count||0}; } }catch(e){}
+  renderShop();
 }
 async function renderMyOrders(){
   renderCustomerBox();
@@ -1312,9 +1350,12 @@ async function renderMyOrders(){
   var c=getCustomer();
   if(c && sb){
     el.innerHTML="<p>আসছে…</p>";
-    var res=await sb.from("orders").select("*").eq("phone", c.phone||"__none__").order("created_at",{ascending:false}).limit(20);
+    var tok=getSessionToken();
+    if(!tok){ onInvalidToken(); return; }
+    var res=await sb.rpc("customer_list_my_orders", {p_token:tok, p_limit:20, p_offset:0});
+    if(rpcInvalidToken(res)){ onInvalidToken(); return; }
     if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
-    var rows=res.data||[];
+    var rows=rpcList(res);
     receiptOrders={}; rows.forEach(function(o){ receiptOrders[o.order_no]=o; });
     if(!rows.length){ el.innerHTML="<p>লগইন করা আছে — এখনো কোনো অর্ডার নেই। প্রথম অর্ডার দিলে এখানে দেখা যাবে।</p>"; return; }
     var bnStatus={"New Order":"নতুন অর্ডার","Contacted":"যোগাযোগ হয়েছে","Confirmed":"নিশ্চিত","Preparing":"তৈরি হচ্ছে","Out for Delivery":"ডেলিভারিতে","Delivered":"ডেলিভারি সম্পন্ন","Cancelled":"বাতিল"};
@@ -1519,8 +1560,8 @@ function parseNamePhone(text){
 async function saveFeedbackRow(row){
   if(sb){
     try{
-      var res=await sb.from("feedback").insert([row]);
-      if(!res.error) return true;
+      var res=await sb.rpc("customer_submit_feedback", {p_name:row.name||"কাস্টমার", p_phone:row.phone||"", p_type:row.type||"মতামত", p_message:row.message||""});
+      if(!res.error){ var d=rpcData(res); if(rpcStatus(d)==="invalid_message") return false; return true; }
     }catch(e){}
   }
   var pend=[]; try{ pend=JSON.parse(localStorage.getItem("mb-feedback-pending")||"[]"); }catch(e){}
@@ -1533,8 +1574,14 @@ async function flushPendingFeedback(){
   var pend=[]; try{ pend=JSON.parse(localStorage.getItem("mb-feedback-pending")||"[]"); }catch(e){}
   if(!pend.length) return;
   try{
-    var res=await sb.from("feedback").insert(pend);
-    if(!res.error){ try{ localStorage.removeItem("mb-feedback-pending"); }catch(e){} }
+    var remaining=[];
+    for(var i=0;i<pend.length;i++){
+      var r0=pend[i];
+      var res=await sb.rpc("customer_submit_feedback", {p_name:r0.name||"কাস্টমার", p_phone:r0.phone||"", p_type:r0.type||"মতামত", p_message:r0.message||""});
+      if(res.error) remaining.push(r0);
+    }
+    if(!remaining.length){ try{ localStorage.removeItem("mb-feedback-pending"); }catch(e){} }
+    else { try{ localStorage.setItem("mb-feedback-pending", JSON.stringify(remaining)); }catch(e){} }
   }catch(e){}
 }
 function renderFeedback(){
@@ -1587,8 +1634,11 @@ async function findOrderByNo(no){
   var c=getCustomer();
   if(c && sb){
     try{
-      var res=await sb.from("orders").select("*").eq("order_no", no).limit(1);
-      var r=(res.data||[])[0];
+      var tok=getSessionToken(); if(!tok){ onInvalidToken(); return null; }
+      var res=await sb.rpc("customer_list_my_orders", {p_token:tok, p_limit:50, p_offset:0});
+      if(rpcInvalidToken(res)){ onInvalidToken(); return null; }
+      var rows=rpcList(res); var r=null;
+      rows.forEach(function(x){ if(x.order_no===no) r=x; });
       if(r){
         var bnStatus={"New Order":"নতুন অর্ডার","Contacted":"যোগাযোগ হয়েছে","Confirmed":"নিশ্চিত","Preparing":"তৈরি হচ্ছে","Out for Delivery":"ডেলিভারিতে","Delivered":"ডেলিভারি সম্পন্ন","Cancelled":"বাতিল"};
         return "অর্ডার "+r.order_no+" — "+(bnStatus[r.status]||r.status)+"।\n"+(r.items||[]).map(function(it){ return "• "+it.name+(it.brand?(" ("+it.brand+")"):"")+" — "+bn(qtyText(it)); }).join("\n")+"\nসর্বমোট: ৳"+bn(r.total)+"।"+(r.delivery_day?("\n🚚 ডেলিভারি: "+r.delivery_day+(r.delivery_slot?(", "+r.delivery_slot):"")):"");
@@ -1670,15 +1720,9 @@ async function aiReply(q){
   if(/(ব্যাংক|bank)/i.test(text)){
     return "🏦 ব্যাংক ট্রান্সফার — ব্র্যাক ব্যাংক, হবিগঞ্জ শাখা।\nঅ্যাকাউন্ট: 1058617890001 (সেভিংস)\nরাউটিং: 060360614 • SWIFT: BRAKBDDH\nঠিকানা: Puran Munsefi Road, Habiganj 3300।\nটাকা পাঠিয়ে অর্ডারের সময় পেমেন্ট মাধ্যমে 'ব্যাংক ট্রান্সফার' বেছে নিন।";
   }
-  /* --- coupons from live data (v63) --- */
+  /* --- coupons (v64): no list RPC by design — a code is validated in the cart coupon box --- */
   if(/(কুপন|ছাড়|অফার|ডিসকাউন্ট)/.test(text)){
-    if(!sb) return "ছাড়ের তথ্য এখন দেখা যাচ্ছে না — ইন্টারনেট সংযোগ পাওয়া যাচ্ছে না। পরে আবার জিজ্ঞেস করুন।";
-    try{
-      var cres=await sb.from("coupons").select("*").eq("active",true);
-      var cps=(cres.data||[]).filter(function(cp){ return !cp.expires_at || new Date(cp.expires_at)>=new Date(); });
-      if(!cps.length) return "এখন কোনো ছাড় চলছে না, তবে 'নতুন আইডিয়া দিন, পুরস্কার জিতুন' চলছে — সেরা আইডিয়ার জন্য পুরস্কার আছে! পেজের নিচে মতামত ফরমে আপনার আইডিয়া লিখুন।";
-      return "🎉 এখন ছাড় চলছে:\n"+cps.map(function(cp){ return "• কোড: "+cp.code+" — "+(cp.discount_type==="percent"?("ছাড় "+bn(cp.discount_value)+"%"):(cp.discount_type==="free_delivery"?"ফ্রি ডেলিভারি":("ছাড় ৳"+bn(cp.discount_value))))+((cp.min_order||0)?(" (ন্যূনতম অর্ডার ৳"+bn(cp.min_order)+")"):""); }).join("\n")+"\nকার্টে কোড লিখে প্রয়োগ করুন।";
-    }catch(e){ return "ছাড়ের তথ্য এখন দেখা যাচ্ছে না — পরে আবার জিজ্ঞেস করুন।"; }
+    return "কুপন কোড থাকলে কার্টে গিয়ে 'কুপন কোড' বাক্সে লিখে প্রয়োগ করুন — কোড সঠিক হলে ছাড় দেখাবে। নতুন ছাড়ের খবর জানতে WhatsApp করুন 01631421995।";
   }
   /* --- payment --- */
   if(/(পেমেন্ট|বিকাশ|নগদ|ক্যাশ|টাকা দেব|কীভাবে দেব|কিভাবে দেব)/.test(text)){
@@ -1851,7 +1895,7 @@ function doInstall(){
 if("serviceWorker" in navigator){ window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
 showInstallBanner();
 // ---- in-app update: new version prompt (v56) ----
-var APP_VER_NUM=63;
+var APP_VER_NUM=65;
 var PENDING_VER=0;
 function showUpdateBanner(){ var b=document.getElementById("updateBanner"); if(b) b.style.display="block"; }
 function dismissUpdate(){ var b=document.getElementById("updateBanner"); if(b) b.style.display="none"; try{ sessionStorage.setItem("mb-upd-dismissed", String(PENDING_VER)); }catch(e){} }
@@ -1894,7 +1938,7 @@ function loadLiveData(){
   }).catch(function(){ renderShop(); renderCart(); });
 }
 loadLiveData();
-renderShop(); renderCart(); loadBulkTiers(); try{ var lc=JSON.parse(localStorage.getItem("mb-last-coupon")||"null"); if(lc){ var eb=document.getElementById("earnedCoupon"); if(eb){ eb.style.display="block"; eb.innerHTML="🎉 <b>আপনার কুপন:</b> "+lc.text+" — কোড: <b>"+lc.code+"</b> <button class=\"ghost\" onclick=\"dismissEarnedCoupon()\">✕</button>"; } } }catch(e){}
+renderShop(); renderCart(); loadBulkTiers();
 renderChatChips(); initFabDrag(); flushPendingFeedback();
 logVisit("open","");
 </script>
