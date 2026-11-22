@@ -92,8 +92,8 @@ h1{margin:0;font-size:21px;font-weight:800;color:#111827;white-space:nowrap;over
 .chatmsg.me{background:#0a2a5e;color:#fff;margin-left:auto}
 .chatmsg.bot{background:#f0f0f0;color:#111}
 .chatchip{border:1px solid #d1d5db;background:#fff;color:#374151;border-radius:999px;padding:11px 14px;font-size:15px;cursor:pointer}
-.cartbar{position:fixed;left:12px;right:12px;bottom:calc(56px + env(safe-area-inset-bottom,0px));z-index:11;background:#0a2a5e;color:#fff;border-radius:16px;padding:12px 16px;min-height:56px;display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25)}
-.cartbar button{background:none;border:0;color:#fff;font-size:20px;cursor:pointer;padding:8px 10px;flex:none}
+.cartbar{position:fixed;left:12px;right:12px;bottom:calc(56px + env(safe-area-inset-bottom,0px));z-index:11;background:#0a2a5e;color:#fff;border-radius:14px;padding:8px 12px;min-height:44px;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.cartbar button{background:none;border:0;color:#fff;font-size:16px;cursor:pointer;padding:6px 8px;flex:none}
 .card h3{margin:0 0 2px;font-size:17px}
 .card .brand{color:#666;font-size:14px}
 .caticon{width:48px;height:48px;border-radius:14px;background:#dbe4f2;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:6px}
@@ -156,7 +156,7 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
 .pkg .total{font-size:20px;font-weight:800;color:#111827}
 section h2{color:#111827;margin:14px 0 8px;font-size:20px}
 input,textarea,select{width:100%;padding:11px;font-size:16px;border:1px solid #999;border-radius:10px;margin:6px 0}
-.wa{display:block;text-align:center;background:#25D366;color:#fff;text-decoration:none;font-weight:800;padding:18px;border-radius:14px;margin-top:10px;font-size:20px}
+.wa{display:block;text-align:center;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;text-decoration:none;font-weight:800;padding:18px;border-radius:16px;margin-top:10px;font-size:20px;box-shadow:0 4px 16px rgba(37,211,102,.45)}
 .pdfbtn{width:100%;background:#0a2a5e;color:#fff;border:0;border-radius:12px;padding:12px;font-size:17px;font-weight:700;cursor:pointer;margin-top:8px}
 .note{background:#fff;border-left:5px solid #d4a017;padding:12px;border-radius:8px;margin:12px 0}
 .warn{background:#fff3cd;border-left:5px solid #b7791f;padding:12px;border-radius:8px;margin:12px 0}
@@ -189,6 +189,21 @@ input,textarea,select{width:100%;padding:11px;font-size:16px;border:1px solid #9
 .pkgrow .ptrash{flex:none;width:24px;height:24px;border:0;background:none;font-size:16px;color:#9ca3af;cursor:pointer;padding:0}
 .pkgnamefull{position:absolute;top:64px;left:30px;z-index:20;background:#111827;color:#fff;font-size:14px;font-weight:600;padding:8px 12px;border-radius:10px;max-width:280px;white-space:normal;line-height:1.5;box-shadow:0 4px 16px rgba(0,0,0,.25)}
 .pkgconfirm{padding:10px;background:#fef3c7;border-radius:10px;margin:6px 0;font-size:14px}
+.cartrow{display:flex;align-items:center;gap:8px;height:64px;border-bottom:1px solid #f3f4f6;position:relative}
+.cartrow .psno{flex:none;width:26px;font-size:15px;font-weight:700;color:#374151;text-align:center}
+.cartrow .pmid{flex:1;min-width:0}
+.cartrow .cname1{display:flex;align-items:center;gap:6px}
+.cartrow .pname{display:block;font-weight:600;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.cartrow .cname1 .pname{flex:1;min-width:0}
+.cartrow .cbrand{flex:none;font-size:12px;color:#6b7280;white-space:nowrap}
+.cartrow .cname1 select{max-width:100px!important;padding:2px 4px!important;font-size:12px!important}
+.cartrow .pqty{font-size:13px;color:#6b7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tab-cart .cartrow .pkgstep input{width:40px;height:26px;text-align:center;padding:0 2px;font-size:14px;font-weight:700;color:#111827;border:0;background:transparent}
+.cartrow .ltotal{flex:none;width:62px;text-align:right;font-weight:700;font-size:15px}
+.cartrow .ptrash{flex:none;width:24px;height:24px;border:0;background:none;font-size:16px;color:#9ca3af;cursor:pointer;padding:0}
+#tab-cart .stephead{font-size:16px;margin:10px 0 2px}
+#tab-cart label{font-size:14px;color:#374151}
+#tab-cart input:not([type=checkbox]),#tab-cart select{padding:9px 10px;margin:4px 0}
 .adminbox h3{color:#111827;margin:8px 0}
 .small{font-size:13px;color:#6b7280}
 button.primary{background:#0a2a5e;color:#fff;border:0;border-radius:10px;padding:12px 16px;font-size:16px;cursor:pointer}
@@ -327,19 +342,19 @@ footer{text-align:center;color:#6b7280;padding:16px 16px 90px;font-size:13px}
 <label>ডেলিভারির দিন</label><select id="delDay" onchange="renderCart()"><option>আজ</option><option>আগামীকাল</option><option>পরশু</option></select>
 <label>সময়</label><select id="delSlot" onchange="renderCart()"><option>সকাল ৯টা–১২টা</option><option>দুপুর ১২টা–৩টা</option><option>বিকাল ৩টা–৬টা</option><option>সন্ধ্যা ৬টা–৯টা</option></select>
 <label>কোনো পণ্য না থাকলে কী করবো?</label><select id="subChoice" onchange="renderCart()"><option>ফোনে জানাবেন</option><option>একই দামের অন্য ব্র্যান্ড দিন</option><option>ওই পণ্যটি বাদ দিন</option></select>
-<div style="background:#f6f7f2;border-radius:12px;padding:12px;margin-top:10px">
+<div style="background:#f6f7f2;border-radius:12px;padding:10px;margin-top:8px">
 <label>নিজের পণ্য যোগ করুন (তালিকায় নেই এমন কিছু)</label>
 <input id="customName" placeholder="পণ্যের নাম — যেমন: দেশি মুরগির ডিম">
 <input id="customQty" placeholder="পরিমাণ — যেমন: ১ ডজন">
 <button class="ghost" onclick="addCustomItem()">+ এই পণ্যটা অর্ডারে যোগ করুন</button>
 </div>
-<div style="background:#f6f7f2;border-radius:12px;padding:12px;margin-top:10px"><label>কুপন কোড (থাকলে লিখুন)</label><input id="promoCode" placeholder="যেমন: MASIK10"><button class="gold" onclick="applyPromo()">প্রয়োগ করুন</button> <span id="promoMsg" class="small"></span></div>
-<div id="earnedCoupon" style="display:none;background:#fef3c7;border:2px solid #d4a017;border-radius:12px;padding:12px;margin-top:10px"></div>
+<div style="background:#f6f7f2;border-radius:12px;padding:10px;margin-top:8px"><label>কুপন কোড (থাকলে লিখুন)</label><input id="promoCode" placeholder="যেমন: MASIK10"><button class="gold" onclick="applyPromo()">প্রয়োগ করুন</button> <span id="promoMsg" class="small"></span></div>
+<div id="earnedCoupon" style="display:none;background:#fef3c7;border:2px solid #d4a017;border-radius:12px;padding:10px;margin-top:8px"></div>
 <p class="stephead"><b>৪.</b> কীভাবে টাকা দেবেন?</p>
 <label>পেমেন্টের ধরন</label><select id="payMethod" onchange="renderCart()"><option value="ক্যাশ অন ডেলিভারি">ক্যাশ অন ডেলিভারি</option><option value="বিকাশ">বিকাশ</option><option value="নগদ">নগদ</option></select>
 <p id="payNote" class="small"></p>
-<div id="pointsBox" style="display:none;background:#eef2f9;border-radius:12px;padding:12px;margin-top:10px"><span id="pointsLine" class="small"></span><br><label><input type="checkbox" id="usePoints" onchange="renderCart()" style="width:auto;height:auto"> ⭐ পয়েন্ট ব্যবহার করুন — ৫০ পয়েন্ট = ৳৫০ ছাড়</label></div>
-<p class="small">🔄 ২৪ ঘণ্টার মধ্যে ফেরত — পণ্যে কোনো সমস্যা থাকলে জানাবেন, বদলে দেওয়া হবে।</p>
+<div id="pointsBox" style="display:none;background:#eef2f9;border-radius:12px;padding:10px;margin-top:8px"><span id="pointsLine" class="small"></span><br><label><input type="checkbox" id="usePoints" onchange="renderCart()" style="width:auto;height:auto"> ⭐ পয়েন্ট ব্যবহার করুন — ৫০ পয়েন্ট = ৳৫০ ছাড়</label></div>
+<p class="small">✅ পণ্যে কোনো সমস্যা থাকলে জানাবেন, বদলে দেওয়া হবে।</p>
 <p class="small">🚚 ডেলিভারি: অর্ডার করলেই দোকান থেকে ফোনে জানানো হবে কখন পৌঁছাবে।</p>
 <p class="stephead"><b>৫.</b> নিচের সবুজ বোতাম চাপুন</p>
 <a class="wa" id="walink" href="#" target="_blank" onclick="saveOrder()">WhatsApp-এ অর্ডার পাঠান</a>
@@ -787,6 +802,8 @@ function pkgChgQty(idx,d){
 function pkgAskRemove(idx){ detailConfirmIdx=idx; pkgNameOpen=-1; renderPkgDetail(); }
 function pkgRemoveItem(idx){ if(!detailItems||!detailItems[idx]) return; detailItems.splice(idx,1); detailConfirmIdx=-1; pkgNameOpen=-1; renderPkgDetail(); }
 function togglePkgName(idx){ pkgNameOpen=(pkgNameOpen===idx)?-1:idx; renderPkgDetail(); }
+var cartNameOpen=-1;
+function toggleCartName(id){ cartNameOpen=(cartNameOpen===id)?-1:id; renderCart(); }
 function pkgDetailAddItem(){
   var sel=document.getElementById("pkgAddSelect"); if(!sel||!detailItems) return;
   var p=findProduct(sel.value); if(!p) return;
@@ -946,7 +963,7 @@ function updateCartBar(){
   if(t.n!==lastCartBarN){ lastCartBarN=t.n; cartBarHidden=false; }
   if(t.n===0||cartBarHidden||curTab==="cart"){ b.style.display="none"; return; }
   b.style.display="flex";
-  document.getElementById("cartBarText").textContent="🛒 কার্টে "+bn(t.n)+"টি পণ্য"+(canSeePrices()?(" — মোট ৳"+bn(t.total)):"");
+  document.getElementById("cartBarText").textContent="🛒 "+bn(t.n)+"টি পণ্য"+(canSeePrices()?(" • মোট ৳"+bn(t.total)):"");
 }
 function saveAddr(){ try{ localStorage.setItem("mb-addr", document.getElementById("caddr").value||""); }catch(e){} }
 function cartTotals(){
@@ -1049,14 +1066,14 @@ function refreshSlots(){
 }
 function renderCart(){
   refreshSlots();
-  var total=0, n=0, lines=[];
+  var total=0, n=0, lines=[], _ci=0;
   Object.keys(cart).forEach(function(id){
-    var p=findProduct(id); if(!p) return;
+    var p=findProduct(id); if(!p) return; _ci++;
     var amt=Math.round(p.price_taka*cart[id]); total+=amt; n+=cart[id];
-    lines.push('<div class="listrow"><div class="n"><b>'+p.name+'</b> '+brandSelectHtml(p,"chgCartBrand",p.id)+(canSeePrices()?('<br>৳'+bn(dispPrice(p))+' × '+bn(fmtQty(dispQty(p,cart[id])))+' '+dispUnit(p)+' = <b>৳'+bn(amt)+'</b>'):('<br>'+bn(fmtQty(dispQty(p,cart[id])))+' '+dispUnit(p)))+'</div><div class="qty"><button onclick="chgDisp('+id+',-'+dispStep(p)+')">−</button><input type="text" value="'+fmtQty(dispQty(p,cart[id]))+'" style="width:76px;text-align:center;padding:12px 2px" inputmode="decimal" onchange="setQtyDisp('+id+',this.value)">'+(isKgPriced(p)?'<span class="qunit">কেজি</span>':'')+'<button onclick="chgDisp('+id+','+dispStep(p)+')">+</button></div><button class="danger" onclick="delCartItem('+id+')">✕ মুছুন</button></div>');
+    lines.push('<div class="cartrow"><span class="psno">'+bn(_ci)+'</span><div class="pmid"><div class="cname1"><span class="pname" onclick="toggleCartName('+id+')">'+p.name+'</span><span class="cbrand">'+brandSelectHtml(p,"chgCartBrand",p.id)+'</span></div><div class="pqty">'+(canSeePrices()?('৳'+bn(dispPrice(p))+' × '+bn(fmtQty(dispQty(p,cart[id])))+' '+dispUnit(p)):bn(fmtQty(dispQty(p,cart[id])))+' '+dispUnit(p))+'</div></div><span class="pkgstep"><button onclick="chgDisp('+id+',-'+dispStep(p)+')">−</button><input type="text" value="'+fmtQty(dispQty(p,cart[id]))+'" inputmode="decimal" onchange="setQtyDisp('+id+',this.value)"><button onclick="chgDisp('+id+','+dispStep(p)+')">+</button></span>'+(isKgPriced(p)?'<span class="qunit">কেজি</span>':'')+(canSeePrices()?('<span class="ltotal">৳'+bn(amt)+'</span>'):'<span class="ltotal"></span>')+'<button class="ptrash" onclick="delCartItem('+id+')" aria-label="মুছুন">🗑️</button>'+(cartNameOpen===+id?('<span class="pkgnamefull" onclick="toggleCartName('+id+')">'+p.name+((p.brand)?(' — '+p.brand):'')+'</span>'):'')+'</div>');
   });
-  customCart.forEach(function(c){
-    lines.push('<div class="listrow"><div class="n"><b>'+c.name+'</b> — '+c.qty+'<br><span class="small">দাম দোকান থেকে জানানো হবে</span></div><button class="danger" onclick="delCustomItem('+c.id+')">✕</button></div>');
+  customCart.forEach(function(c){ _ci++;
+    lines.push('<div class="cartrow"><span class="psno">'+bn(_ci)+'</span><div class="pmid"><div class="cname1"><span class="pname" onclick="toggleCartName('+c.id+')">'+c.name+'</span></div><div class="pqty">'+c.qty+' — দাম দোকান থেকে জানানো হবে</div></div><span class="ltotal"></span><button class="ptrash" onclick="delCustomItem('+c.id+')" aria-label="মুছুন">🗑️</button>'+(cartNameOpen===c.id?('<span class="pkgnamefull" onclick="toggleCartName('+c.id+')">'+c.name+'</span>'):'')+'</div>');
   });
   document.getElementById("cart").innerHTML=lines.join("")||"<p>কার্ট খালি — দোকান থেকে পণ্য যোগ করুন।</p>";
   var fee=effFee(total);
@@ -1105,7 +1122,7 @@ function renderCart(){
   if(pdisc>0) msg+="%0Aপয়েন্ট ছাড়: -৳"+pdisc+" (৫০ পয়েন্ট)%0A";
   msg+=canSeePrices()?("----------------%0Aপণ্যের মোট: ৳"+total+(disc>0?("%0Aছাড়: -৳"+disc):"")+(pdisc>0?("%0Aপয়েন্ট ছাড়: -৳"+pdisc):"")+"%0Aডেলিভারি চার্জ: ৳"+fee+"%0Aসর্বমোট: ৳"+(total-disc-pdisc+fee)+"%0A— মাসিক বাজার, "+encodeURIComponent(DATA.company||"নীড়")):("----------------%0A(দাম দোকান থেকে জানানো হবে)%0A— মাসিক বাজার, "+encodeURIComponent(DATA.company||"নীড়"));
   document.getElementById("walink").href="https://wa.me/"+waNumber()+"?text="+msg;
-  document.getElementById("walink").textContent="WhatsApp-এ অর্ডার পাঠান — "+(DATA.whatsapp||"");
+  document.getElementById("walink").textContent="💬 WhatsApp-এ অর্ডার পাঠান — "+(DATA.whatsapp||"");
   updateCartBar();
 }
 /* ---- my orders (saved on this phone) ---- */
@@ -1761,7 +1778,7 @@ function doInstall(){
 if("serviceWorker" in navigator){ window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
 showInstallBanner();
 // ---- in-app update: new version prompt (v56) ----
-var APP_VER_NUM=59;
+var APP_VER_NUM=60;
 var PENDING_VER=0;
 function showUpdateBanner(){ var b=document.getElementById("updateBanner"); if(b) b.style.display="block"; }
 function dismissUpdate(){ var b=document.getElementById("updateBanner"); if(b) b.style.display="none"; try{ sessionStorage.setItem("mb-upd-dismissed", String(PENDING_VER)); }catch(e){} }
