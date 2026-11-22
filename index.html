@@ -97,7 +97,7 @@ h1{margin:0;font-size:21px;font-weight:800;color:#111827;white-space:nowrap;over
 .card h3{margin:0 0 2px;font-size:17px}
 .card .brand{color:#666;font-size:14px}
 .caticon{width:48px;height:48px;border-radius:14px;background:#dbe4f2;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:6px}
-.brandsel{width:auto;max-width:120px;padding:4px 8px;font-size:13px;border:1px solid #d1d5db;border-radius:999px;background:#fff;color:#374151;font-weight:400;margin:0;cursor:pointer}
+.brandsel{width:auto;max-width:110px;padding:4px 8px;font-size:13px;border:1px solid #d1d5db;border-radius:999px;background:#fff;color:#374151;font-weight:400;margin:0;cursor:pointer}
 .incart{font-size:13px;color:#6b7280;background:#f3f4f6;border-radius:8px;padding:4px 8px;margin-top:6px;flex:1 1 100%}
 .price{color:#111827;font-weight:700;font-size:16px;margin:0}
 .unit{color:#6b7280;font-size:13px}
@@ -105,18 +105,21 @@ h1{margin:0;font-size:21px;font-weight:800;color:#111827;white-space:nowrap;over
 .qty{display:flex;gap:6px;align-items:center;justify-content:center}.qty b{min-width:28px;text-align:center}
 .qty button{width:44px;height:44px;font-size:22px;border-radius:12px;border:1px solid #d1d5db;background:#fff;color:#374151;cursor:pointer}
 .listrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#fff;border-bottom:1px solid #f0f0f0;padding:12px 0}
-.prow{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;background:#fff;border-bottom:1px solid #f0f0f0;padding:12px 0;min-height:64px}
+.prow{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:12px;margin:0 0 10px;box-shadow:0 1px 3px rgba(0,0,0,.06);min-height:64px}
+#list{background:#f6f7f9;border-radius:12px;padding:10px}
+.cathead{font-weight:700;color:#0a2a5e;background:#dbe4f2;border-radius:8px;padding:6px 10px;margin:14px 0 8px;font-size:14px}
+.pactline{flex:1 1 100%;display:flex;justify-content:flex-end;gap:8px;align-items:center;margin-top:8px}
 .psno{flex:none;width:26px;font-size:15px;font-weight:700;color:#374151;padding-top:2px}
 .pleft{flex:1;min-width:0}
-.pleft .pname{font-weight:600;font-size:16px;color:#111827;line-height:1.7}
+.pleft .pname{font-weight:600;font-size:18px;color:#111827;line-height:1.7}
 .pleft .pmeta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:2px;font-size:12px;color:#6b7280}
 .pright{flex:none;width:112px;text-align:right}
 .pright .pprice{font-size:16px;font-weight:700;color:#111827}
 .pright .pprice .small{display:block;font-size:12px;font-weight:400;line-height:1.5}
 .pright .pact{margin-top:6px;display:flex;justify-content:flex-end;height:32px;align-items:center}
-.addbtn{border:1.5px solid #0a2a5e;background:#fff;color:#0a2a5e;border-radius:999px;padding:0 16px;height:32px;min-width:72px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.addbtn{border:1.5px solid #0a2a5e;background:#fff;color:#0a2a5e;border-radius:999px;padding:0 12px;height:26px;min-width:60px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
 .addbtn:active{background:#eef2f9}
-.pmeta .brandsel{margin:0;max-width:120px;padding:3px 6px;font-size:12px}
+.pmeta .brandsel{margin:0;max-width:110px;padding:3px 6px;font-size:12px}
 .pmeta .brand{color:#6b7280;font-size:12px}
 
 
@@ -124,12 +127,12 @@ h1{margin:0;font-size:21px;font-weight:800;color:#111827;white-space:nowrap;over
 
 
 
-.qmini{display:flex;gap:0;align-items:center;flex:none;background:#eef2f9;border:1px solid #c3d2e8;border-radius:999px;padding:2px;height:32px;box-sizing:border-box}
-.qmini button{width:28px;height:28px;font-size:17px;border-radius:50%;border:0;background:transparent;color:#0a2a5e;cursor:pointer}
-.qmini input{width:44px;height:28px;text-align:center;padding:0 2px;font-size:15px;font-weight:700;color:#111827;border:0;background:transparent}
+.qmini{display:flex;gap:0;align-items:center;flex:none;background:#eef2f9;border:1px solid #c3d2e8;border-radius:999px;padding:2px;height:26px;box-sizing:border-box}
+.qmini button{width:22px;height:22px;font-size:15px;border-radius:50%;border:0;background:transparent;color:#0a2a5e;cursor:pointer}
+.qmini input{width:40px;height:22px;text-align:center;padding:0 2px;font-size:14px;font-weight:700;color:#111827;border:0;background:transparent}
 input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 input[type=number]{-moz-appearance:textfield;appearance:textfield}
-.qmini.kgp input{width:34px}
+.qmini.kgp input{width:30px}
 .qunit{font-size:12px;color:#374151;font-weight:700;padding:0 2px;white-space:nowrap}
 .pright.wide{width:132px}
 
@@ -581,9 +584,10 @@ function inCartLineG(gid){
   return parts.length?'<div class="incart">🛒 কার্টে আরও আছে: '+parts.join(", ")+'</div>':"";
 }
 function qtyShownG(gid){ var v=selectedVariantG(gid); if(!v) return 1; if(cart[v.id]) return cart[v.id]; return pickQty[gid]||1; }
-function cartStepperHtml(gid){ var v=selectedVariantG(gid); if(!v) return ""; var st=dispStep(v); var q=cart[v.id]?dispQty(v,cart[v.id]):st; var kg=isKgPriced(v); return '<span class="qmini'+(kg?' kgp':'')+'"><button onclick="adjPick('+gid+',-'+st+')" aria-label="কমান">−</button><input type="text" inputmode="decimal" value="'+fmtQty(q)+'" onchange="setPick('+gid+',this.value)">'+(kg?'<span class="qunit">কেজি</span>':'')+'<button onclick="adjPick('+gid+','+st+')" aria-label="বাড়ান">+</button></span>'; }
+function cartStepperHtml(gid){ var v=selectedVariantG(gid); if(!v) return ""; var st=dispStep(v); var def=isKgPriced(v)?kgStepOf(v):1; var q=cart[v.id]?dispQty(v,cart[v.id]):(pickQty[gid]||def); var kg=isKgPriced(v); return '<span class="qmini'+(kg?' kgp':'')+'"><button onclick="adjPick('+gid+',-'+st+')" aria-label="কমান">−</button><input type="text" inputmode="decimal" value="'+fmtQty(q)+'" onchange="setPick('+gid+',this.value)">'+(kg?'<span class="qunit">কেজি</span>':'')+'<button onclick="adjPick('+gid+','+st+')" aria-label="বাড়ান">+</button></span>'; }
 function adjPick(gid,d){ var v=selectedVariantG(gid); if(!v) return; if(cart[v.id]){ chg(v.id,isKgPriced(v)?packsOfKg(v,d):d); return; } var st=dispStep(v); var def=isKgPriced(v)?kgStepOf(v):1; pickQty[gid]=Math.round(Math.max(st,(pickQty[gid]||def)+d)*100)/100; renderShop(); }
-function setPick(gid,val){ var v=selectedVariantG(gid); if(!v) return; var q=Math.round((parseFloat(val)||0)*100)/100; if(cart[v.id]){ setQty(v.id,isKgPriced(v)?packsOfKg(v,q):val); return; } if(q>0){ pickQty[gid]=q; } else { renderShop(); } }
+function numVal(val){ return parseFloat(String(val||"").replace(/[০-৯]/g,function(d){ return "০১২৩৪৫৬৭৮৯".indexOf(d); })); }
+function setPick(gid,val){ var v=selectedVariantG(gid); if(!v) return; var q=Math.round((numVal(val)||0)*100)/100; if(cart[v.id]){ setQty(v.id,isKgPriced(v)?packsOfKg(v,q):q); return; } if(q>0){ pickQty[gid]=q; } else { renderShop(); } }
 function stockOf(p){ return (p&&p.stock_qty>0)?p.stock_qty:0; }
 function capStock(id,q){ var p=findProduct(id); var s=stockOf(p); if(s>0&&q>s) return s; return q; }
 function addPickedByName(gid){ var v=selectedVariantG(gid); if(!v) return; var def=isKgPriced(v)?kgStepOf(v):1; var q=Math.round((pickQty[gid]||def)*100)/100; if(q<=0) return; var add=isKgPriced(v)?packsOfKg(v,q):q; cart[v.id]=capStock(v.id,Math.round(((cart[v.id]||0)+add)*100)/100); pickQty[gid]=q; saveCart(); renderShop(); renderCart(); }
@@ -638,9 +642,10 @@ function productBlockHtml(gid){
   var stockHtml=(v.stock_qty&&v.stock_qty>0)?' <span class="small" style="color:#0a2a5e">✅ স্টকে আছে</span>':"";
   var ra=ratingAvg[name]; var rateHtml=ra?(' <span class="small">⭐ '+bn(ra.avg)+' ('+bn(ra.n)+'টি)</span>'):"";
   var priceHtml=canSeePrices()?(isKgPriced(v)?'<span class="price">৳'+bn(perKgPrice(v))+' <span class="unit">/ কেজি</span></span> <span class="small">('+v.unit+' ৳'+bn(v.price_taka)+')</span>':'<span class="price">৳'+bn(v.price_taka)+' <span class="unit">/ '+v.unit+'</span></span>'+perKgHtml(v)):'<span class="small">দাম এখন দেখানো হচ্ছে না • প্রতি '+dispUnit(v)+'</span>';
-  var actHtml=inCart?cartStepperHtml(gid):'<button class="addbtn" onclick="addPickedByName('+gid+')">যোগ করুন</button>';
+  var actHtml=inCart?cartStepperHtml(gid):(cartStepperHtml(gid)+'<button class="addbtn" onclick="addPickedByName('+gid+')">যোগ করুন</button>');
   return '<div class="pleft"><div class="pname">'+name+'</div><div class="pmeta">'+nameBrandSelectG(gid)+stockHtml+rateHtml+'</div></div>'
-    +'<div class="pright'+(isKgPriced(v)?' wide':'')+'"><div class="pprice">'+priceHtml+'</div><div class="pact">'+actHtml+'</div></div>'
+    +'<div class="pright'+(isKgPriced(v)?' wide':'')+'"><div class="pprice">'+priceHtml+'</div></div>'
+    +'<div class="pactline">'+actHtml+'</div>'
     +inCartLineG(gid);
 }
 function cardHtml(gid){
@@ -733,7 +738,8 @@ function renderShop(){
     var countHtml=q?('<p class="small" style="grid-column:1/-1">🔍 “'+q+'” — '+bn(groups.length)+'টি পণ্য পাওয়া গেছে</p>'):"";
     var catNote=(q&&catGroups.length)?('<p class="small" style="margin:10px 0;grid-column:1/-1">— নিচেরগুলো “'+q+'” ক্যাটাগরির অন্যান্য পণ্য —</p>'):"";
     el.className="";
-    var rowsHtml=nameGroups.map(function(gid,i){ return listRowHtml(gid,i); }).join("")+(catGroups.length?(catNote+catGroups.map(function(gid,i){ return listRowHtml(gid,nameGroups.length+i); }).join("")):"");
+    var rowsWithHeads=function(gids,off){ var lastCat=null; return gids.map(function(gid,j){ var c=(groupVars(gid)[0]||{}).category||""; var h=(cat==="সব"&&!q&&c&&c!==lastCat)?'<div class="cathead">'+c+'</div>':''; lastCat=c; return h+listRowHtml(gid,off+j); }).join(""); };
+    var rowsHtml=rowsWithHeads(nameGroups,0)+(catGroups.length?(catNote+rowsWithHeads(catGroups,nameGroups.length)):"");
     el.innerHTML=countHtml+(rowsHtml||"<p>কোনো পণ্য পাওয়া যায়নি।</p>");
     loadProductRatings(); renderSpecials();
   }
@@ -1061,8 +1067,8 @@ function specialRowHtml(gid){
   if(!v) return "";
   var inCart=!!cart[v.id];
   var priceHtml=canSeePrices()?(isKgPriced(v)?('<span class="sp-price">৳'+bn(perKgPrice(v))+' <span class="unit">/ কেজি</span></span> <span class="small">('+v.unit+' ৳'+bn(v.price_taka)+')</span>'):('<span class="sp-price">৳'+bn(v.price_taka)+' <span class="unit">/ '+v.unit+'</span></span>')):'<span class="small">দাম এখন দেখানো হচ্ছে না</span>';
-  var actHtml=inCart?cartStepperHtml(gid):'<button class="addbtn" onclick="addPickedByName('+gid+')">যোগ করুন</button>';
-  return '<div class="sprow"><div class="pleft"><div class="pname"><span class="sp-star">⭐</span> '+name+'</div><div class="pmeta">'+nameBrandSelectG(gid)+'</div></div><div class="pright"><div class="pprice">'+priceHtml+'</div><div class="pact">'+actHtml+'</div></div></div>'+inCartLineG(gid);
+  var actHtml=inCart?cartStepperHtml(gid):(cartStepperHtml(gid)+'<button class="addbtn" onclick="addPickedByName('+gid+')">যোগ করুন</button>');
+  return '<div class="sprow"><div class="pleft"><div class="pname"><span class="sp-star">⭐</span> '+name+'</div><div class="pmeta">'+nameBrandSelectG(gid)+'</div></div><div class="pright"><div class="pprice">'+priceHtml+'</div></div><div class="pactline">'+actHtml+'</div></div>'+inCartLineG(gid);
 }
 function renderSpecials(){
   var el=document.getElementById("specials"); if(!el) return;
@@ -1895,7 +1901,7 @@ function doInstall(){
 if("serviceWorker" in navigator){ window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
 showInstallBanner();
 // ---- in-app update: new version prompt (v56) ----
-var APP_VER_NUM=66;
+var APP_VER_NUM=67;
 var PENDING_VER=0;
 function showUpdateBanner(){ var b=document.getElementById("updateBanner"); if(b) b.style.display="block"; }
 function dismissUpdate(){ var b=document.getElementById("updateBanner"); if(b) b.style.display="none"; try{ sessionStorage.setItem("mb-upd-dismissed", String(PENDING_VER)); }catch(e){} }
