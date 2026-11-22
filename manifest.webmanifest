@@ -1,7 +1,7 @@
 {
   "name": "মাসিক বাজার",
   "short_name": "মাসিক বাজার",
-  "description": "মাসিক বাজার — ২৬০টি পণ্য, ১০টি প্যাকেজ। WhatsApp-এ অর্ডার করুন।",
+  "description": "মাসিক বাজার — ২৬০টি পণ্য, ১৬টি প্যাকেজ। WhatsApp-এ অর্ডার করুন।",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0a2a5e",
