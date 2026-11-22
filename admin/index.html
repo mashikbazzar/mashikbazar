@@ -860,8 +860,9 @@ function repairMissingProducts(){
 function mergeNewPackages(){
   if(!DRAFT || !DATA || !DATA.packages) return;
   var have={}; DRAFT.packages.forEach(function(p){ have[p.id]=true; });
+  var del={}; (DRAFT.deleted_package_ids||[]).forEach(function(id){ del[id]=true; });
   var added=false;
-  DATA.packages.forEach(function(p){ if(!have[p.id]){ DRAFT.packages.push(JSON.parse(JSON.stringify(p))); added=true; } });
+  DATA.packages.forEach(function(p){ if(!have[p.id] && !del[p.id]){ DRAFT.packages.push(JSON.parse(JSON.stringify(p))); added=true; } });
   if(added) saveDraft();
 }
 function updateDraftInfo(){
@@ -993,8 +994,19 @@ function orderProfitCovered(o){
   });
   return {covered:Math.round(cov), total:Math.round(tot)};
 }
-function openAdmin(){
-  loadDraft(); mergeNewProducts(); mergeNewPackages(); fixOldRiceName(); repairMissingProducts(); ensureDailyOrder(); loadWholesale(); if(DRAFT){ recalcPackages(DRAFT); saveDraft(); }
+async function downloadLiveDraft(){
+  try{
+    if(!sb) return null;
+    var r=await sb.from("admin_draft").select("data").eq("id","main").maybeSingle();
+    if(r && !r.error && r.data && r.data.data && r.data.data.products) return r.data.data;
+  }catch(e){}
+  return null;
+}
+async function openAdmin(){
+  loadDraft();
+  var __live=await downloadLiveDraft();
+  if(__live && (__live._rev||0)>(DRAFT._rev||0)){ DRAFT=__live; try{ localStorage.setItem("mb-draft", JSON.stringify(DRAFT)); }catch(e){} __lastSavedDraftJson=JSON.stringify(DRAFT); }
+  mergeNewProducts(); mergeNewPackages(); fixOldRiceName(); repairMissingProducts(); ensureDailyOrder(); loadWholesale(); if(DRAFT){ recalcPackages(DRAFT); saveDraft(); }
   document.getElementById("pinBox").style.display="none";
   document.getElementById("sShop").value=DRAFT.shop||"";
   document.getElementById("sCompany").value=DRAFT.company||"";
@@ -1773,7 +1785,7 @@ function addPkgItem(pkgId){
 }
 var pendingDelPkg=null, pendingDelPkgTimer=null;
 function delPackage(id){
-  if(pendingDelPkg===id){ clearTimeout(pendingDelPkgTimer); pendingDelPkg=null; DRAFT.packages=DRAFT.packages.filter(function(p){ return p.id!==id; }); saveDraft(); renderAdminPackages(); return; }
+  if(pendingDelPkg===id){ clearTimeout(pendingDelPkgTimer); pendingDelPkg=null; DRAFT.packages=DRAFT.packages.filter(function(p){ return p.id!==id; }); if(!DRAFT.deleted_package_ids) DRAFT.deleted_package_ids=[]; if(DRAFT.deleted_package_ids.indexOf(id)<0) DRAFT.deleted_package_ids.push(id); saveDraft(); renderAdminPackages(); return; }
   if(pendingDelPkgTimer) clearTimeout(pendingDelPkgTimer);
   pendingDelPkg=id; renderAdminPackages();
   pendingDelPkgTimer=setTimeout(function(){ pendingDelPkg=null; renderAdminPackages(); }, 4000);
