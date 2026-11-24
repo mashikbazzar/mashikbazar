@@ -1819,6 +1819,7 @@ async function loadAdminOrders(){
   rows.forEach(function(o){ var k=(o.delivery_day||"").trim()||"দিন বসানো হয়নি"; (byDay[k]=byDay[k]||[]).push(o); });
   var dayOrder=["আজ","আগামীকাল","পরশু"];
   var days=Object.keys(byDay).sort(function(a,b){ var ia=dayOrder.indexOf(a), ib=dayOrder.indexOf(b); if(ia<0&&ib<0) return a<b?-1:1; if(ia<0) return 1; if(ib<0) return -1; return ia-ib; });
+  window.__daySent={}; try{ window.__daySent=JSON.parse(localStorage.getItem("mb-day-po-sent")||"{}"); }catch(e){}
   var plannerHtml='<div class="card" style="background:#f5f3ff;margin-bottom:12px"><h3 style="margin:0">🗓️ ডেলিভারি পরিকল্পনা</h3><p class="small">কোন দিন কত অর্ডার, আর সব মিলিয়ে কী কী কিনতে হবে।</p>';
   days.forEach(function(day){
     var drows=byDay[day];
@@ -1828,7 +1829,7 @@ async function loadAdminOrders(){
     var aggLines=Object.keys(agg).map(function(k){ var a=agg[k]; return a.name+' — '+bn(a.qty)+' '+(a.unit||""); }).join("<br>");
     var slotCounts={}; drows.forEach(function(o){ var sk=(o.delivery_slot||"সময় বসানো হয়নি"); slotCounts[sk]=(slotCounts[sk]||0)+1; });
     var slotLine=Object.keys(slotCounts).map(function(sk){ return sk+' — '+bn(slotCounts[sk])+'টি'; }).join(' • ');
-    plannerHtml+='<div style="border-top:1px solid #ddd;padding-top:8px;margin-top:8px"><b>'+day+'</b> — '+bn(drows.length)+'টি অর্ডার • মোট ৳'+bn(dayTotal)+'<br><span class="small">🕐 '+slotLine+'</span><br><span class="small">'+(aggLines||"কোনো পণ্য নেই")+'</span></div>';
+    var __ds=(window.__daySent||{})[day]; plannerHtml+='<div style="border-top:1px solid #ddd;padding-top:8px;margin-top:8px"><b>'+day+'</b> — '+bn(drows.length)+'টি অর্ডার • মোট ৳'+bn(dayTotal)+'<br><span class="small">🕐 '+slotLine+'</span><br><span class="small">'+(aggLines||"কোনো পণ্য নেই")+'</span>'+(__ds?('<br><span class="small">✅ বাল্ক অর্ডার পাঠানো হয়েছে — '+esc(__ds.po_no||"")+'</span>'):"")+'<br><button class="primary" style="width:auto;padding:6px 12px;margin-top:6px" onclick="openDayBulk(\''+day+'\')">🛒 আজকের কেনার তালিকা</button></div>';
   });
   plannerHtml+='</div>';
   window.__plannerHtml=plannerHtml;
@@ -1839,7 +1840,7 @@ async function loadAdminOrders(){
     if(["Confirmed","Preparing","Out for Delivery"].indexOf(o.status)>=0){
       onMyWay=' <a class="primary" style="display:inline-block;padding:8px 12px;text-decoration:none" href="https://wa.me/'+ph2+'?text='+encodeURIComponent("আসসালামু আলাইকুম "+(o.customer_name||"")+"! আপনার অর্ডার ("+o.order_no+") রওনা হয়েছে, শীঘ্রই পৌঁছাবে। — মাসিক বাজার")+'" target="_blank">🛵 পথে আছি</a>';
     }
-    var payLine='<br><span class="small">💰 পেমেন্ট: '+esc(o.payment_method||"ক্যাশ অন ডেলিভারি")+' ('+payLabel(o)+')</span>'+advLine(o)+' <button class="ghost" onclick="togglePaymentStatus(\''+o.id+'\')">'+payNextBtn(o)+'</button>';
+    var payLine='<br><span class="small">💰 পেমেন্ট: '+esc(o.payment_method||"ক্যাশ অন ডেলিভারি")+' ('+payLabel(o)+')</span>'+advLine(o)+(o.trx_id?('<br><span class="small">🧾 TrxID: '+esc(o.trx_id)+'</span>'):"")+' <button class="ghost" onclick="togglePaymentStatus(\''+o.id+'\')">'+payNextBtn(o)+'</button>';
     return '<div class="ordercard"><b>'+o.order_no+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br>'+(o.customer_name||"")+' • '+(o.phone||"")+(o.address?('<br>ঠিকানা: '+esc(o.address)):'')+(o.delivery_day?('<br><span class="small">🚚 ডেলিভারি: '+esc(o.delivery_day)+', '+esc(o.delivery_slot||"")+'</span>'):'')+'<br>'+orderItemsText(o.items)+'<br><b>মোট: ৳'+bn(o.total)+' • লাভ: ৳'+bn(orderProfit(o))+'</b>'+(o.bulk_total?('<br><span class="small">📦 বাল্ক কেনা: ৳'+bn(o.bulk_total)+'</span>'):"")+payLine+'<br><label>স্ট্যাটাস</label><select onchange="setAdminOrderStatus(\''+o.id+'\',this.value)">'+statuses.map(function(s){ return '<option value="'+s+'" '+(s===o.status?'selected':'')+'>'+bnStatus[s]+'</option>'; }).join("")+'</select><br><button class="gold" onclick="openMemo(\''+o.id+'\')">🧾 ক্যাশ মেমো</button> <button class="primary" onclick="openBulkSend(\''+o.id+'\')">📤 পাইকারিকে পাঠান</button>'+onMyWay+'</div>';
   }).join("");
 }
@@ -2178,7 +2179,7 @@ function viewPO(poNo){
   var d=new Date(po.created_at);
   var supTotal=0, hasSup=false;
   var rows=(po.items||[]).map(function(it){ var sp=(it.supplier_price!=null?+it.supplier_price:null); if(sp!=null){ hasSup=true; supTotal+=Math.round(sp*it.qty); } return '<tr><td>'+esc(it.product_name||"")+'</td><td>'+esc(it.brand||"")+'</td><td>'+bn(it.qty)+' '+(it.unit||"")+'</td><td>৳'+bn(it.price)+(sp!=null?('<br><span class="small">পাইকারি: ৳'+bn(sp)+'</span>'):"")+'</td><td>৳'+bn(Math.round(it.price*it.qty))+'</td></tr>'; }).join("");
-  document.getElementById("poPaper").innerHTML='<h2 style="margin:0">🧾 ক্রয় আদেশ — '+esc(po.po_no)+'</h2><p class="small">মাসিক বাজার (নীড়) • '+d.toLocaleDateString("bn-BD")+'</p><p>দোকানদার: <b>'+esc(po.supplier_name||"")+'</b>'+(po.order_no?('<br>কাস্টমার অর্ডার: <b>'+esc(po.order_no)+'</b>'):"")+'</p><table><tr><th>পণ্য</th><th>ব্র্যান্ড</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr>'+rows+'</table><p><b>সর্বমোট: ৳'+bn(po.total)+'</b>'+(hasSup?('<br>পাইকারি মোট: <b>৳'+bn(supTotal)+'</b> • ছাড়: ৳'+bn(Math.round(po.total)-supTotal)):"")+'</p><p class="small">এই আদেশ অনুযায়ী পণ্য পাঠাবেন। পণ্য পাওয়ার পর টাকা দেওয়া হবে।</p>';
+  document.getElementById("poPaper").innerHTML='<h2 style="margin:0">🧾 ক্রয় আদেশ — '+esc(po.po_no)+'</h2><p class="small">মাসিক বাজার (নীড়) • '+d.toLocaleDateString("bn-BD")+'</p><p>দোকানদার: <b>'+esc(po.supplier_name||"")+'</b>'+(po.order_no?('<br>কাস্টমার অর্ডার: <b>'+esc(po.order_no)+'</b>'):"")+'</p><table><tr><th>পণ্য</th><th>ব্র্যান্ড</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr>'+rows+'</table><p><b>সর্বমোট: ৳'+bn(po.total)+'</b>'+(hasSup?('<br>পাইকারি মোট: <b>৳'+bn(supTotal)+'</b> • ছাড়: ৳'+bn(Math.round(po.total)-supTotal)):"")+'</p>'+(hasSup?('<p><button class="primary" onclick="applyPOWholesale(\''+po.po_no+'\')">💰 এই পাইকারি দামগুলো পণ্যে বসান</button></p>'):"")+'<p class="small">এই আদেশ অনুযায়ী পণ্য পাঠাবেন। পণ্য পাওয়ার পর টাকা দেওয়া হবে।</p>';
   document.getElementById("poOverlay").style.display="block";
   window.scrollTo(0,0);
 }
@@ -2197,6 +2198,97 @@ async function loadPOs(){
 /* ---- bulk orders: big customer order -> supplier repricing ---- */
 function bulkSupplierTotal(po){ var t=0; (po.items||[]).forEach(function(it){ if(it.supplier_price!=null) t+=Math.round(it.supplier_price*it.qty); }); return t; }
 function bulkHasPrices(po){ return (po.items||[]).some(function(it){ return it.supplier_price!=null; }); }
+/* ---- v53: daily purchase list (auto in the apps, semi-auto on WhatsApp) ---- */
+function aggregateDayItems(day){
+  var agg={};
+  Object.keys(adminOrdersById||{}).forEach(function(id){
+    var o=adminOrdersById[id]; if(!o) return;
+    var k=(o.delivery_day||"").trim()||"দিন বসানো হয়নি";
+    if(k!==day) return;
+    if(o.status==="Cancelled"||o.status==="Delivered") return;
+    (o.items||[]).forEach(function(it){
+      var key=it.product_id?("id:"+it.product_id):(normName(it.name)+"|"+(it.brand||"")+"|"+(it.unit||""));
+      if(!agg[key]) agg[key]={product_id:it.product_id||null, name:it.name||"", brand:it.brand||"", unit:it.unit||"", qty:0, price:0};
+      agg[key].qty=Math.round((agg[key].qty+(+it.qty||0))*1000)/1000;
+      if(!agg[key].price && (+it.price||0)>0) agg[key].price=+it.price;
+    });
+  });
+  return Object.keys(agg).map(function(k){ return agg[k]; });
+}
+function dayBulkItems(day){
+  var rows=aggregateDayItems(day);
+  rows.forEach(function(r){
+    var m=null;
+    if(r.product_id && DRAFT && DRAFT.products) DRAFT.products.forEach(function(p){ if(p.id===r.product_id) m=p; });
+    if(!m && DRAFT && DRAFT.products) DRAFT.products.forEach(function(p){ if(normName(p.name)===normName(r.name) && (p.brand||"")===(r.brand||"")) m=p; });
+    if(m){ r.product_id=m.id; if(!(r.price>0)) r.price=+m.price_taka||0; }
+  });
+  return rows;
+}
+async function openDayBulk(day){
+  if(!sb){ alert("ইন্টারনেট চেক করুন।"); return; }
+  var items=dayBulkItems(day);
+  var sres=await adminRpcCall("admin_list_suppliers", {});
+  var sups=rpcRows(sres).filter(function(s){ return s.active!==false; });
+  var total=0; items.forEach(function(it){ total+=Math.round((+it.price||0)*(+it.qty||0)); });
+  var nOrders=0; Object.keys(adminOrdersById||{}).forEach(function(id){ var o=adminOrdersById[id]; if(o && ((o.delivery_day||"").trim()||"দিন বসানো হয়নি")===day && o.status!=="Cancelled" && o.status!=="Delivered") nOrders++; });
+  var noPrice=items.some(function(it){ return !(+it.price>0); });
+  window.__bulkDay={day:day, items:items};
+  var rows=items.map(function(it){ return '<tr><td>'+esc(it.name||"")+'</td><td>'+esc(it.brand||"")+'</td><td>'+bn(it.qty)+' '+(it.unit||"")+'</td><td>'+(it.price>0?('৳'+bn(it.price)):'<span style="color:#b91c1c">দাম নেই</span>')+'</td><td>৳'+bn(Math.round((+it.price||0)*(+it.qty||0)))+'</td></tr>'; }).join("");
+  document.getElementById("bulkPaper").innerHTML='<h2 style="margin:0">🛒 কেনার তালিকা — '+esc(day)+'</h2><p class="small">'+bn(nOrders)+'টি অর্ডার • মোট ৳'+bn(total)+'</p><table><tr><th>পণ্য</th><th>ব্র্যান্ড</th><th>পরিমাণ</th><th>দর</th><th>মোট</th></tr>'+rows+'</table>'+(noPrice?'<p style="color:#b91c1c"><b>⚠️ কিছু পণ্যের খুচরা দাম পাওয়া যায়নি — দাম ছাড়া পাঠানো যাবে না। আগে পণ্যের দাম ঠিক করুন।</b></p>':'')+'<label>কোন দোকানদারকে পাঠাবেন</label><select id="bulkSupSel">'+sups.map(function(s){ return '<option value="'+s.id+'">'+esc(s.name||"")+' • '+esc(s.phone||"")+'</option>'; }).join("")+'</select><label>দোকানদারকে বার্তা</label><input id="bulkNote" value="দিনের কেনার তালিকা — এই সব পণ্যের পাইকারি দাম (খুচরা দামের চেয়ে কম) দিন।"><p class="small">সাপ্লায়ার শুধু পণ্য আর পরিমাণ দেখবে — কাস্টমারের নাম/ফোন/ঠিকানা যাবে না।</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="primary" style="flex:1" '+(noPrice||!sups.length?'disabled':'')+' onclick="sendDayBulk()">✅ WhatsApp-এ পাঠান + বাল্ক অর্ডার</button><button class="gold" '+(noPrice||!sups.length?'disabled':'')+' onclick="sendDayBulkPOOnly()">📦 শুধু বাল্ক অর্ডার তৈরি করুন</button><button class="ghost" onclick="closeBulk()">বাতিল</button></div><p id="bulkMsg" class="small"></p><div id="bulkWa"></div>';
+  document.getElementById("bulkOverlay").style.display="block";
+  window.scrollTo(0,0);
+}
+async function sendDayBulk(){ await sendDayBulkPO(true); }
+async function sendDayBulkPOOnly(){ await sendDayBulkPO(false); }
+async function sendDayBulkPO(withWa){
+  var bd=window.__bulkDay; if(!bd||!sb) return;
+  var msg=document.getElementById("bulkMsg");
+  var sel=document.getElementById("bulkSupSel"); if(!sel||!sel.value){ msg.textContent="কোনো চালু দোকানদার পাওয়া যায়নি।"; return; }
+  var supId=sel.value; var supName=""; var supPhone="";
+  var sres=await adminRpcCall("admin_list_suppliers", {});
+  rpcRows(sres).forEach(function(s){ if(String(s.id)===String(supId)){ supName=s.name||""; supPhone=s.phone||""; } });
+  var items=(bd.items||[]).map(function(it){ return {product_id:it.product_id||null, product_name:it.name||"", brand:it.brand||"", unit:it.unit||"", price:+it.price||0, qty:+it.qty||0}; });
+  var retail=0; items.forEach(function(it){ retail+=Math.round(it.price*it.qty); });
+  var note=(document.getElementById("bulkNote")||{}).value||"";
+  var res=await adminRpcCall("admin_create_purchase_order", {p_order_no:null, p_supplier_id:supId, p_items:items});
+  if(res.error){ msg.textContent="হয়নি: "+res.error.message; return; }
+  var d=(res&&res.data)||{}; var poNo=d.po_no||"";
+  window.__poRows=window.__poRows||{};
+  if(poNo) window.__poRows[poNo]={po_no:poNo, supplier_id:supId, supplier_name:supName, items:items.map(function(it){ return {product_id:it.product_id, product_name:it.product_name, brand:it.brand, unit:it.unit, price:it.price, qty:it.qty}; }), total:retail, status:"sent", order_no:"", created_at:new Date().toISOString()};
+  try{ var sent=JSON.parse(localStorage.getItem("mb-day-po-sent")||"{}"); sent[bd.day]={po_no:poNo, at:new Date().toISOString()}; localStorage.setItem("mb-day-po-sent", JSON.stringify(sent)); }catch(e){}
+  if(withWa){
+    var ph=(supPhone||"").replace(/[^0-9]/g,""); if(ph.indexOf("88")!==0) ph="88"+ph;
+    var txt="আসসালামু আলাইকুম "+supName+"! মাসিক বাজার থেকে কেনার তালিকা ("+bd.day+"): "+items.map(function(it){ return it.product_name+" — "+it.qty+" "+it.unit; }).join(", ")+". "+note+" — আপনার অ্যাপে দাম লিখে পাঠান।";
+    document.getElementById("bulkWa").innerHTML='<a class="primary" style="display:inline-block;padding:10px 14px;text-decoration:none;margin-top:8px" href="https://wa.me/'+ph+'?text='+encodeURIComponent(txt)+'" target="_blank">💬 WhatsApp-এ দোকানদারকে জানান</a>';
+    msg.textContent="✅ বাল্ক অর্ডার তৈরি হয়েছে — WhatsApp-এ পাঠান (নিচের বোতাম চাপুন)।";
+  } else {
+    msg.textContent="✅ বাল্ক অর্ডার তৈরি হয়েছে — দোকানদারের অ্যাপে চলে গেছে।";
+  }
+  loadBulkPOs(); loadAdminOrders();
+}
+async function applyPOWholesale(poNo){
+  var po=(window.__poRows||{})[poNo]; if(!po||!sb) return;
+  var ok=0, fail=[];
+  for(var i=0;i<(po.items||[]).length;i++){
+    var it=po.items[i];
+    var sp=(it.supplier_price!=null?+it.supplier_price:null);
+    if(!(sp>0)) continue;
+    var pid=it.product_id||null;
+    if(!pid && DRAFT && DRAFT.products) DRAFT.products.forEach(function(p){ if(normName(p.name)===normName(it.product_name||"") && (p.brand||"")===(it.brand||"")) pid=p.id; });
+    if(!pid){ fail.push(it.product_name||""); continue; }
+    var r=await adminRpcCall("admin_set_product_wholesale", {p_product_id:pid, p_wholesale_price:sp});
+    if(r.error){ fail.push(it.product_name||""); continue; }
+    var applyLocal=function(p){ p.wholesale_price=sp; };
+    DATA.products.forEach(function(p){ if(p.id===pid) applyLocal(p); });
+    if(DRAFT) DRAFT.products.forEach(function(p){ if(p.id===pid) applyLocal(p); });
+    ok++;
+  }
+  if(ok){ recalcPackages(DRAFT); saveDraft(); }
+  alert("✅ "+ok+"টি পণ্যের পাইকারি দাম বসানো হয়েছে।"+(fail.length?(" হয়নি: "+fail.join(", ")):""));
+  loadBulkPOs();
+}
+
 async function openBulkSend(orderId){
   var o=adminOrdersById[orderId]; if(!o) return;
   if(!sb){ alert("ইন্টারনেট চেক করুন।"); return; }
@@ -2238,7 +2330,7 @@ async function loadBulkPOs(){
   if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
   var res=await adminRpcCall("admin_list_purchase_orders", {});
   if(res.error){ el.innerHTML="<p>দেখা যাচ্ছে না: "+res.error.message+"</p>"; return; }
-  var rows=rpcRows(res).filter(function(po){ return po.order_no; });
+  var rows=rpcRows(res);
   window.__poRows=window.__poRows||{};
   rows.forEach(function(po){ window.__poRows[po.po_no]=po; });
   if(!rows.length){ el.innerHTML="<p>এখনো কোনো বড় অর্ডার পাইকারিকে পাঠানো হয়নি।</p>"; return; }
@@ -2251,7 +2343,7 @@ async function loadBulkPOs(){
     var btns='<button class="primary" onclick="viewPO(\''+po.po_no+'\')">👁️ দেখুন</button>';
     if(po.status==="priced") btns+=' <button class="gold" onclick="confirmBulkPO(\''+po.po_no+'\')">✅ এই দামে নিশ্চিত করুন</button>';
     if(po.status==="sent") btns+=' <span class="small">দোকানদারের দামের অপেক্ষায়…</span>';
-    return '<div class="ordercard"><b>'+esc(po.po_no)+'</b> — অর্ডার '+esc(po.order_no||"")+'<br>'+esc(po.customer_name||"")+' • দোকানদার: '+esc(po.supplier_name||"")+'<br><span class="small">'+d.toLocaleDateString("bn-BD")+' • '+(stTxt[po.status]||po.status)+'</span><br>খুচরা মোট: ৳'+bn(po.total)+(sup!=null?('<br>পাইকারি মোট: <b>৳'+bn(sup)+'</b> • ছাড়: ৳'+bn(save)+' ('+bn(pct)+'%)'):"")+'<br>'+btns+'</div>';
+    return '<div class="ordercard"><b>'+esc(po.po_no)+'</b> — '+(po.order_no?("অর্ডার "+esc(po.order_no)):"📋 দিনের তালিকা")+'<br>'+(po.customer_name?(esc(po.customer_name)+" • "):"")+'দোকানদার: '+esc(po.supplier_name||"")+'<br><span class="small">'+d.toLocaleDateString("bn-BD")+' • '+(stTxt[po.status]||po.status)+'</span><br>খুচরা মোট: ৳'+bn(po.total)+(sup!=null?('<br>পাইকারি মোট: <b>৳'+bn(sup)+'</b> • ছাড়: ৳'+bn(save)+' ('+bn(pct)+'%)'):"")+'<br>'+btns+'</div>';
   }).join("");
 }
 async function confirmBulkPO(poNo){
