@@ -6,6 +6,9 @@
 <title>মাসিক বাজার — নীড়</title>
 <meta name="description" content="মাসিক বাজার — ২৬০টি পণ্য, ২–৮ জনের পরিবার প্যাকেজ। দামসহ অর্ডার করুন, WhatsApp-এ পাঠান।">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@500;600;700&family=Noto+Serif+Bengali:wght@700;800&display=swap" rel="stylesheet">
 <meta name="theme-color" content="#ffffff">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -21,6 +24,12 @@ a.wa:active{filter:brightness(.92)}
 body{margin:0;font-family:"Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif;background:#fff;color:#111827;line-height:1.7;-webkit-text-size-adjust:100%}
 header{position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:8px;padding:0 12px 0 16px;height:60px}
 .logo{width:40px;height:40px;border-radius:10px;flex:none}
+#splash{position:fixed;inset:0;z-index:9999;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:opacity .5s ease}
+#splash.hide{opacity:0;pointer-events:none}
+#splash img{width:124px;height:124px}
+.sp-title{font-family:"Noto Serif Bengali","Hind Siliguri",serif;font-size:36px;font-weight:800;color:#0a2a5e;line-height:1.3}
+.sp-sub{font-family:"Hind Siliguri","Noto Sans Bengali",sans-serif;font-size:19px;font-weight:600;color:#d4a017;letter-spacing:.5px}
+.sp-rule{width:64px;height:3px;background:#d4a017;border-radius:2px;margin-top:10px}
 h1{margin:0;font-size:21px;font-weight:800;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .hcart{position:relative;background:none;border:0;font-size:22px;cursor:pointer;padding:8px;flex:none}
 .hcart .cbadge{position:absolute;top:2px;right:0;background:#0a2a5e;color:#fff;border-radius:999px;font-size:11px;font-weight:700;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 4px}
@@ -258,6 +267,7 @@ footer{text-align:center;color:#6b7280;padding:16px 16px 90px;font-size:13px}
 </style>
 </head>
 <body>
+<div id="splash"><img src="icon-512.png" alt="মাসিক বাজার"><div class="sp-title">মাসিক বাজার</div><div class="sp-sub">নীড়ের একটি উদ্যোগ</div><div class="sp-rule"></div></div>
 <header>
 <span class="logo"><img src="icon-192.png" width="40" height="40" style="border-radius:10px;display:block" alt="মাসিক বাজার"></span>
 <h1 id="shopTitle">নীড় • মাসিক বাজার</h1>
@@ -1244,7 +1254,7 @@ function saveTrxId(){
 }
 function renderCart(){
   refreshSlots();
-  if(cartTotals().n===0){ window.__pkgKind=null; window.__pkgNote=null; window.__pkgIds=null; advChoice=null; }
+  if(cartTotals().n===0){ window.__pkgKind=null; window.__pkgNote=null; window.__pkgIds=null; advChoice=null; window.__trxId=""; }
   if(window.__pkgIds&&window.__pkgIds.length&&!window.__pkgIds.some(function(id){ return cart[id]; })){ window.__pkgKind=null; window.__pkgNote=null; window.__pkgIds=null; advChoice=null; }
   var total=0, n=0, lines=[], _ci=0;
   Object.keys(cart).forEach(function(id){
@@ -2017,7 +2027,8 @@ function doInstall(){
 if("serviceWorker" in navigator){ window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
 showInstallBanner();
 // ---- in-app update: new version prompt (v56) ----
-var APP_VER_NUM=72;
+var APP_VER_NUM=73;
+setTimeout(function(){var s=document.getElementById("splash");if(!s)return;s.classList.add("hide");setTimeout(function(){s.remove();},500);},2000);
 var PENDING_VER=0;
 function showUpdateBanner(){ var b=document.getElementById("updateBanner"); if(b) b.style.display="block"; }
 function dismissUpdate(){ var b=document.getElementById("updateBanner"); if(b) b.style.display="none"; try{ sessionStorage.setItem("mb-upd-dismissed", String(PENDING_VER)); }catch(e){} }
