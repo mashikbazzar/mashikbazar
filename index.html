@@ -948,7 +948,7 @@ function openSubscribe(id){
   subPkgId=id;
   document.getElementById("subTitle").textContent="📅 মাসিক সাবস্ক্রিপশন — "+pkg.name;
   var _sp=document.getElementById("subPrice"); if(_sp) _sp.textContent="৳"+bn(pkgTotal(pkg));
-  var _sl=document.getElementById("subLockNote"); if(_sl) _sl.textContent="🔒 অগ্রিম ৫০% (৳"+bn(Math.round(pkgTotal(pkg)*0.5))+") দিলে এই দাম "+bn(DATA.lock_months||3)+" মাস লক থাকবে — দাম বাড়লেও আপনি এই দামেই পাবেন। বিকাশ/নগদ ০১৬৩১৪২১৯৯৫-এ পাঠিয়ে WhatsApp-এ জানান।";
+  var _sl=document.getElementById("subLockNote"); if(_sl) _sl.innerHTML="🔒 অগ্রিম ৫০% (৳"+bn(Math.round(pkgTotal(pkg)*0.5))+") দিলে এই দাম "+bn(DATA.lock_months||3)+" মাস লক থাকবে — দাম বাড়লেও আপনি এই দামেই পাবেন। বিকাশ/নগদ <b>01631421995</b> <button class=\"ghost\" style=\"width:auto;padding:4px 10px\" onclick=\"copyText('01631421995',this)\">📋 কপি</button>-এ পাঠিয়ে WhatsApp-এ জানান।";
   var _sa=document.getElementById("subAddr"); if(_sa){ var _a=""; try{ _a=localStorage.getItem("mb-addr")||""; }catch(e){} _sa.textContent=_a||"ঠিকানা দেওয়া নেই — ডেলিভারির আগে দোকান ফোনে নিশ্চিত করবে।"; }
   var c=getCustomer();
   document.getElementById("subName").value=(c&&c.name)||"";
@@ -1229,6 +1229,19 @@ function refreshSlots(){
   ds.innerHTML=opts.map(function(s){ return "<option"+(s===cur?" selected":"")+">"+s+"</option>"; }).join("");
   if(opts.indexOf(cur)<0) ds.value=opts[0];
 }
+function copyText(txt, btn){
+  if(btn && !btn.getAttribute("data-label")) btn.setAttribute("data-label", btn.textContent);
+  var done=function(){ if(btn){ btn.textContent="✅ কপি হয়েছে"; setTimeout(function(){ btn.textContent=btn.getAttribute("data-label")||"📋 কপি"; },2000); } };
+  var fallback=function(){ try{ var ta=document.createElement("textarea"); ta.value=txt; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); }catch(e){} document.body.removeChild(ta); done(); }catch(e){} };
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done, fallback); } else fallback();
+}
+function saveTrxId(){
+  var inp=document.getElementById("trxId"); var v=inp?(inp.value||"").trim():"";
+  if(!v){ var m=document.getElementById("trxMsg"); if(m) m.textContent=" TrxID লিখুন।"; return; }
+  window.__trxId=v;
+  var m2=document.getElementById("trxMsg"); if(m2) m2.textContent=" ✅ TrxID সংরক্ষিত — অর্ডার পাঠানোর সময় এটা যাবে।";
+  renderCart();
+}
 function renderCart(){
   refreshSlots();
   if(cartTotals().n===0){ window.__pkgKind=null; window.__pkgNote=null; window.__pkgIds=null; advChoice=null; }
@@ -1259,13 +1272,13 @@ function renderCart(){
   }
   var pm=(document.getElementById("payMethod")||{}).value||"ক্যাশ অন ডেলিভারি";
   var pn=document.getElementById("payNote");
-  if(pn){ if(pm==="বিকাশ"||pm==="নগদ"){ pn.textContent="📱 "+pm+" নম্বর: ০১৬৩১৪২১৯৯৫ — এই নম্বরে টাকা পাঠান, তারপর অর্ডার পাঠান।"; } else if(pm==="ব্যাংক ট্রান্সফার"){ pn.innerHTML="🏦 ব্র্যাক ব্যাংক — হবিগঞ্জ শাখা<br>অ্যাকাউন্ট: 1058617890001 (সেভিংস)<br>রাউটিং: 060360614 • SWIFT: BRAKBDDH"; } else { pn.textContent="ডেলিভারির সময় টাকা দেবেন।"; } }
+  if(pn){ if(pm==="বিকাশ"||pm==="নগদ"){ pn.innerHTML="📱 "+pm+" নম্বর: <b>01631421995</b> <button class=\"ghost\" style=\"width:auto;padding:4px 10px\" onclick=\"copyText('01631421995',this)\">📋 কপি</button><br><span class=\"small\">এই নম্বরে টাকা পাঠান, তারপর অর্ডার পাঠান।</span>"; } else if(pm==="ব্যাংক ট্রান্সফার"){ pn.innerHTML="🏦 ব্র্যাক ব্যাংক — হবিগঞ্জ শাখা<br>অ্যাকাউন্ট: <b>1058617890001</b> (সেভিংস) <button class=\"ghost\" style=\"width:auto;padding:4px 10px\" onclick=\"copyText('1058617890001',this)\">📋 কপি</button><br>রাউটিং: <b>060360614</b> <button class=\"ghost\" style=\"width:auto;padding:4px 10px\" onclick=\"copyText('060360614',this)\">📋 কপি</button> • SWIFT: BRAKBDDH"; } else { pn.textContent="ডেলিভারির সময় টাকা দেবেন।"; } }
   var ab=document.getElementById("advBox");
   if(ab){
     var _am=advAmounts();
     var _isM=isMonthlyOrder();
     if(cartTotals().n===0){ ab.innerHTML='<b>💰 অগ্রিম (বুকিং)</b><br><span class="small">মাসের বাজারের প্যাকেজে অগ্রিম ৫০%, সাধারণ অর্ডারে ২০% — চাইলে ২০% বা ৫০% বেছে নিতে পারবেন।</span>'; }
-    else{ ab.innerHTML='<b>💰 অগ্রিম (বুকিং)</b><br><span class="small">'+(_isM?'📦 মাসের বাজারের প্যাকেজ — অগ্রিম ৫০%':'🛒 সাধারণ অর্ডার — অগ্রিম ২০%')+' • চাইলে বদলাতে পারেন:</span><br><button class="ghost" style="width:auto;padding:6px 14px;'+(_am.pct===20?'background:#0a2a5e;color:#fff;':'')+'" onclick="setAdvPct(20)">২০%</button> <button class="ghost" style="width:auto;padding:6px 14px;'+(_am.pct===50?'background:#0a2a5e;color:#fff;':'')+'" onclick="setAdvPct(50)">৫০%</button><br><span class="small">অগ্রিম: <b>৳'+bn(_am.adv)+'</b> ('+bn(_am.pct)+'%) • বাকি: <b>৳'+bn(_am.rest)+'</b> ডেলিভারির সময়</span><br><span class="small">অগ্রিম বিকাশ/নগদ (০১৬৩১৪২১৯৯৫) বা ব্যাংকে পাঠাবেন।</span>'; }
+    else{ ab.innerHTML='<b>💰 অগ্রিম (বুকিং)</b><br><span class="small">'+(_isM?'📦 মাসের বাজারের প্যাকেজ — অগ্রিম ৫০%':'🛒 সাধারণ অর্ডার — অগ্রিম ২০%')+' • চাইলে বদলাতে পারেন:</span><br><button class="ghost" style="width:auto;padding:6px 14px;'+(_am.pct===20?'background:#0a2a5e;color:#fff;':'')+'" onclick="setAdvPct(20)">২০%</button> <button class="ghost" style="width:auto;padding:6px 14px;'+(_am.pct===50?'background:#0a2a5e;color:#fff;':'')+'" onclick="setAdvPct(50)">৫০%</button><br><span class="small">অগ্রিম: <b>৳'+bn(_am.adv)+'</b> ('+bn(_am.pct)+'%) • বাকি: <b>৳'+bn(_am.rest)+'</b> ডেলিভারির সময়</span><br><span class="small">অগ্রিম বিকাশ/নগদ (<b>01631421995</b>) <button class="ghost" style="width:auto;padding:4px 10px" onclick="copyText(\'01631421995\',this)>📋 কপি</button> বা ব্যাংকে পাঠাবেন।</span><br><span class="small">টাকা পাঠিয়ে থাকলে TrxID লিখুন:</span><br><input id="trxId" placeholder="TrxID (যেমন: 9HX7K2M4P1)" value="'+esc(window.__trxId||"")+'" style="width:60%;font-size:16px;padding:8px" oninput="window.__trxId=this.value" onchange="renderCart()"><button class="gold" style="width:auto;padding:8px 14px" onclick="saveTrxId()">✅ পেমেন্ট করেছি</button><span id="trxMsg" class="small">'+(window.__trxId?" ✅ TrxID সংরক্ষিত":"")+'</span>'; }
   }
   document.getElementById("cartPriceNote").textContent=canSeePrices()?"":"🔑 দাম এখন দেখানো হচ্ছে না। অর্ডার পাঠালে দোকান WhatsApp-এ দাম জানিয়ে দেবে।";
   var fd=document.getElementById("freeDeliv");
@@ -1294,6 +1307,7 @@ function renderCart(){
   var _am2=advAmounts();
   msg+="%0Aপেমেন্ট: "+encodeURIComponent(pm);
   msg+="%0Aঅগ্রিম: "+encodeURIComponent(bn(_am2.pct)+"% (৳"+bn(_am2.adv)+") — বাকি ৳"+bn(_am2.rest)+" ডেলিভারির সময়");
+  if((window.__trxId||"").trim()) msg+="%0ATrxID: "+encodeURIComponent((window.__trxId||"").trim());
   if(disc>0) msg+="%0Aকুপন "+encodeURIComponent(promo.code)+": -৳"+bn(disc)+"%0A";
   if(pdisc>0) msg+="%0Aপয়েন্ট ছাড়: -৳"+bn(pdisc)+" (৫০ পয়েন্ট)%0A";
   msg+=canSeePrices()?("----------------%0Aপণ্যের মোট: ৳"+bn(total)+(disc>0?("%0Aছাড়: -৳"+bn(disc)):"")+(pdisc>0?("%0Aপয়েন্ট ছাড়: -৳"+bn(pdisc)):"")+"%0Aডেলিভারি চার্জ: ৳"+bn(fee)+"%0Aসর্বমোট: ৳"+bn(total-disc-pdisc+fee)+"%0A— মাসিক বাজার, "+encodeURIComponent(DATA.company||"নীড়")):("----------------%0A(দাম দোকান থেকে জানানো হবে)%0A— মাসিক বাজার, "+encodeURIComponent(DATA.company||"নীড়"));
@@ -1317,13 +1331,14 @@ function saveOrder(){
   Object.keys(cart).forEach(function(id){ var p=findProduct(id); if(p) items.push({product_id:+id, name:p.name, brand:p.brand, qty:cart[id], unit:p.unit, price:p.price_taka, total:Math.round(p.price_taka*cart[id])}); });
   var _pd=pointsDiscount(t.total-promoDiscount(t.total));
   var feeEff=effFee(t.total);
-  var ord={code:code(), date:new Date().toISOString(), name:document.getElementById("cname").value||"", phone:document.getElementById("cphone").value||"", address:(document.getElementById("caddr")||{}).value||"", items:items, custom:customCart.slice(), total:t.total, fee:feeEff, grand:t.total-promoDiscount(t.total)-_pd+feeEff, delivery_day:(document.getElementById("delDay")||{}).value||"", delivery_slot:(document.getElementById("delSlot")||{}).value||"", sub_choice:(document.getElementById("subChoice")||{}).value||"", coupon:promo?promo.code:"", discount:promoDiscount(t.total), payment_method:(document.getElementById("payMethod")||{}).value||"ক্যাশ অন ডেলিভারি", points_used:_pd>0?50:0, points_discount:_pd, advance_pct:advPct(), advance_amount:advAmounts().adv, advance_rest:advAmounts().rest, status:"sent"};
+  var ord={code:code(), date:new Date().toISOString(), name:document.getElementById("cname").value||"", phone:document.getElementById("cphone").value||"", address:(document.getElementById("caddr")||{}).value||"", items:items, custom:customCart.slice(), total:t.total, fee:feeEff, grand:t.total-promoDiscount(t.total)-_pd+feeEff, delivery_day:(document.getElementById("delDay")||{}).value||"", delivery_slot:(document.getElementById("delSlot")||{}).value||"", sub_choice:(document.getElementById("subChoice")||{}).value||"", coupon:promo?promo.code:"", discount:promoDiscount(t.total), payment_method:(document.getElementById("payMethod")||{}).value||"ক্যাশ অন ডেলিভারি", points_used:_pd>0?50:0, points_discount:_pd, advance_pct:advPct(), advance_amount:advAmounts().adv, advance_rest:advAmounts().rest, trx_id:(window.__trxId||"").trim(), status:"sent"};
+  window.__trxId="";
   if(_c){ var list=getOrders(); list.unshift(ord); localStorage.setItem("mb-orders", JSON.stringify(list)); }
   if(sb && _c){
     var tok=getSessionToken();
     if(!tok){ console.log("order sync skipped: no session — please log in again"); }
     else{
-      var _ord={order_no:ord.code, customer_name:ord.name, phone:ord.phone, items:ord.items.concat(ord.custom.map(function(c){ return {name:c.name, brand:"", qty:1, unit:c.qty, price:0, total:0}; })), subtotal:ord.total, delivery_fee:ord.fee, total:ord.grand, delivery_day:ord.delivery_day, delivery_slot:ord.delivery_slot, status:"New Order", payment_method:ord.payment_method, payment_status:"unpaid", advance_pct:ord.advance_pct, advance_amount:ord.advance_amount, advance_rest:ord.advance_rest, points_used:ord.points_used, points_discount:ord.points_discount, coupon_code:(ord.coupon||null), coupon_discount:(ord.discount||0), address:ord.address};
+      var _ord={order_no:ord.code, customer_name:ord.name, phone:ord.phone, items:ord.items.concat(ord.custom.map(function(c){ return {name:c.name, brand:"", qty:1, unit:c.qty, price:0, total:0}; })), subtotal:ord.total, delivery_fee:ord.fee, total:ord.grand, delivery_day:ord.delivery_day, delivery_slot:ord.delivery_slot, status:"New Order", payment_method:ord.payment_method, payment_status:"unpaid", advance_pct:ord.advance_pct, advance_amount:ord.advance_amount, advance_rest:ord.advance_rest, points_used:ord.points_used, points_discount:ord.points_discount, coupon_code:(ord.coupon||null), coupon_discount:(ord.discount||0), address:ord.address, trx_id:ord.trx_id};
       sb.rpc("customer_place_order", {p_token:tok, p_order:_ord}).then(function(r){
         if(r.error){ console.log("order sync failed", r.error.message); return; }
         var _d=rpcData(r); var _st=rpcStatus(_d);
@@ -1377,7 +1392,7 @@ function renderMemo(editable){
   var d=new Date(m.date);
   var t=memoTotals();
   var head='<div style="text-align:center;border-bottom:2px solid #0a2a5e;padding-bottom:10px;margin-bottom:12px"><h2 style="margin:0;color:#0a2a5e">মাসিক বাজার</h2><p style="margin:2px 0">নীড় • WhatsApp: 01631421995</p><h3 style="margin:8px 0 0">🧾 ক্যাশ মেমো</h3></div>';
-  var info='<p>অর্ডার নম্বর: <b>'+esc(m.no)+'</b><br>তারিখ: '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br>কাস্টমার: <b>'+esc(m.name||"—")+'</b><br>মোবাইল: '+esc(m.phone||"—")+'<br>ঠিকানা: '+esc(m.address||"—")+(m.delivery_day?('<br>🚚 ডেলিভারি: '+esc(m.delivery_day)+', '+esc(m.delivery_slot||"")):'')+(m.payment_method?('<br>💰 পেমেন্ট: '+esc(m.payment_method)+' ('+payTxt(m.payment_status)+')'):'')+(m.advance_pct?('<br>💰 অগ্রিম: '+bn(m.advance_pct)+'% (৳'+bn(m.advance_amount||0)+') — বাকি ৳'+bn(m.advance_rest||0)+')'):'')+'</p>';
+  var info='<p>অর্ডার নম্বর: <b>'+esc(m.no)+'</b><br>তারিখ: '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br>কাস্টমার: <b>'+esc(m.name||"—")+'</b><br>মোবাইল: '+esc(m.phone||"—")+'<br>ঠিকানা: '+esc(m.address||"—")+(m.delivery_day?('<br>🚚 ডেলিভারি: '+esc(m.delivery_day)+', '+esc(m.delivery_slot||"")):'')+(m.payment_method?('<br>💰 পেমেন্ট: '+esc(m.payment_method)+' ('+payTxt(m.payment_status)+')'):'')+(m.trx_id?('<br>🧾 TrxID: '+esc(m.trx_id)):'')+(m.advance_pct?('<br>💰 অগ্রিম: '+bn(m.advance_pct)+'% (৳'+bn(m.advance_amount||0)+') — বাকি ৳'+bn(m.advance_rest||0)+')'):'')+'</p>';
   var rows=m.items.map(function(it,i){
     var line=(+it.qty||0)*(+it.price||0);
     if(editable){
@@ -1475,7 +1490,7 @@ async function renderMyOrders(){
           return '<div id="rw-'+key+'">'+rateWidgetHtml(key, it)+'</div>';
         }).join("");
       }
-      return '<div class="ordercard"><b>'+o.order_no+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br><b>'+(bnStatus[o.status]||o.status)+'</b>'+trackHtml(bnStatus[o.status]||o.status)+'<br>'+(o.items||[]).map(function(it){ return it.name+(it.brand?(' ('+it.brand+')'):"")+' — '+bn(qtyText(it))+' (৳'+bn(it.total||0)+')'; }).join("<br>")+'<br><b>সর্বমোট: ৳'+bn(o.total)+'</b>'+(o.advance_pct?('<br><span class="small">💰 অগ্রিম: '+bn(o.advance_pct)+'% (৳'+bn(o.advance_amount||0)+') — বাকি ৳'+bn(o.advance_rest||0)+'</span>'):"")+(o.payment_method?('<br><span class="small">💰 পেমেন্ট: '+esc(o.payment_method)+' ('+payTxt(o.payment_status)+')</span>'):"")+(o.delivery_day?('<br><span class="small">🚚 ডেলিভারি: '+esc(o.delivery_day)+', '+esc(o.delivery_slot||"")+'</span>'):'')+(o.address?('<br><span class="small">ঠিকানা: '+esc(o.address)+'</span>'):'')+rateHtml+'<br><button class="primary" onclick="reorderByNo(\''+o.order_no+'\')">🔁 আবার এই অর্ডারটি করুন</button> <button class="gold" onclick="openReceipt(\''+o.order_no+'\')">🧾 রসিদ</button></div>';
+      return '<div class="ordercard"><b>'+o.order_no+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br><b>'+(bnStatus[o.status]||o.status)+'</b>'+trackHtml(bnStatus[o.status]||o.status)+'<br>'+(o.items||[]).map(function(it){ return it.name+(it.brand?(' ('+it.brand+')'):"")+' — '+bn(qtyText(it))+' (৳'+bn(it.total||0)+')'; }).join("<br>")+'<br><b>সর্বমোট: ৳'+bn(o.total)+'</b>'+(o.advance_pct?('<br><span class="small">💰 অগ্রিম: '+bn(o.advance_pct)+'% (৳'+bn(o.advance_amount||0)+') — বাকি ৳'+bn(o.advance_rest||0)+'</span>'):"")+(o.payment_method?('<br><span class="small">💰 পেমেন্ট: '+esc(o.payment_method)+' ('+payTxt(o.payment_status)+')</span>'):"")+(o.trx_id?('<br><span class="small">🧾 TrxID: '+esc(o.trx_id)+'</span>'):"")+(o.delivery_day?('<br><span class="small">🚚 ডেলিভারি: '+esc(o.delivery_day)+', '+esc(o.delivery_slot||"")+'</span>'):'')+(o.address?('<br><span class="small">ঠিকানা: '+esc(o.address)+'</span>'):'')+rateHtml+'<br><button class="primary" onclick="reorderByNo(\''+o.order_no+'\')">🔁 আবার এই অর্ডারটি করুন</button> <button class="gold" onclick="openReceipt(\''+o.order_no+'\')">🧾 রসিদ</button></div>';
     }).join("");
     return;
   }
@@ -1487,7 +1502,7 @@ async function renderMyOrders(){
     var d=new Date(o.date);
     var gTrack={sent:"নতুন অর্ডার", confirmed:"নিশ্চিত", delivered:"ডেলিভারি সম্পন্ন"};
     var steps=trackHtml(gTrack[o.status]||"নতুন অর্ডার");
-    return '<div class="ordercard"><b>'+o.code+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br><b>'+statusText[o.status]+'</b>'+(o.address?('<br>ঠিকানা: '+o.address):"")+'<br>'+o.items.map(function(it){ return it.name+(it.brand?(' ('+it.brand+')'):"")+' — '+bn(qtyText(it))+' (৳'+bn(it.total)+')'; }).join("<br>")+(o.custom.length?("<br>"+o.custom.map(function(c){ return c.name+" — "+c.qty; }).join("<br>")):"")+'<br><b>সর্বমোট: ৳'+bn(o.grand)+'</b>'+(o.advance_pct?('<br><span class="small">💰 অগ্রিম: '+bn(o.advance_pct)+'% (৳'+bn(o.advance_amount||0)+') — বাকি ৳'+bn(o.advance_rest||0)+'</span>'):'')+(o.delivery_day?('<br><span class="small">🚚 ডেলিভারি: '+esc(o.delivery_day)+', '+esc(o.delivery_slot||"")+'</span>'):'')+(o.payment_method?('<br><span class="small">💰 পেমেন্ট: '+esc(o.payment_method)+'</span>'):'')+steps+'<button class="primary" onclick="reorder(\''+o.code+'\')">🔁 আবার এই অর্ডারটি করুন</button> <button class="gold" onclick="openReceipt(\''+o.code+'\')">🧾 রসিদ</button> '+'</div>';
+    return '<div class="ordercard"><b>'+o.code+'</b> — '+d.toLocaleDateString("bn-BD")+' '+d.toLocaleTimeString("bn-BD",{hour:"2-digit",minute:"2-digit"})+'<br><b>'+statusText[o.status]+'</b>'+(o.address?('<br>ঠিকানা: '+o.address):"")+'<br>'+o.items.map(function(it){ return it.name+(it.brand?(' ('+it.brand+')'):"")+' — '+bn(qtyText(it))+' (৳'+bn(it.total)+')'; }).join("<br>")+(o.custom.length?("<br>"+o.custom.map(function(c){ return c.name+" — "+c.qty; }).join("<br>")):"")+'<br><b>সর্বমোট: ৳'+bn(o.grand)+'</b>'+(o.advance_pct?('<br><span class="small">💰 অগ্রিম: '+bn(o.advance_pct)+'% (৳'+bn(o.advance_amount||0)+') — বাকি ৳'+bn(o.advance_rest||0)+'</span>'):'')+(o.delivery_day?('<br><span class="small">🚚 ডেলিভারি: '+esc(o.delivery_day)+', '+esc(o.delivery_slot||"")+'</span>'):'')+(o.payment_method?('<br><span class="small">💰 পেমেন্ট: '+esc(o.payment_method)+'</span>'):'')+(o.trx_id?('<br><span class="small">🧾 TrxID: '+esc(o.trx_id)+'</span>'):'')+steps+'<button class="primary" onclick="reorder(\''+o.code+'\')">🔁 আবার এই অর্ডারটি করুন</button> <button class="gold" onclick="openReceipt(\''+o.code+'\')">🧾 রসিদ</button> '+'</div>';
   }).join("");
 }
 var __recBusy=false;
@@ -1821,7 +1836,7 @@ async function aiReply(q){
   }
   /* --- advance (v63) --- */
   if(/(অগ্রিম|এডভান্স|advance)/i.test(text)){
-    return "অগ্রিম (বুকিং) — মাসের বাজারের প্যাকেজে (পরিবারের প্যাকেজ) অগ্রিম ৫০%, সাধারণ অর্ডারে ২০%। চেকআউটে আপনি চাইলে ২০% বা ৫০% বেছে নিতে পারবেন — বাকিটা ডেলিভারির সময় দেবেন। অগ্রিম বিকাশ/নগদ (০১৬৩১৪২১৯৯৫) বা ব্যাংক ট্রান্সফারে পাঠাবেন।";
+    return "অগ্রিম (বুকিং) — মাসের বাজারের প্যাকেজে (পরিবারের প্যাকেজ) অগ্রিম ৫০%, সাধারণ অর্ডারে ২০%। চেকআউটে আপনি চাইলে ২০% বা ৫০% বেছে নিতে পারবেন — বাকিটা ডেলিভারির সময় দেবেন। অগ্রিম বিকাশ/নগদ (01631421995) বা ব্যাংক ট্রান্সফারে পাঠাবেন।";
   }
   /* --- bank transfer (v63) --- */
   if(/(ব্যাংক|bank)/i.test(text)){
@@ -1833,7 +1848,7 @@ async function aiReply(q){
   }
   /* --- payment --- */
   if(/(পেমেন্ট|বিকাশ|নগদ|ক্যাশ|টাকা দেব|কীভাবে দেব|কিভাবে দেব)/.test(text)){
-    return "পেমেন্ট খুব সহজ — ক্যাশ অন ডেলিভারি, বিকাশ/নগদ (০১৬৩১৪২১৯৯৫), অথবা ব্যাংক ট্রান্সফার (ব্র্যাক ব্যাংক, হবিগঞ্জ শাখা)। মাসের বাজারের প্যাকেজে অগ্রিম ৫০%, সাধারণ অর্ডারে ২০% — তবে আপনি চাইলে ২০% বা ৫০% বেছে নিতে পারবেন। বাকিটা ডেলিভারির সময়। বিস্তারিত জানতে WhatsApp করুন 01631421995।";
+    return "পেমেন্ট খুব সহজ — ক্যাশ অন ডেলিভারি, বিকাশ/নগদ (01631421995), অথবা ব্যাংক ট্রান্সফার (ব্র্যাক ব্যাংক, হবিগঞ্জ শাখা)। মাসের বাজারের প্যাকেজে অগ্রিম ৫০%, সাধারণ অর্ডারে ২০% — তবে আপনি চাইলে ২০% বা ৫০% বেছে নিতে পারবেন। বাকিটা ডেলিভারির সময়। বিস্তারিত জানতে WhatsApp করুন 01631421995। টাকা পাঠিয়ে TrxID লিখে 'পেমেন্ট করেছি' চাপুন — দোকানদার যাচাই করে নেবে।";
   }
   /* --- shop hours --- */
   if(/(দোকান.*(খোলা|বন্ধ)|কখন খোলা|কটা পর্যন্ত|সময়সূচি|কখন খোলে)/.test(text)){
@@ -2002,7 +2017,7 @@ function doInstall(){
 if("serviceWorker" in navigator){ window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
 showInstallBanner();
 // ---- in-app update: new version prompt (v56) ----
-var APP_VER_NUM=71;
+var APP_VER_NUM=72;
 var PENDING_VER=0;
 function showUpdateBanner(){ var b=document.getElementById("updateBanner"); if(b) b.style.display="block"; }
 function dismissUpdate(){ var b=document.getElementById("updateBanner"); if(b) b.style.display="none"; try{ sessionStorage.setItem("mb-upd-dismissed", String(PENDING_VER)); }catch(e){} }
