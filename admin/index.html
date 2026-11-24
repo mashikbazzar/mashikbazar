@@ -337,6 +337,7 @@ section h2{color:#6d28d9}
 <label>কোম্পানির নাম</label><input id="sCompany" onchange="saveSettings()">
 <label>WhatsApp নম্বর (অর্ডার যাবে)</label><input id="sWa" onchange="saveSettings()">
 <label>ডেলিভারি চার্জ (টাকা) — ০ মানে ফ্রি</label><input id="sFee" type="number" min="0" onchange="saveSettings()">
+<label>🔒 প্রাইস লক (মাস) — সাবস্ক্রিপশনে অগ্রিম দিলে দাম এত মাস লক থাকবে</label><input id="sLockMonths" type="number" min="1" max="12" onchange="saveSettings()">
 <label>Facebook পেজের লিংক</label><input id="sFb" onchange="saveSettings()" placeholder="https://facebook.com/...">
 <p class="small">বদলালেই সংরক্ষণ হয় আর কাস্টমারের কাছে কয়েক সেকেন্ডে লাইভ যায়। প্রকাশ শুধু অফলাইন ব্যাকআপ ফাইল আপডেট করে।</p>
 <h3 style="margin-top:18px">🎟️ কুপন কোড</h3>
@@ -358,6 +359,15 @@ section h2{color:#6d28d9}
 <p id="btMsg" class="small"></p>
 <p id="btMargin" class="small"></p>
 <div id="bulkTierList"></div>
+<h3 style="margin-top:18px">🎉 অফার</h3>
+<p class="small">কাস্টমার অ্যাপের দোকান ট্যাবে সোনালি জায়গায় দেখাবে। অফার বন্ধ করতে "বন্ধ করুন" চাপুন — মুছে ফেলার দরকার নেই।</p>
+<label>অফারের শিরোনাম</label><input id="ofTitle" placeholder="যেমন: প্যাকেজে ডেলিভারি ফ্রি">
+<label>অফারের লেখা</label><input id="ofText" placeholder="যেমন: ৳২,০০০+ অর্ডারে ডেলিভারি চার্জ একদম ফ্রি!">
+<label>শুরুর তারিখ (না বসালে এখন থেকেই)</label><input id="ofStart" type="date">
+<label>শেষের তারিখ (না বসালে মেয়াদ নেই)</label><input id="ofEnd" type="date">
+<button class="gold" onclick="addOffer()">➕ অফার যোগ করুন</button>
+<p id="ofMsg" class="small"></p>
+<div id="offerList"></div>
 <h3 style="margin-top:18px">🔒 অ্যাডমিন নিরাপত্তা</h3>
 <p class="small">সব ডিভাইস থেকে লগআউট করলে এই ফোনসহ সব ফোন/কম্পিউটারে অ্যাডমিন খুলতে আবার PIN দিতে হবে। ফোন হারালে বা অন্য কেউ অ্যাডমিন খুলে ফেললে এটা চাপুন।</p>
 <button class="danger" onclick="revokeAllAdminSessions(this)">🚪 সব ডিভাইস থেকে লগআউট</button>
@@ -736,6 +746,7 @@ async function openAdmin(){
   document.getElementById("sCompany").value=DRAFT.company||"";
   document.getElementById("sWa").value=DRAFT.whatsapp||"";
   document.getElementById("sFee").value=DRAFT.delivery_fee_taka||0;
+  var __lm=document.getElementById("sLockMonths"); if(__lm) __lm.value=DRAFT.lock_months||3;
   var __fb=document.getElementById("sFb"); if(__fb) __fb.value=DRAFT.facebook_url||"";
   document.getElementById("ghToken").value=localStorage.getItem("mb-gh-token")||"";
   document.getElementById("marginPct").value=DRAFT.margin_pct||"";
@@ -808,7 +819,7 @@ function showAdminTab(t, force){
   var doLoad=force || isReTap || !fresh;
   if(doLoad) __tabLastLoad[t]=Date.now();
   if(t==="dashboard" && doLoad) loadDashboard();
-  if(t==="settings" && doLoad){ loadCoupons(); loadBulkTiers(); }
+  if(t==="settings" && doLoad){ loadCoupons(); loadBulkTiers(); renderOffersAdmin(); }
   if(t==="products") loadProductRatingsAdmin();
   if(t==="daily") renderDailyList();
   if(t==="analytics" && doLoad) loadAnalytics();
@@ -874,6 +885,25 @@ async function dashConfirmOrder(id){
   await setAdminOrderStatus(id,"Confirmed");
   loadDashboard();
 }
+function subLockLineAdmin(r){
+  if(!r || !r.locked_total) return "";
+  var pkg=null; (DRAFT.packages||[]).forEach(function(p){ if(p.id===r.package_id) pkg=p; });
+  var cur=null;
+  if(pkg){
+    cur=0;
+    (pkg.items||[]).forEach(function(it){
+      var pr=null; (DRAFT.products||[]).forEach(function(x){ if(x.id===it.product_id) pr=x; });
+      if(pr) cur+=Math.round(pr.price_taka*(it.qty_multiplier||1));
+    });
+  }
+  var save=(cur!==null)?Math.max(0, Math.round(cur-(+r.locked_total))):0;
+  var until=""; try{ until=new Date(r.lock_until).toLocaleDateString("bn-BD"); }catch(e){}
+  var h='<br>🔒 লক: ৳'+bn(+r.locked_total);
+  if(cur!==null) h+=' • আজকের দাম ৳'+bn(cur);
+  if(save>0) h+=' • সাশ্রয় ৳'+bn(save);
+  if(until) h+=' ('+until+' পর্যন্ত)';
+  return h;
+}
 async function loadSubs(){
   var el=document.getElementById("subsList"); if(!el) return;
   if(!sb){ el.innerHTML="<p>ডেটাবেসের সঙ্গে যুক্ত হওয়া যায়নি।</p>"; return; }
@@ -894,7 +924,7 @@ async function loadSubs(){
     if(r.status==="active") btns='<button class="ghost" onclick="setSubStatusAdmin(\''+r.id+'\',\'paused\')">⏸️ থামান</button>';
     else if(r.status==="paused") btns='<button class="primary" onclick="setSubStatusAdmin(\''+r.id+'\',\'active\')">▶️ চালু করুন</button>';
     if(r.status!=="cancelled") btns+=' <button class="danger" onclick="cancelSubAdmin(\''+r.id+'\',this)">✕ বাতিল</button>';
-    return '<div class="ordercard"><b>'+r.package_name+'</b> — '+r.delivery_day+'<br>'+(r.customer_name||"")+' • '+(r.customer_phone||"")+'<br>'+(stTxt[r.status]||r.status)+' • '+d.toLocaleDateString("bn-BD")+'<br><a class="primary" style="display:inline-block;padding:8px 12px;text-decoration:none" href="'+wa+'" target="_blank">💬 WhatsApp-এ নিশ্চিত করুন</a> '+btns+'</div>';
+    return '<div class="ordercard"><b>'+r.package_name+'</b> — '+r.delivery_day+'<br>'+(r.customer_name||"")+' • '+(r.customer_phone||"")+'<br>'+(stTxt[r.status]||r.status)+' • '+d.toLocaleDateString("bn-BD")+subLockLineAdmin(r)+'<br><a class="primary" style="display:inline-block;padding:8px 12px;text-decoration:none" href="'+wa+'" target="_blank">💬 WhatsApp-এ নিশ্চিত করুন</a> '+btns+'</div>';
   }).join("");
 }
 var pendingCancelSub=null, pendingCancelSubTimer=null;
@@ -910,6 +940,29 @@ async function setSubStatusAdmin(id,status){
   var res=await adminRpcCall("admin_set_subscription_status", {p_sub_id:id, p_status:status});
   if(res.error){ alert("হয়নি: "+res.error.message+" — আবার চেষ্টা করুন।"); return; }
   loadSubs();
+}
+function renderOffersAdmin(){
+  var el=document.getElementById("offerList"); if(!el) return;
+  var list=DRAFT.offers||[];
+  if(!list.length){ el.innerHTML='<p class="small">এখনো কোনো অফার নেই।</p>'; return; }
+  el.innerHTML=list.map(function(o){
+    return '<div class="ordercard"><b>'+esc(o.title||"")+'</b> — '+(o.active===false?"⏸️ বন্ধ":"✅ চালু")+'<br><span class="small">'+esc(o.text||"")+'</span><br><span class="small">'+(o.start||"")+(o.start&&o.end?" — ":"")+(o.end||"")+'</span><br><button class="ghost" onclick="toggleOffer('+o.id+')">'+(o.active===false?"▶️ চালু করুন":"⏸️ বন্ধ করুন")+'</button></div>';
+  }).join("");
+}
+function addOffer(){
+  var t=document.getElementById("ofTitle").value.trim();
+  var tx=document.getElementById("ofText").value.trim();
+  var msg=document.getElementById("ofMsg");
+  if(!t||!tx){ msg.textContent="শিরোনাম আর লেখা দুটোই দিন।"; return; }
+  if(!DRAFT.offers) DRAFT.offers=[];
+  DRAFT.offers.push({id:Date.now(), title:t, text:tx, start:document.getElementById("ofStart").value||"", end:document.getElementById("ofEnd").value||"", active:true});
+  document.getElementById("ofTitle").value=""; document.getElementById("ofText").value=""; document.getElementById("ofStart").value=""; document.getElementById("ofEnd").value="";
+  msg.textContent="✅ অফার যোগ হয়েছে — কাস্টমারের কাছে কয়েক সেকেন্ডে লাইভ যাবে।";
+  saveDraft(); renderOffersAdmin();
+}
+function toggleOffer(id){
+  (DRAFT.offers||[]).forEach(function(o){ if(o.id===id) o.active=(o.active===false)?true:false; });
+  saveDraft(); renderOffersAdmin();
 }
 async function loadCoupons(){
   var el=document.getElementById("couponList"); if(!el) return;
@@ -1060,6 +1113,7 @@ function saveSettings(){
   DRAFT.company=document.getElementById("sCompany").value;
   DRAFT.whatsapp=document.getElementById("sWa").value;
   DRAFT.delivery_fee_taka=parseInt(document.getElementById("sFee").value||"0",10)||0;
+  var lmEl=document.getElementById("sLockMonths"); if(lmEl){ var lm=parseInt(lmEl.value||"3",10)||3; DRAFT.lock_months=Math.max(1,Math.min(12,lm)); }
   var fbEl=document.getElementById("sFb"); if(fbEl) DRAFT.facebook_url=(fbEl.value||"").trim();
   saveDraft();
 }
