@@ -2178,7 +2178,7 @@ function viewPO(poNo){
   var po=(window.__poRows||{})[poNo]; if(!po) return;
   var d=new Date(po.created_at);
   var supTotal=0, hasSup=false;
-  var rows=(po.items||[]).map(function(it){ var sp=(it.supplier_price!=null?+it.supplier_price:null); if(sp!=null){ hasSup=true; supTotal+=Math.round(sp*it.qty); } return '<tr><td>'+esc(it.product_name||"")+'</td><td>'+esc(it.brand||"")+'</td><td>'+bn(it.qty)+' '+(it.unit||"")+'</td><td>৳'+bn(it.price)+(sp!=null?('<br><span class="small">পাইকারি: ৳'+bn(sp)+'</span>'):"")+'</td><td>৳'+bn(Math.round(it.price*it.qty))+'</td></tr>'; }).join("");
+  var rows=(po.items||[]).map(function(it){ var sp=(it.wholesale_price!=null?+it.wholesale_price:(it.supplier_price!=null?+it.supplier_price:null)); if(sp!=null){ hasSup=true; supTotal+=Math.round(sp*it.qty); } return '<tr><td>'+esc(it.product_name||"")+'</td><td>'+esc(it.brand||"")+'</td><td>'+bn(it.qty)+' '+(it.unit||"")+'</td><td>৳'+bn(it.price)+(sp!=null?('<br><span class="small">পাইকারি: ৳'+bn(sp)+'</span>'):"")+'</td><td>৳'+bn(Math.round(it.price*it.qty))+'</td></tr>'; }).join("");
   document.getElementById("poPaper").innerHTML='<h2 style="margin:0">🧾 ক্রয় আদেশ — '+esc(po.po_no)+'</h2><p class="small">মাসিক বাজার (নীড়) • '+d.toLocaleDateString("bn-BD")+'</p><p>দোকানদার: <b>'+esc(po.supplier_name||"")+'</b>'+(po.order_no?('<br>কাস্টমার অর্ডার: <b>'+esc(po.order_no)+'</b>'):"")+'</p><table><tr><th>পণ্য</th><th>ব্র্যান্ড</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr>'+rows+'</table><p><b>সর্বমোট: ৳'+bn(po.total)+'</b>'+(hasSup?('<br>পাইকারি মোট: <b>৳'+bn(supTotal)+'</b> • ছাড়: ৳'+bn(Math.round(po.total)-supTotal)):"")+'</p>'+(hasSup?('<p><button class="primary" onclick="applyPOWholesale(\''+po.po_no+'\')">💰 এই পাইকারি দামগুলো পণ্যে বসান</button></p>'):"")+'<p class="small">এই আদেশ অনুযায়ী পণ্য পাঠাবেন। পণ্য পাওয়ার পর টাকা দেওয়া হবে।</p>';
   document.getElementById("poOverlay").style.display="block";
   window.scrollTo(0,0);
@@ -2196,8 +2196,8 @@ async function loadPOs(){
   el.innerHTML=rows.map(function(po){ var d=new Date(po.created_at); return '<div class="listrow"><div class="n"><b>'+esc(po.po_no)+'</b> — '+esc(po.supplier_name||"")+'<br><span class="small">'+d.toLocaleDateString("bn-BD")+' • মোট ৳'+bn(po.total)+' • '+(po.status||"")+'</span></div><button class="primary" onclick="viewPO(\''+po.po_no+'\')">👁️ দেখুন</button></div>'; }).join("");
 }
 /* ---- bulk orders: big customer order -> supplier repricing ---- */
-function bulkSupplierTotal(po){ var t=0; (po.items||[]).forEach(function(it){ if(it.supplier_price!=null) t+=Math.round(it.supplier_price*it.qty); }); return t; }
-function bulkHasPrices(po){ return (po.items||[]).some(function(it){ return it.supplier_price!=null; }); }
+function bulkSupplierTotal(po){ var t=0; (po.items||[]).forEach(function(it){ var sp=(it.wholesale_price!=null?+it.wholesale_price:(it.supplier_price!=null?+it.supplier_price:null)); if(sp!=null) t+=Math.round(sp*it.qty); }); return t; }
+function bulkHasPrices(po){ return (po.items||[]).some(function(it){ return it.wholesale_price!=null||it.supplier_price!=null; }); }
 /* ---- v53: daily purchase list (auto in the apps, semi-auto on WhatsApp) ---- */
 function aggregateDayItems(day){
   var agg={};
@@ -2272,7 +2272,7 @@ async function applyPOWholesale(poNo){
   var ok=0, fail=[];
   for(var i=0;i<(po.items||[]).length;i++){
     var it=po.items[i];
-    var sp=(it.supplier_price!=null?+it.supplier_price:null);
+    var sp=(it.wholesale_price!=null?+it.wholesale_price:(it.supplier_price!=null?+it.supplier_price:null));
     if(!(sp>0)) continue;
     var pid=it.product_id||null;
     if(!pid && DRAFT && DRAFT.products) DRAFT.products.forEach(function(p){ if(normName(p.name)===normName(it.product_name||"") && (p.brand||"")===(it.brand||"")) pid=p.id; });
