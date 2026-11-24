@@ -291,6 +291,7 @@ footer{text-align:center;color:#6b7280;padding:16px 16px 90px;font-size:13px}
 <div id="loginHint"></div>
 <div id="specials"></div>
 <div id="needCalc"></div>
+<div id="offers"></div>
 <div id="list"></div>
 <div class="prizebanner" onclick="document.getElementById('fbBox').scrollIntoView({behavior:'smooth'})">💡 <b>নতুন আইডিয়া দিন, পুরস্কার জিতুন!</b><span>আমাদের সেবা কেমন? অ্যাপটি কেমন হলে আপনি আরও ভালোভাবে ব্যবহার করতে পারতেন? আপনার আইডিয়া জানান — সেরা আইডিয়ার জন্য থাকছে পুরস্কার!</span></div>
 <section class="adminbox" id="fbBox"><h2>💬 মতামত</h2>
@@ -333,6 +334,7 @@ footer{text-align:center;color:#6b7280;padding:16px 16px 90px;font-size:13px}
 <h3 id="subTitle">📅 মাসিক সাবস্ক্রিপশন</h3>
 <p class="small">প্রতি মাসে এই প্যাকেজটি নিজে থেকে আসবে — বারবার কার্ট সাজাতে হবে না। ডেলিভারির আগে দোকান থেকে জানানো হবে। যেকোনো সময় থামানো বা বাদ দেওয়া যাবে।</p>
 <p><b>প্যাকেজের মোট: <span id="subPrice"></span></b> <span class="small">(প্রতি মাসে — ডেলিভারি চার্জ আলাদা)</span></p>
+<p id="subLockNote" class="small"></p>
 <p class="small">ডেলিভারির ঠিকানা: <span id="subAddr"></span></p>
 <label>ডেলিভারির দিন</label>
 <select id="subDay"><option>মাসের ১ তারিখ</option><option>মাসের ৫ তারিখ</option><option>প্রতি শনিবার</option><option>প্রতি শুক্রবার</option></select>
@@ -756,7 +758,7 @@ function renderShop(){
     loadProductRatings(); renderSpecials();
   }
   renderPkgs();
-  loadProductRatings(); renderSpecials(); renderNeedCalc();
+  loadProductRatings(); renderSpecials(); renderNeedCalc(); renderOffers();
 }
 function pkgCardHtml(pkg){
   var sc=pkg.scale?('<p class="small">📏 '+bn(pkg.scale.min)+'–'+bn(pkg.scale.max)+' '+pkg.scale.unit+' — সংখ্যা দিলেই পরিমাণ বদলাবে</p>'):"";
@@ -946,6 +948,7 @@ function openSubscribe(id){
   subPkgId=id;
   document.getElementById("subTitle").textContent="📅 মাসিক সাবস্ক্রিপশন — "+pkg.name;
   var _sp=document.getElementById("subPrice"); if(_sp) _sp.textContent="৳"+bn(pkgTotal(pkg));
+  var _sl=document.getElementById("subLockNote"); if(_sl) _sl.textContent="🔒 অগ্রিম ৫০% (৳"+bn(Math.round(pkgTotal(pkg)*0.5))+") দিলে এই দাম "+bn(DATA.lock_months||3)+" মাস লক থাকবে — দাম বাড়লেও আপনি এই দামেই পাবেন। বিকাশ/নগদ ০১৬৩১৪২১৯৯৫-এ পাঠিয়ে WhatsApp-এ জানান।";
   var _sa=document.getElementById("subAddr"); if(_sa){ var _a=""; try{ _a=localStorage.getItem("mb-addr")||""; }catch(e){} _sa.textContent=_a||"ঠিকানা দেওয়া নেই — ডেলিভারির আগে দোকান ফোনে নিশ্চিত করবে।"; }
   var c=getCustomer();
   document.getElementById("subName").value=(c&&c.name)||"";
@@ -981,6 +984,18 @@ async function saveSubscribe(){
   window.__subJustStarted=pkg.name+" — "+day;
   setTimeout(function(){ closeSubscribe(true); showTab("orders"); }, 1200);
 }
+function subLockLine(s){
+  if(!s || !s.locked_total) return "";
+  var pkg=null; DATA.packages.forEach(function(p){ if(p.id===s.package_id) pkg=p; });
+  var cur=pkg?pkgTotal(pkg):null;
+  var save=(cur!==null)?Math.max(0, Math.round(cur-(+s.locked_total))):0;
+  var until=""; try{ until=new Date(s.lock_until).toLocaleDateString("bn-BD"); }catch(e){}
+  var h='<br>🔒 দাম লক করা: ৳'+bn(+s.locked_total);
+  if(cur!==null) h+=' — আজকের দাম ৳'+bn(cur);
+  if(save>0) h+=' — আপনি ৳'+bn(save)+' বাঁচালেন';
+  if(until) h+=' ('+until+' পর্যন্ত)';
+  return h;
+}
 async function loadMySubs(){
   var el=document.getElementById("mySubs"); if(!el) return;
   var c=getCustomer();
@@ -1000,7 +1015,7 @@ async function loadMySubs(){
     if(s.status==="active") btn='<button class="ghost" onclick="setSubStatus(\''+s.id+'\',\'paused\')">⏸️ থামান</button>';
     else if(s.status==="paused") btn='<button class="primary" onclick="setSubStatus(\''+s.id+'\',\'active\')">▶️ আবার চালু করুন</button>';
     var cancel=s.status!=="cancelled"?'<button class="danger" onclick="setSubStatus(\''+s.id+'\',\'cancelled\')">✕ বাতিল করুন</button>':"";
-    return '<div class="ordercard"><b>'+s.package_name+'</b> — '+s.delivery_day+'<br><span id="substat-'+s.id+'">'+(stTxt[s.status]||s.status)+'</span><br>'+btn+" "+cancel+"</div>";
+    return '<div class="ordercard"><b>'+s.package_name+'</b> — '+s.delivery_day+subLockLine(s)+'<br><span id="substat-'+s.id+'">'+(stTxt[s.status]||s.status)+'</span><br>'+btn+" "+cancel+"</div>";
   }).join("");
 }
 async function setSubStatus(id,status){
@@ -1130,6 +1145,31 @@ function renderNeedCalc(){
   }
   h+='</div>';
   el.innerHTML=h;
+}
+function offerActive(o){
+  if(!o || o.active===false) return false;
+  var now=new Date(); now.setHours(0,0,0,0);
+  if(o.start){ var st=new Date(o.start+"T00:00:00"); if(now<st) return false; }
+  if(o.end){ var en=new Date(o.end+"T00:00:00"); if(now>en) return false; }
+  return true;
+}
+function offerWhen(o){
+  var f=function(d){ try{ return new Date(d+"T00:00:00").toLocaleDateString("bn-BD"); }catch(e){ return d; } };
+  if(o.start&&o.end) return "📅 "+f(o.start)+" — "+f(o.end);
+  if(o.start) return "📅 "+f(o.start)+" থেকে";
+  if(o.end) return "📅 "+f(o.end)+" পর্যন্ত";
+  return "";
+}
+function renderOffers(){
+  var el=document.getElementById("offers"); if(!el) return;
+  var q=(document.getElementById("q")||{}).value||"";
+  if(q || cat!=="সব" || catView || dailyView){ el.innerHTML=""; return; }
+  var list=(DATA.offers||[]).filter(offerActive);
+  if(!list.length){ el.innerHTML=""; return; }
+  el.innerHTML='<div style="background:#fef3c7;border:2px solid #d4a017;border-radius:14px;padding:12px 14px;margin:0 0 10px"><div style="font-weight:800;color:#92400e;font-size:16px">🎉 অফার</div>'+list.map(function(o){
+    var w=offerWhen(o);
+    return '<div style="background:#fff;border-radius:10px;padding:10px;margin-top:8px"><b>'+esc(o.title||"")+'</b><div style="font-size:14px;color:#444">'+esc(o.text||"")+'</div>'+(w?'<div style="font-size:12px;color:#92400e">'+w+'</div>':"")+'</div>';
+  }).join("")+'</div>';
 }
 function renderSpecials(){
   var el=document.getElementById("specials"); if(!el) return;
@@ -1962,7 +2002,7 @@ function doInstall(){
 if("serviceWorker" in navigator){ window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
 showInstallBanner();
 // ---- in-app update: new version prompt (v56) ----
-var APP_VER_NUM=70;
+var APP_VER_NUM=71;
 var PENDING_VER=0;
 function showUpdateBanner(){ var b=document.getElementById("updateBanner"); if(b) b.style.display="block"; }
 function dismissUpdate(){ var b=document.getElementById("updateBanner"); if(b) b.style.display="none"; try{ sessionStorage.setItem("mb-upd-dismissed", String(PENDING_VER)); }catch(e){} }
