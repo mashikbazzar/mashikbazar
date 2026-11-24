@@ -582,7 +582,7 @@ function groupList(){ var seen={}, out=[]; DATA.products.forEach(function(p){ if
 function groupName(gid){ var p=findProduct(gid); return p?p.name:""; }
 function groupVars(gid){ return variantsOf(groupName(gid)); }
 function selectedVariantG(gid){ var v=groupVars(gid); var id=selBrand[gid]; var f=null; if(id!==undefined){ v.forEach(function(x){ if(x.id===id) f=x; }); } return f||v[0]||null; }
-function setSelBrand(gid, id){ selBrand[gid]=parseInt(id,10); renderShop(); }
+function setSelBrand(gid, id){ var prev=selectedVariantG(gid); selBrand[gid]=parseInt(id,10); var v=selectedVariantG(gid); if(prev && v && prev.id!==v.id){ pickQty[gid]=isKgPriced(v)?kgStepOf(v):1; } renderShop(); }
 function nameBrandSelectG(gid){
   var vars=groupVars(gid);
   if(vars.length<=1) return (vars[0]&&vars[0].brand)?'<span class="brand">'+vars[0].brand+'</span>':"";
@@ -1962,7 +1962,7 @@ function doInstall(){
 if("serviceWorker" in navigator){ window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
 showInstallBanner();
 // ---- in-app update: new version prompt (v56) ----
-var APP_VER_NUM=69;
+var APP_VER_NUM=70;
 var PENDING_VER=0;
 function showUpdateBanner(){ var b=document.getElementById("updateBanner"); if(b) b.style.display="block"; }
 function dismissUpdate(){ var b=document.getElementById("updateBanner"); if(b) b.style.display="none"; try{ sessionStorage.setItem("mb-upd-dismissed", String(PENDING_VER)); }catch(e){} }
