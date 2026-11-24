@@ -1126,7 +1126,7 @@ function renderNeedCalc(){
       var qq=needQtyOf(i);
       h+='<div class="needrow"><div class="nm"><b>'+NEED_ITEMS[i].name+'</b><small>'+(v.brand||"ব্র্যান্ড ছাড়া")+' · '+(isKgPriced(v)?("৳"+bn(perKgPrice(v))+" / কেজি"):("৳"+bn(v.price_taka)+" / "+v.unit))+'</small></div><span class="qmini'+(isKgPriced(v)?" kgp":"")+'"><button onclick="needChg('+i+',-'+dispStep(v)+')" aria-label="কমান">−</button><span style="min-width:52px;text-align:center;font-weight:700">'+fmtQty(qq)+' '+dispUnit(v)+'</span><button onclick="needChg('+i+','+dispStep(v)+')" aria-label="বাড়ান">+</button></span><span class="needamt">৳ '+bn(needLineTotal(i))+'</span><button class="needadd" onclick="needAdd('+i+')">যোগ করুন</button></div>';
     }
-    h+='<div style="display:flex;justify-content:space-between;padding:12px 14px;background:#f7f9fc;font-size:16px"><span>মোট (সব পণ্য)</span><b style="color:#0a2a5e">৳ '+bn(needGrand())+'</b></div><div style="padding:0 14px 10px;background:#f7f9fc;font-size:13px;color:#555">+ ডেলিভারি চার্জ ৳'+bn(DATA.delivery_fee_taka||0)+' (চেকআউটে যোগ হবে)</div><button class="primary" style="width:calc(100% - 28px);margin:0 14px 14px" onclick="needAddAll()">🛒 সব কার্টে যোগ করুন</button>';
+    h+='<div style="display:flex;justify-content:space-between;padding:12px 14px;background:#f7f9fc;font-size:16px"><span>মোট (সব পণ্য)</span><b style="color:#0a2a5e">৳ '+bn(needGrand())+'</b></div><div style="padding:0 14px 10px;background:#f7f9fc;font-size:13px;color:#555">+ ডেলিভারি চার্জ ৳'+bn(effFee(needGrand()))+(effFee(needGrand())===0?' (ফ্রি ডেলিভারি)':' (চেকআউটে যোগ হবে)')+'</div><button class="primary" style="width:calc(100% - 28px);margin:0 14px 14px" onclick="needAddAll()">🛒 সব কার্টে যোগ করুন</button>';
   }
   h+='</div>';
   el.innerHTML=h;
@@ -1962,7 +1962,7 @@ function doInstall(){
 if("serviceWorker" in navigator){ window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
 showInstallBanner();
 // ---- in-app update: new version prompt (v56) ----
-var APP_VER_NUM=68;
+var APP_VER_NUM=69;
 var PENDING_VER=0;
 function showUpdateBanner(){ var b=document.getElementById("updateBanner"); if(b) b.style.display="block"; }
 function dismissUpdate(){ var b=document.getElementById("updateBanner"); if(b) b.style.display="none"; try{ sessionStorage.setItem("mb-upd-dismissed", String(PENDING_VER)); }catch(e){} }
