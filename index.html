@@ -526,7 +526,7 @@ function logVisit(ev, detail){
 }
 function waNumber(){ return (DATA.whatsapp||"01631421995").replace(/[^0-9]/g,"").replace(/^0/,"880"); }
 function findProduct(id){ var f=null; DATA.products.forEach(function(x){ if(String(x.id)===String(id)) f=x; }); return f; }
-function brandVariants(name){ return DATA.products.filter(function(x){ return x.name===name; }); }
+function brandVariants(name){ return activeProducts().filter(function(x){ return x.name===name; }); }
 function brandSelectHtml(p, fnName, arg){
   var vars=brandVariants(p.name);
   if(vars.length<=1) return (p.brand||"");
@@ -589,8 +589,10 @@ function add(id){ cart[id]=(cart[id]||0)+1; saveCart(); renderShop(); renderCart
 var pickQty={};
 var selBrand={};
 var CAT_EMOJI={"চাল ও আটা":"🌾","তেল ও ঘি":"🛢️","ডাল ও চিনি":"🫘","মসলা":"🌶️","সাবান ও পরিষ্কারক":"🧼","ব্যক্তিগত যত্ন":"🧴","চা ও পানীয়":"🍵","নাস্তা":"🍪","ঘরোয়া সামগ্রী":"🏠","অন্যান্য":"📦"};
-function variantsOf(name){ return DATA.products.filter(function(x){ return x.name===name; }); }
-function groupList(){ var seen={}, out=[]; DATA.products.forEach(function(p){ if(!seen[p.name]){ seen[p.name]=true; out.push(p.id); } }); return out; }
+function isActiveProd(p){ return p.active!==false; }
+function activeProducts(){ return DATA.products.filter(isActiveProd); }
+function variantsOf(name){ return activeProducts().filter(function(x){ return x.name===name; }); }
+function groupList(){ var seen={}, out=[]; activeProducts().forEach(function(p){ if(!seen[p.name]){ seen[p.name]=true; out.push(p.id); } }); return out; }
 function groupName(gid){ var p=findProduct(gid); return p?p.name:""; }
 function groupVars(gid){ return variantsOf(groupName(gid)); }
 function selectedVariantG(gid){ var v=groupVars(gid); var id=selBrand[gid]; var f=null; if(id!==undefined){ v.forEach(function(x){ if(x.id===id) f=x; }); } return f||v[0]||null; }
@@ -706,7 +708,7 @@ async function loadProductRatings(){
   if(!sb) return;
   try{
     var seen={}, names=[], firstId={};
-    DATA.products.forEach(function(p){ if(!seen[p.name]){ seen[p.name]=true; names.push(p.name); } if(!firstId[p.name]) firstId[p.name]=p.id; });
+    activeProducts().forEach(function(p){ if(!seen[p.name]){ seen[p.name]=true; names.push(p.name); } if(!firstId[p.name]) firstId[p.name]=p.id; });
     var CH=12;
     for(var s=0;s<names.length;s+=CH){
       var chunk=names.slice(s,s+CH);
@@ -727,7 +729,7 @@ function renderShop(){
   var nc=document.getElementById("nav-cats"); if(nc) nc.classList.toggle("on", curTab==="shop" && catView);
   var ns2=document.getElementById("nav-shop"); if(ns2) ns2.classList.toggle("on", curTab==="shop" && !catView);
   document.getElementById("shopTitle").textContent=(DATA.company||"নীড়")+" • "+(DATA.shop||"মাসিক বাজার");
-  var fc=document.getElementById("footCounts"); if(fc && liveLoaded) fc.textContent="🛒 "+bn(groupList().length)+"টি পণ্য • "+bn(DATA.products.length)+"টি ব্র্যান্ড";
+  var fc=document.getElementById("footCounts"); if(fc && liveLoaded) fc.textContent="🛒 "+bn(groupList().length)+"টি পণ্য • "+bn(activeProducts().length)+"টি ব্র্যান্ড";
   renderFeedback();
   var lh=document.getElementById("loginHint");
   if(lh){ lh.innerHTML = getCustomer()? "" : '<div class="note">🔑 <b>লগইন করলে আপনার অর্ডার সেভ থাকবে</b> — ফোন বদলালেও দেখা যাবে। <button class="primary" style="padding:8px 14px" onclick="showTab(\'orders\')">লগইন করুন</button></div>'; }
@@ -754,7 +756,7 @@ function renderShop(){
   } else if(catView){
     el.className="";
     var seenN={}, cc={};
-    DATA.products.forEach(function(p){ if(!seenN[p.name]){ seenN[p.name]=true; cc[p.category]=(cc[p.category]||0)+1; } });
+    activeProducts().forEach(function(p){ if(!seenN[p.name]){ seenN[p.name]=true; cc[p.category]=(cc[p.category]||0)+1; } });
     var cats=CATS.filter(function(c){ return cc[c]; });
     el.innerHTML=cats.map(function(c){ return '<button class="catrow" onclick="pickCat(\''+c+'\')"><span class="catem">'+(CAT_EMOJI[c]||"🛒")+'</span><span class="catname">'+c+'</span><span class="catcount">'+bn(cc[c])+'টি পণ্য</span><span class="catarrow">›</span></button>'; }).join("")||"<p>কোনো ক্যাটাগরি পাওয়া যায়নি।</p>";
     var s2=document.getElementById("specials"); if(s2) s2.innerHTML="";
@@ -1093,7 +1095,7 @@ function nextSlotText(){
 var specialsOpen=false;
 function specialGroups(){
   var seen={}, out=[];
-  DATA.products.forEach(function(p){
+  activeProducts().forEach(function(p){
     if(p.special && !seen[p.name]){ seen[p.name]=true; out.push(p.id); }
   });
   return out;
@@ -1633,7 +1635,7 @@ function findCategoryByText(q){
 }
 function categoryListText(cat){
   var names=[]; var seen={};
-  DATA.products.forEach(function(p){ if(p.category===cat && !seen[p.name]){ seen[p.name]=1; names.push(p); } });
+  activeProducts().forEach(function(p){ if(p.category===cat && !seen[p.name]){ seen[p.name]=1; names.push(p); } });
   if(!names.length) return "“"+cat+"” ক্যাটাগরিতে এখন কোনো পণ্য নেই।";
   var lines=names.map(function(p){
     var vars=variantsOf(p.name);
@@ -1647,7 +1649,7 @@ function categoryListText(cat){
 function categoriesOverviewText(){
   var lines=CATS.map(function(c){
     var n=0; var seen={};
-    DATA.products.forEach(function(p){ if(p.category===c && !seen[p.name]){ seen[p.name]=1; n++; } });
+    activeProducts().forEach(function(p){ if(p.category===c && !seen[p.name]){ seen[p.name]=1; n++; } });
     return n?("• "+c+" — "+bn(n)+"টি পণ্য"):null;
   }).filter(function(x){ return x; });
   return "🛒 মাসিক বাজারে মোট "+bn(groupList().length)+"টি পণ্য আছে, "+bn(lines.length)+"টি ক্যাটাগরিতে:\n"+lines.join("\n")+"\nকোনো ক্যাটাগরির নাম লিখুন (যেমন: 'মসলায় কী কী আছে'), আমি সেই তালিকা দেবো।";
@@ -2027,7 +2029,7 @@ function doInstall(){
 if("serviceWorker" in navigator){ window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
 showInstallBanner();
 // ---- in-app update: new version prompt (v56) ----
-var APP_VER_NUM=74;
+var APP_VER_NUM=75;
 setTimeout(function(){var s=document.getElementById("splash");if(!s)return;s.classList.add("hide");setTimeout(function(){s.remove();},500);},2000);
 var PENDING_VER=0;
 function showUpdateBanner(){ var b=document.getElementById("updateBanner"); if(b) b.style.display="block"; }
