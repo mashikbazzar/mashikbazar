@@ -120,6 +120,10 @@ footer{text-align:center;color:#555;padding:16px;font-size:14px}
 #poPaper table{width:100%;border-collapse:collapse;margin:10px 0}
 #poPaper th,#poPaper td{border:1px solid #ccc;padding:6px 8px;font-size:15px;text-align:left;vertical-align:top}
 #poPaper th{background:#f5f3ff;color:#6d28d9}
+#bulkPaper{background:#fff;max-width:640px;margin:0 auto;padding:20px;border-radius:8px;color:#111;overflow-x:auto}
+#bulkPaper table{width:100%;border-collapse:collapse;margin:10px 0}
+#bulkPaper th,#bulkPaper td{border:1px solid #ccc;padding:6px 8px;font-size:15px;text-align:left;vertical-align:top}
+#bulkPaper th{background:#f5f3ff;color:#6d28d9}
 #memoPaper{background:#fff;max-width:640px;margin:0 auto;padding:20px;border-radius:8px;color:#111}
 #memoPaper table{width:100%;border-collapse:collapse;margin:10px 0}
 #memoPaper th,#memoPaper td{border:1px solid #ccc;padding:6px 8px;font-size:15px;text-align:left;vertical-align:top}
@@ -182,12 +186,16 @@ section h2{color:#6d28d9}
   /* supplier price rows: text block takes its own full-width line on a phone,
      otherwise the 4 action buttons squeeze it to one letter per line */
   #supplierPrices .listrow .n{flex:1 1 100%}
+  /* package item rows: same squeeze fix — the name takes its own full-width
+     line on a phone, otherwise qty input + buttons squeeze it to one letter per line */
+  #adminPackages .listrow .n{flex:1 1 100%}
   #supplierPrices .listrow>button.gold{flex:1 1 100%}
   #supplierPrices .listrow>a{flex:1 1 45%}
   #supplierPrices .rowprice input[type=number]{flex:1 1 35%}
   #memoPaper{overflow-x:auto}
   #memoPaper th,#memoPaper td{padding:4px 6px;font-size:13px}
   #memoPaper input{max-width:64px}
+  #bulkPaper th,#bulkPaper td{padding:4px 6px;font-size:13px}
   .admintabs{gap:8px}
   .admintabs button{flex:1 1 30%;font-size:14px}
   .statgrid{gap:6px}
@@ -820,7 +828,7 @@ function showAdminTab(t, force){
   if(doLoad) __tabLastLoad[t]=Date.now();
   if(t==="dashboard" && doLoad) loadDashboard();
   if(t==="settings" && doLoad){ loadCoupons(); loadBulkTiers(); renderOffersAdmin(); }
-  if(t==="products") loadProductRatingsAdmin();
+  if(t==="products"){ renderAdminProducts(); loadProductRatingsAdmin(); }
   if(t==="daily") renderDailyList();
   if(t==="analytics" && doLoad) loadAnalytics();
   if(t==="orders" && doLoad) loadAdminOrders();
@@ -1158,6 +1166,9 @@ var draggedId=null;
 function groupNameA(gid){ if(__pendingProduct && __pendingProduct.id===gid) return __pendingProduct.name; var p=null; DRAFT.products.forEach(function(x){ if(x.id===gid) p=x; }); return p?p.name:""; }
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 var editGroupId=null;
+var __savedAt=0;
+function showSavedNote(){ __savedAt=Date.now(); }
+function savedNoteHtml(){ return (Date.now()-__savedAt<4000)?'<p class="small" style="color:#065f46;font-weight:700">✅ সংরক্ষণ হয়েছে — দাম কাস্টমারের কাছে লাইভ যাবে।</p>':""; }
 var adminProdCat="সব";
 function adminGroups(){
   var map={}, out=[];
@@ -1190,6 +1201,7 @@ function renderAdminProducts(){
     return true;
   });
   var h='<div class="chips">'+["সব"].concat(CATS).map(function(c){ return '<button class="chip'+(adminProdCat===c?' on':'')+'" onclick="setAdminProdCat(\''+c+'\')">'+c+'</button>'; }).join("")+'</div>';
+  h+=savedNoteHtml();
   h+='<p class="small">মোট '+bn(groups.length)+'টি পণ্য • '+bn(DRAFT.products.length)+'টি ব্র্যান্ড — বদলাতে পণ্যের কার্ডে চাপ দিন।'+((q||adminProdCat!=="সব")?(' এই তালিকায় '+bn(list.length)+'টি দেখাচ্ছে।'):"")+'</p>';
   var gidByName={}; groups.forEach(function(g){ gidByName[g.name]=g.gid; });
   var lowStock=DRAFT.products.filter(function(p){ return (p.stock_qty||0)>0 && (p.stock_qty||0)<=5; });
@@ -1200,7 +1212,7 @@ function renderAdminProducts(){
   }
   h+=list.map(function(g){
     var brands=g.vars.map(function(v){ var b=(v.brand||"").trim(); return '<div class="brandrow">'+(b?'<span class="bname">'+esc(b)+'</span>':'<span class="bunit">ব্র্যান্ড ছাড়া • '+esc(v.unit||"")+'</span>')+'<span class="bprices"><span class="pr">খুচরা ৳'+bn(v.price_taka||0)+'</span><span class="pw">পাইকারি ৳'+bn(v.wholesale_price||0)+'</span></span></div>'; }).join("");
-    return '<div class="pcard" onclick="openGroupEdit('+g.gid+')"><div>'+(CAT_EMOJI[g.category]||"🛒")+' <b>'+esc(g.name)+'</b>'+(g.vars.some(function(v){ return v.special; })?' ⭐':'')+(isDailyGid(g.gid)?' 🌅':'')+' <span class="pcat">• '+esc(g.category)+'</span></div><div class="pbrands">'+brands+'</div><div class="pacts"><button class="primary" onclick="event.stopPropagation();openGroupEdit('+g.gid+')">✏️ বদলান</button><button class="ghost" onclick="event.stopPropagation();moveGroup('+g.gid+',-1)">↑ ওপরে</button><button class="ghost" onclick="event.stopPropagation();moveGroup('+g.gid+',1)">↓ নিচে</button></div></div>';
+    return '<div class="pcard"'+(groupHidden(g)?' style="opacity:.55;background:#f3f4f6"':'')+' onclick="openGroupEdit('+g.gid+')"><div>'+(CAT_EMOJI[g.category]||"🛒")+' <b>'+esc(g.name)+'</b>'+(g.vars.some(function(v){ return v.special; })?' ⭐':'')+(isDailyGid(g.gid)?' 🌅':'')+(groupHidden(g)?' <span style="background:#fee2e2;color:#991b1b;border-radius:999px;padding:2px 8px;font-size:12px">নিস্ক্রিয়</span>':'')+' <span class="pcat">• '+esc(g.category)+'</span></div><div class="pbrands">'+brands+'</div><div class="pacts"><button class="primary" onclick="event.stopPropagation();openGroupEdit('+g.gid+')">✏️ বদলান</button><button class="ghost" onclick="event.stopPropagation();setGroupActive('+g.gid+','+(groupHidden(g)?'true':'false')+')">'+(groupHidden(g)?'▶️ দেখান':'⏸️ লুকান')+'</button><button class="ghost" onclick="event.stopPropagation();moveGroup('+g.gid+',-1)">↑ ওপরে</button><button class="ghost" onclick="event.stopPropagation();moveGroup('+g.gid+',1)">↓ নিচে</button></div></div>';
   }).join("")||"<p>কোনো পণ্য পাওয়া যায়নি।</p>";
   el.innerHTML=h;
 }
@@ -1228,6 +1240,7 @@ function renderPriceList(){
     return true;
   });
   var h='<div class="chips">'+["সব"].concat(CATS).map(function(c){ return '<button class="chip'+(adminProdCat===c?' on':'')+'" onclick="setAdminProdCat(\''+c+'\')">'+c+'</button>'; }).join("")+'</div>';
+  h+=savedNoteHtml();
   h+='<p class="small">মোট '+bn(groups.length)+'টি পণ্য • '+bn(DRAFT.products.length)+'টি ব্র্যান্ড। দাম লিখলেই সাথে সাথে সংরক্ষণ হবে আর কাস্টমারের কাছে কয়েক সেকেন্ডে লাইভ যাবে — আলাদা করে প্রকাশ করতে হবে না।</p>';
   h+='<div class="card" style="background:#eff6ff"><b>⚙️ মার্জিন দিয়ে খুচরা দাম বসান</b><div style="display:flex;gap:8px;margin-top:8px;align-items:center"><input id="marginPct2" type="number" min="0" placeholder="লাভের হার % (যেমন: ১০)" style="flex:1"><button class="gold" onclick="applyMargin2()">সব খুচরা দাম বসান</button></div><p class="small">পাইকারি দাম থেকে খুচরা দাম হিসাব হবে (পাইকারি × (১০০+লাভ%) ÷ ১০০)। যাদের পাইকারি দাম নেই, তাদের দাম বদলাবে না।</p></div>';
   h+=list.map(function(g){
@@ -1261,7 +1274,8 @@ function applyMargin3(btn){
   alert("হয়ে গেছে — "+bn(n)+"টি পণ্যের খুচরা দাম বসানো হয়েছে ("+bn(pct)+"% লাভে)। যাদের পাইকারি দাম নেই, তাদের দাম বদলায়নি। দাম কাস্টমারের কাছে ইতিমধ্যে লাইভ — প্রকাশ শুধু অফলাইন ব্যাকআপ ফাইল আপডেট করে।");
 }
 function renderGroupEdit(g){
-  var h='<button class="ghost" onclick="closeGroupEdit()">← পণ্যের তালিকা</button>';
+  var h='<button class="ghost" onclick="closeGroupEdit()">← পণ্যের তালিকা</button> <button class="primary" onclick="closeGroupEdit()">💾 সংরক্ষণ ও ফিরুন</button>';
+  h+=savedNoteHtml();
   h+='<h3>✏️ '+esc(g.name||"নতুন পণ্য")+'</h3>';
   h+='<p class="small">যা বদলাবেন, তা সাথে সাথে সংরক্ষণ হবে আর কাস্টমারের কাছে কয়েক সেকেন্ডে লাইভ যাবে।</p>';
   h+='<label>পণ্যের নাম</label><input value="'+esc(g.name)+'" onchange="renameGroup('+g.gid+',this.value)" placeholder="যেমন: সয়াবিন তেল">';
@@ -1283,7 +1297,7 @@ function renderGroupEdit(g){
   });
   h+='<button class="gold" onclick="addVariant('+g.gid+')">＋ ব্র্যান্ড যোগ করুন</button> ';
   h+='<button class="danger" onclick="delGroup('+g.gid+')">'+(pendingDelGroup===g.gid?'নিশ্চিত? পণ্যটি মুছুন':'🗑️ পণ্যটি মুছুন')+'</button><br><br>';
-  h+='<button class="ghost" onclick="closeGroupEdit()">← পণ্যের তালিকা</button>';
+  h+='<button class="primary" onclick="closeGroupEdit()">💾 সংরক্ষণ ও ফিরুন</button> <button class="ghost" onclick="closeGroupEdit()">← পণ্যের তালিকা</button>';
   return h;
 }
 function renameGroup(gid, newName){
@@ -1351,6 +1365,13 @@ function setGroupDaily(gid, on){
   var i=DRAFT.daily_order.indexOf(gid);
   if(on && i<0) DRAFT.daily_order.push(gid);
   if(!on && i>=0) DRAFT.daily_order.splice(i,1);
+  saveDraft(); renderAdminProducts();
+}
+function groupHidden(g){ return g.vars.length>0 && g.vars.every(function(v){ return v.active===false; }); }
+function setGroupActive(gid, on){
+  if(!DRAFT) return;
+  var name=groupNameA(gid); if(!name) return;
+  DRAFT.products.forEach(function(p){ if(p.name===name) p.active=!!on; });
   saveDraft(); renderAdminProducts();
 }
 function addDailyProduct(gid){
@@ -1500,7 +1521,7 @@ function editProduct(id, field, val){
   }
   DRAFT.products.forEach(function(p){ if(p.id===id){ p[field]=(field==="price_taka"||field==="wholesale_price"||field==="stock_qty")?(parseInt(val,10)||0):val; } });
   recalcPackages(DRAFT); if(field==="wholesale_price") markWsManual(id, +val||0);
-  saveDraft(); renderAdminPackages();
+  saveDraft(); renderAdminPackages(); showSavedNote(); renderAdminProducts();
 }
 var pendingDelId=null, pendingDelTimer=null;
 function delProduct(id){
